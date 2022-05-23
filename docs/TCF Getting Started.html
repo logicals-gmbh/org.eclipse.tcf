@@ -1,0 +1,298 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <title>Target Communication Framework: Getting Started</title>
+</head>
+
+<body lang='EN-US'>
+
+<h1>Target Communication Framework: Getting Started</h1>
+
+<p>Copyright (c) 2007-2019 Wind River Systems, Inc. and others. Made available under the EPL 2.0<br/>
+Agent portion made available under your choice of EPL 2.0 or EDL v1.0 dual-license.</p>
+<p>Direct comments, questions to the <a href="https://dev.eclipse.org/mailman/listinfo/tcf-dev">tcf-dev@eclipse.org</a> mailing list</p>
+
+<h2>Table of Contents</h2>
+<ul>
+    <li><a href='#Workspace'>Creating an Eclipse Workspace for Development</a>
+    <li><a href='#Plugins'>TCF Plugins</a>
+    <li><a href='#TE_Plugins'>Target Explorer Plugins</a>
+    <li><a href='#Agent'>Building TCF Agent</a>
+    <li><a href='#TcfPython'>TCF Integration with Python</a>
+    <li><a href='#TcfLua'>TCF Integration with Lua</a>
+    <li><a href='#Browsing'>Browsing Agent Source Code in CDT</a>
+    <li><a href='#TE'>Using TCF With Target Explorer</a>
+    <li><a href='#Debugger'>Using TCF With Eclipse Debugger</a>
+    <li><a href='#RSE'>Using TCF With Remote System Explorer</a>
+</ul>
+
+<h2><a name='Workspace'>Creating an Eclipse Workspace for Development</a></h2>
+
+<p>Eclipse can be used for developing clients for TCF in Java.
+The TCF host side code is organized into several Eclipse plug-in projects,
+below are steps to create and populate an Eclipse workspace with TCF projects:</p>
+
+<ul>
+   <li>Install <b>JDK 1.7.0</b> or later, recommended 1.8.0</li>
+   <li>Install <b>Eclipse SDK 3.8.2</b> or later, last tested with 4.7, recommended 4.7<br>
+       <a href='http://download.eclipse.org/eclipse/downloads/'>http://download.eclipse.org/eclipse/downloads/</a></li>
+   <li>Run Eclipse:
+      <pre>eclipse.exe -vm &lt;JDK path&gt;/bin/javaw.exe -data &lt;Workspace path&gt; -vmargs -Xmx1024M</pre>
+   <li>Open the "Java" perspective.
+   <li>In "Package Explorer" view: do right click and then select "Import...".<ul>
+     <li>If EGit is installed, choose "Git", otherwise choose "General/Existing Projects into Workspace" and click "Next".</li>
+     <li>Clone TCF Java code from <a href='http://git.eclipse.org/c/tcf/org.eclipse.tcf.git'>Eclipse GIT repository</a>.
+   If you intend contributing, best get an account from <a href="">Eclipse Gerrit</a>, sign the CLA, and use the
+   https: URL with your username below. Alternatively, anonymous access is possible as well from any of the below:
+       <pre>
+git clone https://&lt;user&gt;@git.eclipse.org/r/a/tcf/org.eclipse.tcf
+git clone ssh://&lt;user&gt;@git.eclipse.org:29418/tcf/org.eclipse.tcf
+git clone https://git.eclipse.org/r/tcf/org.eclipse.tcf
+git clone git://git.eclipse.org/gitroot/tcf/org.eclipse.tcf
+       </pre></ul></li>
+   <li>Setting the Target Platform:<ul>
+     <li>For import, select root directory: &lt;TCF Root&gt;/admin, and click "Next".
+     <li>From the (admin project)/target-defs/*.target , choose the intended Target Platform and "Open With" &gt; "Target Editor"</li>
+     <li>In the Target Editor, choose "Reload" and "Set as Target Platform". This pulls in all required as well as optional dependencies, along with SWTBot for testing:<ul>
+       <li><b>Optional</b> dependencies for TCF/CDT and TCF/RSE integration: these are not required by
+       TCF itself or TCF based debugger.
+       <ul>
+       <li><b>CDT (C/C++ Development Tools) SDK 8.1</b> or later, last tested with 8.3, recommended 9.3<br>
+       <a href='http://www.eclipse.org/cdt/downloads.php'>http://www.eclipse.org/cdt/downloads.php</a>
+       <li><b>RSE (Remote System Explorer) SDK 3.4</b> or later, last tested with 3.7, recommended 3.7.3<br>
+       <a href='http://download.eclipse.org/tm/downloads/'>http://download.eclipse.org/tm/downloads/</a>
+       </ul>
+     </li></ul></li></ul></li>
+   <li>In "Package Explorer" view: do right click and then select "Import...".
+   <li>Select "General/Existing Projects into Workspace" and click "Next".
+   <li>Select root directory: &lt;TCF Root&gt;/plugins, and click "Next".
+       <ul>
+       <li>If CDT is not installed, don't import the following plugins into your workspace:
+           <ul>
+           <li>org.eclipse.tcf.cdt.ui
+           </ul>
+       <li>If RSE is not installed, don't import the following plugins into your workspace:
+           <ul>
+           <li>org.eclipse.tcf.rse
+           </ul>
+       </ul>
+    <li>Optional: From <b>Window &gt; Preferences &gt; PDE &gt; API Baselines</b>, pick the admin/target-defs/<b>tcf-baseline.target</b>,
+        to get proper warnings and errors about proper API versioning and @since tags.</li>
+</ul>
+
+<h2><a name='Plugins'>TCF Plugins</a></h2>
+
+<p>TCF plugins source code is stored in <code>&lt;TCF Root&gt;/plugins</code> directory.<br>
+Examples source code is stored in <code>&lt;TCF Root&gt;/examples</code> directory.
+
+<dl>
+    <dt><b>org.eclipse.tcf</b>
+    <dd>This is the main TCF plugin. It contains Eclipse integration code for the framework.
+    It is the only TCF plugin, which (together with its fragments) should be required by a TCF client. The rest of TCF plugins are
+    clients developed as a reference implementation or for demonstration purposes.
+    <p>
+    <dt><b>org.eclipse.tcf.core</b>
+        <dd>This is a fragment of <b>org.eclipse.tcf</b> plugin. It contains the framework itself and interfaces for standard services.
+        The Java code in the fragment does not have any Eclipse dependencies and can be used outside Eclipse.
+        <p>
+    <dt><b>org.eclipse.tcf.debug, org.eclipse.tcf.debug.ui</b>
+    <dd>This code connects Eclipse Debug Framework and Target Communication Framework.
+    It allows to launch Eclipse debug session by connecting to a target running TCF agent,
+    and then perform basic debugging tasks, like resuming, suspending, single-stepping, setting/removing breakpoints, etc.
+    The code can be used as a reference for developing new TCF clients.
+    <p>
+    <dt><b>org.eclipse.tcf.rse</b>
+    <dd>This optional plugin allows Remote System Explorer (RSE) to connect to remote machines using TCF as communication protocol.
+    It includes implementation of RSE services as TCF clients.
+    <p>
+    <dt><b>org.eclipse.tcf.cdt.ui</b>
+    <dd>This optional plugin improves integration between CDT and TCF debugger.
+    It helps to search for CDT projects and executable files when creating TCF launch configuration.
+    <p>
+    <dt><b>org.eclipse.tcf.examples.daytime</b>
+    <dd>This is an example plugin.
+    The Example shows how TCF/Java binding can be extended for a new, user defined service.
+    The plugin provides Java binding for DayTime service.
+    Also, see directory <code>&lt;TCF Root&gt;/examples/org.eclipse.tcf.examples.daytime.agent</code>
+    for example code of a customized TCF agent, which implements DayTime service.
+</dl>
+
+<p>Pre-built TCF plugins are available at Eclipse Update site/p2 repositories. The repositories can be accessed from Eclipse using Help/Install New Software command.
+<ul>
+    <li>TCF 1.0 maintenance build, requires Eclipse 3.8 or 4.2: http://download.eclipse.org/tools/tcf/builds/1.0/nightly
+    <li>TCF 1.1 maintenance build, requires Eclipse 3.8 or 4.2: http://download.eclipse.org/tools/tcf/builds/1.1/nightly
+    <li>TCF latest development build: http://download.eclipse.org/tools/tcf/builds/development/nightly
+</ul>
+
+<h2><a name='TE_Plugins'>Target Explorer Plugins</a></h2>
+
+<p>Target Explorer plugins source code is stored in the <code>&lt;TCF Root&gt;/target_explorer/plugins</code> directory.
+<p>Target Explorer 1.1 nightly build: http://download.eclipse.org/tools/tcf/builds/development/nightly
+
+<h2><a name='Agent'>Building TCF Agent</a></h2>
+
+Clone TCF C code from <a href='http://git.eclipse.org/c/tcf/org.eclipse.tcf.agent.git'>Eclipse GIT repository</a>, using one of the following commands:
+<pre>
+git clone git://git.eclipse.org/gitroot/tcf/org.eclipse.tcf.agent.git
+git clone ssh://&lt;user&gt;@git.eclipse.org/gitroot/tcf/org.eclipse.tcf.agent.git
+git clone http://git.eclipse.org/gitroot/tcf/org.eclipse.tcf.agent.git
+</pre>
+
+<p><b>CDT</b> can be used to build TCF agent.
+CDT .project file is located in <code>&lt;TCF Root&gt;/agent</code> directory.
+
+<p><b>Linux</b>: To build the agent:
+<ul>
+   <li>Check that SSL and UUID libraries are installed. Fedora package names are: openssl, openssl-devel, libuuid, libuuid-devel.
+   <li>Run <code>make</code> command in <code>&lt;TCF Root&gt;/agent</code> directory.
+   <li>Start agent: <pre>obj/GNU/Linux/i686/Debug/agent -L- -l0</pre>
+       Use other -l option values to increase agent log details level.
+</ul>
+
+<p><b>Windows</b>: For building the agent, there are two possibilities:<ul>
+<li>Building with gcc (freely available from <a href="http://wascana.sourceforge.net/">Wascana</a>,
+<a href="http://www.cygwin.com">Cygwin</a> or the
+<a href="http://www.mingw.org/">MinGW32 project</a>): run
+<pre>make</pre> or <pre>make OPSYS=Msys</pre>
+in the agent directory.</li>
+
+<li>Building with Microsoft Visual C++:
+open workspace file <code>&lt;TCF Root&gt;/agent/agent.sln</code>
+and then build and run the agent using Development Studio commands. If getting an error about
+<tt>IPHlpApi.h</tt> missing, you'll need to install the latest
+<a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=0BAF2B35-C656-4969-ACE8-E4C0C0716ADB&displaylang=en">MS Platform SDK</a>.
+For the free <a href="http://www.microsoft.com/express/vc/">Visual C++ Express Edition</a>, the
+following changes in settings may be necessary:<ul>
+  <li>Project &gt; Properties &gt; C/C++ &gt; Preprocessor &gt; Preprocessor Definitions:
+       add <tt>_CRT_SECURE_NO_DEPRECATE</tt></li>
+  <li>Project &gt; Properties &gt; Linker &gt; Input &gt; Additional Dependencies :
+       add <tt>shell32.lib</tt></li>
+</ul></li>
+</ul></p>
+
+<p>On <b>VxWorks</b>, the SysMonitor service (needed for RSE Processes Demo) is not yet implemented.<br/>
+To build the agent: Use Wind River Workbench 3.0 or 3.1, and VxWorks 6.6 or 6.7 to create a Kernel Module
+project out of source code in <code>&lt;TCF Root&gt;/agent</code> directory. Use Workbench
+commands to build and run the agent. To run the agent on VxWorks Simulator
+you will need to setup a simulated network - see Networking with the VxWorks Simulator chapter
+in Wind River VxWorks Simulator user's guide for details.</p>
+
+<h2><a name='TcfPython'>TCF Integration with Python</a></h2>
+
+<p>The TCF integration with Python allows writing TCF client and server programs in the Python programming lanugage.
+TCF Python code is stored in &lt;TCF Root&gt;/python directory.
+
+<h2><a name='TcfLua'>TCF Integration with Lua</a></h2>
+
+<p>The TCF integration with Lua allows writing TCF client and server programs in the Lua programming lanugage.
+See <a href='TCF Lua Integration.html'>TCF Lua Integration</a> for details.
+
+<h2><a name='Browsing'>Browsing Agent Source Code in CDT</a></h2>
+On Linux, the default configuration from the CDT .project file included in TCF
+should be fine for correctly browsing the agent source code.
+<p>
+On Windows, open Project Properties of the agent project, and under C/C++ General &gt;
+Indexer switch the configuration to "Win32 - Cygwin" or "Win32 - DevStudio"
+as needed.
+<p>
+For VxWorks, browsing should be configured automatically through the WR Workbench
+Kernel Module Project.
+
+<h2><a name='TE'>Using TCF With Target Explorer</a></h2>
+
+<p>The Target Explorer aims to create a lightweight but highly flexible and extensible remote system management
+framework. The focus is on TCF remote system management, but is by no means limited to it. The Target Explorer comes
+with full remote file system and remote process support, and allows to connect a terminal to the remote system using
+TCF, SSH, Telnet and serial line.
+
+<p>If building from source, import all <b>org.eclipse.tcf.te.*</b> plug-in's to enable the Target Explorer.
+
+<p>Since Eclipse version 3.8, Target Explorer is available for download from main Eclipse p2 repository.
+The feature name is "Mobile and Device Development / Target Explorer, TCF".
+
+<p>To connect a remote machine over TCF:</p>
+<ul>
+   <li>Make sure TCF agent is running on remote machine.
+   <li>Run Eclipse with Target Explorer and TCF plugins installed.
+   <li>In Eclipse, do "Window/Open Perspective/Target Explorer" command.
+   <li>If the remote machine is on the same subnet as the host, than expand the "Neighborhood" and/or "My Targets"
+       nodes in the "Target Explorer" view to select the remote machine.
+   <li>If the remote machine is not on the same subnet as the host, In "Target Explorer" view: press "CTRL+N" or click on the "New wizard" button in the views toolbar.
+   <li>In "New" dialog box: select "Peer" and press "Next" button.
+   <li>In the upcoming editor window, enter the "Peer Name" and "Host" - IP host name of the target machine.
+       Press "CTRL+S" to save the connection properties.
+   <li>New tabs "File System" and "Processes" should appear in editor.
+      <ul>
+         <li>To add the remote file system tree and/or running processes directly into the "Target Explorer" view,
+             select "Content..." from the views menu and enable "File System" and/or "Processes".
+      </ul>
+</ul>
+
+<h2><a name='Debugger'>Using TCF With Eclipse Debugger</a></h2>
+
+<p>Plugins <b>org.eclipse.tcf.debug</b> and <b>org.eclipse.tcf.debug.ui</b> allow to start a debug session
+by connecting to a machine runnning TCF agent. Plugin <b>org.eclipse.tcf.cdt.ui</b> handles integration of the debugger with CDT UI.
+
+<p>Since Eclipse version 3.8, TCF Debugger is available for download from main Eclipse p2 repository.
+The feature name is "Mobile and Device Development / Target Communication Framework, CDT Extender".
+
+<p>To start a debug session over TCF:</p>
+<ul>
+   <li>Make sure TCF agent is running on remote machine.
+   <li>Run Eclipse with TCF plugins installed.
+   <li>In Eclipse, do "Window/Open Perspective/Debug" command.
+   <li>Do "Run/Debug Configurations..." command.
+   <li>In "Debug Configurations" dialog box: select "Target Comminucation Framework" configuration type and press "New" button.
+   <li>Enter a name for the configuration.
+   <li>On "Target" page, uncheck "Run instance of..." and "Use local host...".
+   <li>Select a target machine in "Available targtes" list. The list shows targets autodetected on local network.
+   <li>Press "Run Diagnostics" button to test connectivity for selected target.
+   <li>On "Main" page, enter a program name to run in debug session, for example "/bin/ls".
+   <li>Press "Debug" to start the debugger.
+</ul>
+
+<p>The TCF Debugger implements advanced, asynchronous, transaction based retrieval and caching of remote data.
+The technology allows excellent data coherency and communication performance.
+
+<p>The debugger fully supports multi-threaded, multi-process, multi-core, whole system and multi-system debugging in a single debug session.
+
+<p>In TCF debug session, "Debug", "Breakpoints", "Registers", "Variables", "Expressions", "Memory" and "Modules" views are populated by the TCF debugger.
+"Disassembly" view and instruction level stepping are available if the agent supports it. Reverse execution is available if the agent supports it.
+TCF Trace view can be used to display TCF communication traffic. Remote process standard I/O is redirected to the Console view.
+Source level debugging is fully supported.
+</p>
+
+<h2><a name='RSE'>Using TCF With Remote System Explorer</a></h2>
+
+<p>Remote System Explorer is an Eclipse based component that allows users to create connections to remote machines and
+explore their file systems, see list of processes and access some other resources, like remote shells.
+Remote System Explorer has been designed as a flexible, extensible framework to which Eclipse plug-in developers can
+contribute their own system definitions, actions, etc.</p>
+
+<p>Plugin <b>org.eclipse.tcf.rse</b> enables use of Processes, Shells, Terminals and Files subsystems of Remote System Explorer over TCF.
+It also extends Processes subsystem to include CPU utilization data and some other process attributes in RSE views.</p>
+
+<p>Since Eclipse version 3.8, TCF-RSE is available for download from main Eclipse p2 repository.
+The feature name is "Mobile and Device Development / Target Communication Framework, RSE Extender".
+
+<p>To connect a remote machine over TCF:</p>
+<ul>
+   <li>Make sure TCF agent is running on remote machine.
+   <li>Run Eclipse with RSE and TCF plugins installed.
+   <li>In Eclipse, do "Window/Open Perspective/Remote System Explorer" command.
+   <li>In "Remote Systems" view: do right click and select "New/Connection..."
+   <li>In "New Connection" dialog box: select TCF and press "Next" button.
+   <li>Enter "Host name" - IP host name of the target machine, and "Connection name" - arbitrary string to name new connection.
+   Press "Finish" button.
+   <li>New connection should appear in "Remote Systems" view and it is ready to be explored.
+</ul>
+
+<p>RSE features supported by TCF connection:
+<ul>
+    <li>File Subsystem: full support, i.e. browse, upload, download, copy, move, delete
+    <li>Processes: browse, including parent/child relationship
+        <li>Terminals and Shells: supported, but without authentication, TCF terminal and shell inherit credentials of the TCF agent.
+</ul>
+
+</body>
+</html>

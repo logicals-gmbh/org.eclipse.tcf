@@ -1,0 +1,920 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Preference contributions -->   
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.tcf.te.launch.ui.internal.preferences.PreferencesInitializer"/>
+   </extension>
+
+<!-- Adapter factory contributions -->
+   <extension point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.tcf.te.launch.ui.model.LaunchNode"
+            class="org.eclipse.tcf.te.launch.ui.internal.adapters.AdapterFactory">
+         <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
+         <adapter type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
+      </factory>
+   </extension>
+
+<!-- Property tester contributions -->
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.launch.ui.internal.PropertyTester"
+            id="org.eclipse.tcf.te.launch.ui.propertytester.launchNode"
+            namespace="org.eclipse.tcf.te.launch.ui.model"
+            properties="isLaunchConfig,isLaunchConfigType,canDelete,canRefresh,isValidLaunchConfig"
+            type="org.eclipse.tcf.te.launch.ui.model.LaunchNode">
+      </propertyTester>
+   </extension>
+
+<!-- Service contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.services.services">
+      <service
+            class="org.eclipse.tcf.te.launch.ui.services.UIService"
+            id="org.eclipse.tcf.te.launch.uiservice">
+         <serviceType class="org.eclipse.tcf.te.runtime.services.interfaces.IUIService"/>
+         <enablement>
+            <or>
+               <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchModel"/>
+               <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+            </or>
+         </enablement>
+      </service>
+   </extension>
+   
+<!-- Editor page contributions -->
+   <extension point="org.eclipse.tcf.te.ui.views.editorPages">
+      <editorPage
+            class="org.eclipse.tcf.te.launch.ui.internal.pages.LaunchExplorerEditorPage"
+            name="%LauchEditorPage.name"
+            icon="icons/obj16/launches_root.gif"
+            id="org.eclipse.tcf.te.launch.ui.LaunchEditorPage">
+      </editorPage>
+   </extension>
+
+<!-- Navigator viewer contributions -->
+   <extension point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.tcf.te.launch.ui.navigator.project.*"
+                  isRoot="false"/>
+         </includes>
+      </viewerContentBinding>
+      <dragAssistant
+            class="org.eclipse.tcf.te.launch.ui.viewer.dnd.DragAssistant"
+            viewerId="org.eclipse.tcf.te.ui.views.View">
+      </dragAssistant>
+      <dragAssistant
+            class="org.eclipse.tcf.te.launch.ui.viewer.dnd.DragAssistant"
+            viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+      </dragAssistant>
+   </extension>
+   
+<!-- Navigator content contributions -->
+   <extension point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            id="org.eclipse.tcf.te.tcf.launch.ui.navigator.favorites.content"
+            name="%LaunchTree.name"
+            activeByDefault="true"
+            contentProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchFavoritesContentProvider"
+            labelProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeLabelProvider"
+            priority="lowest">
+         <triggerPoints>
+            <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
+         </triggerPoints>
+         <possibleChildren>
+            <instanceof value="java.lang.Object"/>
+         </possibleChildren>
+         <commonSorter class="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeViewerSorter"/>
+         <dropAssistant
+               class="org.eclipse.tcf.te.launch.ui.viewer.dnd.DropAssistant"
+               id="org.eclipse.tcf.te.launch.ui.navigator.dnd">
+            <possibleDropTargets>
+               <instanceof value="java.lang.Object"/>
+            </possibleDropTargets>
+         </dropAssistant>
+      </navigatorContent>
+   </extension>
+
+   <extension point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            id="org.eclipse.tcf.te.launch.ui.navigator.project.content"
+            name="%LaunchTree.name"
+      		icon="icons/obj16/launches_root.gif"
+            activeByDefault="false"
+            contentProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchNavigatorContentProvider"
+            labelProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeLabelProvider"
+            priority="lower">
+         <triggerPoints>
+         	<and>
+            	<instanceof value="org.eclipse.core.resources.IProject"/>
+            	<test property="org.eclipse.core.resources.open" value="true"/>
+            </and>
+         </triggerPoints>
+         <possibleChildren>
+            <instanceof value="java.lang.Object"/>
+         </possibleChildren>
+         <commonSorter
+               class="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeViewerSorter">
+         </commonSorter>
+         <actionProvider
+               class="org.eclipse.tcf.te.launch.ui.handler.OpenActionProvider"
+               id="org.eclipse.tcf.te.launch.ui.actions.open"
+               overrides="org.eclipse.ui.navigator.resources.OpenActions">
+	        <enablement>
+	           <and>
+                  <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                  <or>
+	                 <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+	                 <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
+	              </or>
+	           </and>
+            </enablement>
+         </actionProvider>
+         <dropAssistant
+               class="org.eclipse.tcf.te.launch.ui.viewer.dnd.DropAssistant"
+               id="org.eclipse.tcf.te.launch.ui.navigator.dnd">
+            <possibleDropTargets>
+               <instanceof value="java.lang.Object"/>
+            </possibleDropTargets>
+         </dropAssistant>
+      </navigatorContent>
+   </extension>
+
+<!-- Viewer contributions -->
+   <extension point="org.eclipse.tcf.te.ui.viewers">
+      <viewer
+            id="org.eclipse.tcf.te.launch.ui.viewer.launches"
+            autoExpandLevel="2"
+            contentProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchEditorContentProvider">
+         <creation>
+            <style name="SWT.FULL_SELECTION"/>
+            <style name="SWT.MULTI"/>
+         </creation>
+         <dragSupport
+               class="org.eclipse.tcf.te.launch.ui.viewer.dnd.DragSourceListener">
+            <operations>
+               <operation name="DND.DROP_COPY"/>
+               <operation name="DND.DROP_MOVE"/>
+               <operation name="DND.DROP_LINK"/>
+            </operations>
+            <transferTypes>
+               <transferType name ="LocalSelectionTransfer"/>
+            </transferTypes>
+         </dragSupport>
+         <dropSupport
+               class="org.eclipse.tcf.te.launch.ui.viewer.dnd.DropTargetListener">
+            <operations>
+               <operation name="DND.DROP_COPY"/>
+               <operation name="DND.DROP_MOVE"/>
+            </operations>
+            <transferTypes>
+               <transferType name ="LocalSelectionTransfer"/>
+            </transferTypes>
+         </dropSupport>
+      </viewer>
+      <columnContribution viewerId="org.eclipse.tcf.te.launch.ui.viewer.launches">
+         <column
+               id="launchConfigurations"
+               labelProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeLabelProvider"
+               name="%LauchEditorPage.column.name"
+               width="250">
+         </column>
+         <column
+               id="description"
+               labelProvider="org.eclipse.tcf.te.launch.ui.viewer.DescriptionColumnLabelProvider"
+               name="%LauchEditorPage.column.description"
+               width="300">
+         </column>
+         <column
+               visible="false"
+               id="lastLaunched"
+               labelProvider="org.eclipse.tcf.te.launch.ui.viewer.LastLaunchedColumnLabelProvider"
+               name="%LauchEditorPage.column.lastLaunched"
+               width="100">
+         </column>
+      </columnContribution>
+   </extension>
+
+<!-- Launches menu contributions -->
+   <extension point="org.eclipse.ui.menus">
+
+   <!-- Project explorer launches menu contributions -->
+      <menuContribution locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu">
+         <separator
+               name="group.new"
+               visible="true"/>
+         <menu 
+               id="org.eclipse.tcf.te.launch.ui.views.project.menu.new"
+               label="%New.menu.name">
+            <dynamic
+                  id="org.eclipse.tcf.te.launch.ui.views.project.dynamic.new"
+                  class="org.eclipse.tcf.te.launch.ui.handler.NewLaunchConfigurationContributionItem">
+            </dynamic>
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isMultiLaunchConfigOrType"/>
+            </visibleWhen>
+         </menu>
+         <separator
+               name="group.showIn"
+               visible="true"/>
+         <menu
+               id="org.eclipse.tcf.te.launch.ui.views.project.menu.showIn"
+               label="%ShowIn.menu.name"
+               mnemonic="%ShowIn.menu.mnemonic">
+            <command
+                  commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
+                  id="org.eclipse.tcf.te.launch.ui.views.project.commands.showInProperties"
+                  icon="icons/eview16/prop_ps.gif" 
+                  label="%Properties.menu.name"
+                  mnemonic="%Properties.menu.mnemonic"
+                  style="push">
+            </command>
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+            </visibleWhen>
+         </menu>
+         <separator
+               name="group.launch"
+               visible="true"/>
+         <dynamic
+               id="org.eclipse.tcf.te.launch.ui.views.project.dynamic.launch"
+               class="org.eclipse.tcf.te.launch.ui.handler.LaunchLaunchConfigurationContributionItem">
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+            </visibleWhen>
+         </dynamic>
+         <separator
+               name="group.open"
+               visible="true"/>
+         <menu 
+               id="org.eclipse.tcf.te.launch.ui.views.project.menu.open"
+               label="%Open.menu.name">
+            <dynamic
+                  id="org.eclipse.tcf.te.launch.ui.views.project.dynamic.open"
+                  class="org.eclipse.tcf.te.launch.ui.handler.OpenLaunchConfigurationContributionItem"/>
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isSingleLaunchConfigType"/>
+            </visibleWhen>
+         </menu>
+         <separator
+               name="group.openAs"
+               visible="true"/>
+         <menu 
+               id="org.eclipse.tcf.te.launch.ui.views.project.menu.openAs"
+               label="%OpenAs.menu.name">
+            <dynamic
+                  id="org.eclipse.tcf.te.launch.ui.views.project.dynamic.openAs"
+                  class="org.eclipse.tcf.te.launch.ui.handler.OpenLaunchConfigurationContributionItem">
+            </dynamic>
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+            </visibleWhen>
+         </menu>
+         <separator
+               name="group.delete"
+               visible="false"/>
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               id="org.eclipse.tcf.te.launch.ui.views.project.commands.delete"
+               label="%Delete.menu.name"
+               mnemonic="%Delete.menu.mnemonic"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="launch.expressions.isMultiLaunchConfig"/>
+            </visibleWhen>
+         </command>
+         <separator
+               name="group.refresh"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.launch.ui.views.project.commands.refresh"
+               label="%Refresh.menu.name"
+               mnemonic="%Refresh.menu.mnemonic"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="launch.expressions.isSingleLaunchNode"/>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+   <!-- Target explorer launches menu contributions -->
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.new">
+         <menu 
+               id="org.eclipse.tcf.te.ui.views.View.menu.new"
+               label="%New.menu.name">
+            <dynamic
+                  id="org.eclipse.tcf.te.launch.ui.views.target.dynamic.new"
+                  class="org.eclipse.tcf.te.launch.ui.handler.NewLaunchConfigurationContributionItem">
+               <visibleWhen>
+                  <reference definitionId="launch.expressions.isMultiLaunchConfigOrType"/>
+               </visibleWhen>
+            </dynamic>
+         </menu>
+      </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.launch">
+         <dynamic
+               id="org.eclipse.tcf.te.launch.ui.views.target.dynamic.launch"
+               class="org.eclipse.tcf.te.launch.ui.handler.LaunchLaunchConfigurationContributionItem">
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.edit">
+         <menu 
+               id="org.eclipse.tcf.te.launch.ui.views.target.menu.open"
+               label="%Open.menu.name">
+            <dynamic
+                  id="org.eclipse.tcf.te.launch.ui.views.target.dynamic.open"
+                  class="org.eclipse.tcf.te.launch.ui.handler.OpenLaunchConfigurationContributionItem"/>
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isSingleLaunchConfigType"/>
+            </visibleWhen>
+         </menu>
+         <menu 
+               id="org.eclipse.tcf.te.launch.ui.views.target.menu.openAs"
+               label="%OpenAs.menu.name">
+            <dynamic
+                  id="org.eclipse.tcf.te.launch.ui.views.target.dynamic.openAs"
+                  class="org.eclipse.tcf.te.launch.ui.handler.OpenLaunchConfigurationContributionItem"/>
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+            </visibleWhen>
+         </menu>
+      </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.delete">
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               disabledIcon="icons/dtool16/delete.png"
+               helpContextId="org.eclipse.tcf.te.ui.command_Delete"
+               icon="icons/etool16/delete.png"
+               id="org.eclipse.tcf.te.ui.commands.delete"
+               label="%command.delete.label"
+               mnemonic="%Delete.menu.mnemonic"
+               style="push"
+               tooltip="%command.delete.description">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="launch.expressions.isMultiLaunchConfig"/>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.launch.ui.views.project.commands.refresh"
+               label="%Refresh.menu.name"
+               mnemonic="%Refresh.menu.mnemonic"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="launch.expressions.isSingleLaunchNode"/>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+   <!-- Launches editor page menu contributions -->
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.launch.ui.LaunchEditorPage">
+         <separator
+               name="group.new"
+               visible="true"/>
+         <menu 
+               id="org.eclipse.tcf.te.launch.ui.editor.menu.new"
+               label="%New.menu.name">
+            <dynamic
+                  id="org.eclipse.tcf.te.launch.ui.editor.dynamic.new"
+                  class="org.eclipse.tcf.te.launch.ui.handler.NewLaunchConfigurationContributionItem">
+               <visibleWhen>
+                  <reference definitionId="launch.expressions.isMultiLaunchConfigOrType"/>
+               </visibleWhen>
+            </dynamic>
+         </menu>
+         <separator
+               name="group.showIn"
+               visible="true"/>
+         <menu
+               id="org.eclipse.tcf.te.launch.ui.editor.menu.showIn"
+               label="%ShowIn.menu.name"
+               mnemonic="%ShowIn.menu.mnemonic">
+            <command
+                  commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
+                  id="org.eclipse.tcf.te.launch.ui.editor.commands.showInProperties"
+                  icon="icons/eview16/prop_ps.gif" 
+                  label="%Properties.menu.name"
+                  mnemonic="%Properties.menu.mnemonic"
+                  style="push">
+               <visibleWhen>
+                  <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+               </visibleWhen>
+            </command>
+            <visibleWhen checkEnabled="true"/>
+         </menu>
+         <separator
+               name="group.launch"
+               visible="true"/>
+         <dynamic
+               id="org.eclipse.tcf.te.launch.ui.editor.dynamic.launch"
+               class="org.eclipse.tcf.te.launch.ui.handler.LaunchLaunchConfigurationContributionItem">
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+            </visibleWhen>
+         </dynamic>
+         <separator
+               name="group.edit"
+               visible="true"/>
+         <menu 
+               id="org.eclipse.tcf.te.launch.ui.editor.menu.open"
+               label="%Open.menu.name">
+            <dynamic
+                  id="org.eclipse.tcf.te.launch.ui.editor.dynamic.open"
+                  class="org.eclipse.tcf.te.launch.ui.handler.OpenLaunchConfigurationContributionItem"/>
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isSingleLaunchConfigType"/>
+            </visibleWhen>
+         </menu>
+         <menu 
+               id="org.eclipse.tcf.te.launch.ui.editor.menu.openAs"
+               label="%OpenAs.menu.name">
+            <dynamic
+                  id="org.eclipse.tcf.te.launch.ui.editor.dynamic.openAs"
+                  class="org.eclipse.tcf.te.launch.ui.handler.OpenLaunchConfigurationContributionItem">
+            </dynamic>
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+            </visibleWhen>
+         </menu>
+         <separator
+               name="group.delete"
+               visible="true"/>
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               id="org.eclipse.tcf.te.launch.ui.editor.commands.delete"
+               label="%Delete.menu.name"
+               mnemonic="%Delete.menu.mnemonic"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="launch.expressions.isMultiLaunchConfig"/>
+            </visibleWhen>
+         </command>
+         <separator
+               name="group.refresh"
+               visible="true"/>
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.launch.ui.editor.commands.refresh"
+               label="%Refresh.menu.name"
+               mnemonic="%Refresh.menu.mnemonic"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="launch.expressions.isSingleLaunchNode"/>
+            </visibleWhen>
+         </command>
+         <separator
+               name="group.categories"
+               visible="true"/>
+         <menu
+               id="org.eclipse.tcf.te.launch.ui.editor.menu.addTo"
+               label="%AddTo.menu.name">
+            <dynamic 
+                  id="org.eclipse.tcf.te.launch.ui.editor.dynamic.addTo.multi"
+                  class="org.eclipse.tcf.te.ui.views.handler.CategoryAddToContributionItem">
+               <visibleWhen checkEnabled="false">
+                  <with variable="selection">
+                     <test property="org.eclipse.tcf.te.ui.views.validAddToCategoriesCount" value="(1-"/>
+                     <iterate operator="and" ifEmpty="false">
+                        <adapt type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
+                     </iterate>
+                  </with> 
+               </visibleWhen>
+            </dynamic>
+            <visibleWhen>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+            </visibleWhen>
+         </menu>
+         <dynamic
+               id="org.eclipse.tcf.te.launch.ui.editor.dynamic.addTo.single"
+               class="org.eclipse.tcf.te.ui.views.handler.CategoryAddToContributionItem">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <test property="org.eclipse.tcf.te.ui.views.validAddToCategoriesCount" value="1"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <adapt type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+      
+   <!-- Launches editor page toolbar contributions -->
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.launch.ui.LaunchEditorPage">
+         <separator
+               name="group.run"
+               visible="false"/>
+         <command
+               commandId="org.eclipse.tcf.te.ui.launch.command.run"
+               id="org.eclipse.tcf.te.launch.ui.editor.toolbar.commands.run"
+               label="%command.run.label"
+               style="push"/>
+         <separator
+               name="group.debug"
+               visible="false"/>
+         <command
+               commandId="org.eclipse.tcf.te.ui.launch.command.debug"
+               id="org.eclipse.tcf.te.launch.ui.editor.toolbar.commands.debug"
+               label="%command.debug.label"
+               style="push"/>
+         <separator
+               name="group.launch"
+               visible="false"/>
+         <separator
+               name="group.delete"
+               visible="true"/>
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               id="org.eclipse.tcf.te.launch.ui.editor.toolbar.commands.delete"
+               label="%Delete.menu.name"
+               style="push"/>
+         <separator
+               name="group.refresh"
+               visible="false"/>
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.launch.ui.editor.toolbar.commands.refresh"
+               label="%Refresh.menu.name"
+               style="push"/>
+      </menuContribution>
+   </extension>
+
+<!-- Command contributions -->
+   <extension point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.attach.description"
+            id="org.eclipse.tcf.te.launch.command.attach"
+            helpContextId="org.eclipse.tcf.te.launch.command_Attach"
+            name="%command.attach.name"/>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.detach.description"
+            id="org.eclipse.tcf.te.launch.command.detach"
+            helpContextId="org.eclipse.tcf.te.launch.command_Detach"
+            name="%command.detach.name"/>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.run.description"
+            id="org.eclipse.tcf.te.ui.launch.command.run"
+            helpContextId="org.eclipse.tcf.te.ui.launch.command_Run"
+            name="%command.run.name"/>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.debug.description"
+            id="org.eclipse.tcf.te.ui.launch.command.debug"
+            helpContextId="org.eclipse.tcf.te.ui.launch.command_Debug"
+            name="%command.debug.name"/>
+   </extension>
+   
+<!-- Command image contributions -->
+   <extension point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.eclipse.tcf.te.ui.launch.command.run"
+            icon="icons/etool16/run_exc.png"
+            disabledIcon="icons/dtool16/run_exc.png"/>
+      <image
+            commandId="org.eclipse.tcf.te.ui.launch.command.debug"
+            icon="icons/etool16/debug_exc.png"
+            disabledIcon="icons/dtool16/debug_exc.png"/>
+      <image
+            commandId="org.eclipse.tcf.te.launch.command.attach"
+            disabledIcon="icons/dlcl16/attach.gif"
+            icon="icons/elcl16/attach.gif"/>
+      <image
+            commandId="org.eclipse.tcf.te.launch.command.detach"
+            disabledIcon="icons/dlcl16/detach.gif"
+            icon="icons/elcl16/detach.gif"/>
+   </extension>
+
+<!-- Handler contributions -->
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            commandId="org.eclipse.ui.navigator.Open"
+            class="org.eclipse.tcf.te.launch.ui.handler.LaunchDialogHandler">
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <or>
+                     <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                     <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                     <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
+                  </or>
+               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchConfig"/>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <iterate operator="and" ifEmpty="false">
+                  <and>
+                     <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.isValidLaunchConfig"/>
+                  </and>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            commandId="org.eclipse.ui.edit.delete"
+            class="org.eclipse.tcf.te.launch.ui.handler.DeleteHandler">
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <or>
+                     <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                     <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                     <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
+                  </or>
+               </with>
+               <reference definitionId="launch.expressions.isMultiLaunchConfig"/>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <iterate operator="and" ifEmpty="false">
+                  <and>
+                     <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.canDelete"/>
+                  </and>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            commandId="org.eclipse.tcf.te.ui.command.refresh"
+            class="org.eclipse.tcf.te.launch.ui.handler.RefreshHandler">
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <or>
+                     <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                     <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                     <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
+                  </or>
+               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchNode"/>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <iterate operator="and" ifEmpty="false">
+                  <and>
+                     <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.canRefresh"/>
+                  </and>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
+            class="org.eclipse.tcf.te.ui.views.handler.ShowInPropertiesHandler">
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <or>
+                     <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                     <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                     <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
+                  </or>
+               </with>
+               <reference definitionId="launch.expressions.isSingleLaunchConfigOrType"/>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler commandId="org.eclipse.tcf.te.ui.launch.command.run">
+         <class class="org.eclipse.tcf.te.launch.ui.handler.LaunchHandler">
+            <parameter name="mode" value="run"/>
+         </class>
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+               </with>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <count value="1"/>
+               <iterate  operator="and" ifEmpty="false">
+                  <and>
+                     <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.isValidLaunchConfig" value="run"/>
+                  </and>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler commandId="org.eclipse.tcf.te.ui.launch.command.debug">
+         <class class="org.eclipse.tcf.te.launch.ui.handler.LaunchHandler">
+            <parameter name="mode" value="debug"/>
+         </class>
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+               </with>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <count value="1"/>
+               <iterate  operator="and" ifEmpty="false">
+                  <and>
+                     <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+                     <test property="org.eclipse.tcf.te.launch.ui.model.isValidLaunchConfig" value="debug"/>
+                  </and>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+   </extension>
+
+<!-- Property tab contributions -->
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs contributorId="org.eclipse.tcf.te.ui">
+         <propertyTab
+               id="org.eclipse.tcf.te.launch.ui.propertytab.refprojects"
+               label="%ReferencedProjects.propertyTab.name"
+               category="org.eclipse.tcf.te"/>
+         <propertyTab
+               id="org.eclipse.tcf.te.launch.ui.propertytab.filetransfers"
+               label="%FileTransfers.propertyTab.name"
+               category="org.eclipse.tcf.te"/>
+         <propertyTab
+               id="org.eclipse.tcf.te.launch.ui.propertytab.general"
+               label="%General.propertyTab.name"
+               category="org.eclipse.tcf.te"/>
+      </propertyTabs>
+   </extension>
+
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs contributorId="org.eclipse.ui.navigator.ProjectExplorer">
+         <propertyTab
+               id="org.eclipse.tcf.te.launch.ui.project.propertytab.refprojects"
+               label="%ReferencedProjects.propertyTab.name"
+               category="general"/>
+         <propertyTab
+               id="org.eclipse.tcf.te.launch.ui.project.propertytab.filetransfers"
+               label="%FileTransfers.propertyTab.name"
+               category="general"/>
+         <propertyTab
+               id="org.eclipse.tcf.te.launch.ui.project.propertytab.general"
+               label="%General.propertyTab.name"
+               category="general"/>
+      </propertyTabs>
+   </extension>
+   
+<!-- Property section contributions -->
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections contributorId="org.eclipse.tcf.te.ui">
+         <propertySection
+               id="org.eclipse.tcf.te.launch.ui.launchconfigtype"
+               class="org.eclipse.tcf.te.launch.ui.internal.properties.LaunchConfigTypePropertiesSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.launch.ui.internal.properties.LaunchConfigTypeFilter"
+               tab="org.eclipse.tcf.te.launch.ui.propertytab.general"/>
+         <propertySection
+               id="org.eclipse.tcf.te.launch.ui.launchcontext"
+               class="org.eclipse.tcf.te.launch.ui.internal.properties.LaunchContextPropertiesSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.launch.ui.internal.properties.LaunchContextFilter"
+               tab="org.eclipse.tcf.te.launch.ui.propertytab.general"/>
+         <propertySection
+               id="org.eclipse.tcf.te.launch.ui.propertysection.refprojetcs"
+               class="org.eclipse.tcf.te.launch.ui.internal.properties.RefProjectsPropertiesSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.launch.ui.internal.properties.RefProjectsFilter"
+               tab="org.eclipse.tcf.te.launch.ui.propertytab.refprojects"/>
+         <propertySection
+               id="org.eclipse.tcf.te.launch.ui.propertysection.filetransfers"
+               class="org.eclipse.tcf.te.launch.ui.internal.properties.FileTransferPropertiesSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.launch.ui.internal.properties.FileTransferFilter"
+               tab="org.eclipse.tcf.te.launch.ui.propertytab.filetransfers"/>
+      </propertySections>
+   </extension>
+
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections contributorId="org.eclipse.ui.navigator.ProjectExplorer">
+         <propertySection
+               id="org.eclipse.tcf.te.launch.ui.project.launchconfigtype"
+               class="org.eclipse.tcf.te.launch.ui.internal.properties.LaunchConfigTypePropertiesSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.launch.ui.internal.properties.LaunchConfigTypeFilter"
+               tab="org.eclipse.tcf.te.launch.ui.project.propertytab.general"/>
+         <propertySection
+               id="org.eclipse.tcf.te.launch.ui.project.launchcontext"
+               class="org.eclipse.tcf.te.launch.ui.internal.properties.LaunchContextPropertiesSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.launch.ui.internal.properties.LaunchContextFilter"
+               tab="org.eclipse.tcf.te.launch.ui.project.propertytab.general"/>
+         <propertySection
+               id="org.eclipse.tcf.te.launch.ui.project.propertysection.refprojetcs"
+               class="org.eclipse.tcf.te.launch.ui.internal.properties.RefProjectsPropertiesSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.launch.ui.internal.properties.RefProjectsFilter"
+               tab="org.eclipse.tcf.te.launch.ui.project.propertytab.refprojects"/>
+         <propertySection
+               id="org.eclipse.tcf.te.launch.ui.project.propertysection.filetransfers"
+               class="org.eclipse.tcf.te.launch.ui.internal.properties.FileTransferPropertiesSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.launch.ui.internal.properties.FileTransferFilter"
+               tab="org.eclipse.tcf.te.launch.ui.project.propertytab.filetransfers"/>
+      </propertySections>
+   </extension>
+
+<!-- Reusable core expression fragments -->   
+   <extension point="org.eclipse.core.expressions.definitions">
+      <definition id="launch.expressions.isSingleLaunchConfigOrType">
+	      <with variable="selection">
+	         <count value="1"/>
+	         <iterate
+	               ifEmpty="false"
+	               operator="and">
+	            <and>
+                   <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                   <or>
+	                  <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+	                  <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
+	               </or>
+	            </and>
+	         </iterate>
+	      </with>
+      </definition>
+      <definition id="launch.expressions.isMultiLaunchConfigOrType">
+	      <with variable="selection">
+	         <iterate
+	               ifEmpty="false"
+	               operator="and">
+	            <and>
+                   <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                   <or>
+	                  <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+	                  <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
+	               </or>
+	            </and>
+	         </iterate>
+	      </with>
+      </definition>
+      <definition id="launch.expressions.isSingleLaunchConfig">
+          <with variable="selection">
+             <count value="1"/>
+             <iterate ifEmpty="false" operator="and">
+	            <and>
+                   <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                   <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                   <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+                </and>
+             </iterate>
+          </with>
+      </definition>
+      <definition id="launch.expressions.isMultiLaunchConfig">
+          <with variable="selection">
+             <iterate ifEmpty="false" operator="and">
+	            <and>
+                   <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                   <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                   <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfig"/>
+                </and>
+             </iterate>
+          </with>
+      </definition>
+      <definition id="launch.expressions.isSingleLaunchConfigType">
+          <with variable="selection">
+             <count value="1"/>
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+	            <and>
+                   <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+                   <test property="org.eclipse.tcf.te.launch.ui.model.isLaunchConfigType"/>
+                </and>
+             </iterate>
+          </with>
+      </definition>
+      <definition id="launch.expressions.isSingleLaunchNode">
+          <with variable="selection">
+             <count value="1"/>
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+             </iterate>
+          </with>
+      </definition>
+   </extension>
+
+</plugin>

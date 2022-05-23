@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Service contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.services.services">
+      <service
+            class="org.eclipse.tcf.te.tcf.launch.ui.internal.services.DebugService"
+            id="org.eclipse.tcf.te.tcf.launch.core.services.debug">
+         <serviceType
+               bundleId="org.eclipse.tcf.te.runtime.services"
+               class="org.eclipse.tcf.te.runtime.services.interfaces.IDebugService"/>
+         <enablement>
+            <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+         </enablement>
+      </service>
+   </extension>
+
+<!-- Launch configuration type contributions -->
+   <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+            icon="icons/obj16/remote_app.gif"
+            id="org.eclipse.tcf.te.tcf.launch.type.remote.app.image"/>
+      <launchConfigurationTypeImage
+            configTypeID="org.eclipse.tcf.te.tcf.launch.type.attach"
+            icon="icons/obj16/attach.gif"
+            id="org.eclipse.tcf.te.tcf.launch.type.attach.image"/>
+   </extension>
+
+<!-- Launch configuration tab group contributions -->
+   <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.eclipse.tcf.te.tcf.launch.ui.remote.app.LaunchConfigurationTabGroup"
+            id="org.eclipse.tcf.te.tcf.launch.type.remote.app.tabgroup"
+            type="org.eclipse.tcf.te.tcf.launch.type.remote.app"/>
+      <launchConfigurationTabGroup
+            class="org.eclipse.tcf.te.tcf.launch.ui.attach.LaunchConfigurationTabGroup"
+            id="org.eclipse.tcf.te.tcf.launch.type.attach.tabgroup"
+            type="org.eclipse.tcf.te.tcf.launch.type.attach"/>
+   </extension>
+   
+ <!-- Launch shortcut contributions -->
+   <extension point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            id="org.eclipse.tcf.te.tcf.launch.ui.launchshortcut.remote.app.run"
+            label="%LaunchShortcut.Remote.App.name"
+            icon="icons/obj16/remote_app.gif"
+            modes="run">
+         <class class="org.eclipse.tcf.te.launch.ui.handler.LaunchShortcutHandler">
+            <parameter name="typeId" value="org.eclipse.tcf.te.tcf.launch.type.remote.app"/>
+         </class>
+         <contextualLaunch>
+            <enablement>
+               <with variable="selection">
+                  <iterate ifEmpty="false">
+                     <test 
+                           forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
+                           value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+                           args="run"/>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+      <shortcut
+            id="org.eclipse.tcf.te.tcf.launch.ui.launchshortcut.remote.app.debug"
+            label="%LaunchShortcut.Remote.App.name"
+            icon="icons/obj16/remote_app.gif"
+            modes="debug">
+         <class class="org.eclipse.tcf.te.launch.ui.handler.LaunchShortcutHandler">
+            <parameter name="typeId" value="org.eclipse.tcf.te.tcf.launch.type.remote.app"/>
+         </class>
+         <contextualLaunch>
+            <enablement>
+               <with variable="selection">
+                  <iterate ifEmpty="false">
+                     <test 
+                           forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
+                           value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+                           args="debug"/>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
+
+<!-- Editor page contributions -->
+   <extension point="org.eclipse.tcf.te.ui.views.editorPages">
+      <editorPage
+            class="org.eclipse.tcf.te.tcf.launch.ui.editor.MemoryMapEditorPage"
+            name="%MemoryMapEditorPage.name"
+            id="org.eclipse.tcf.te.tcf.launch.ui.MemoryMapEditorPage">
+      </editorPage>
+
+      <editorPage
+            class="org.eclipse.tcf.te.tcf.launch.ui.editor.PathMapEditorPage"
+            name="%PathMapEditorPage.name"
+            id="org.eclipse.tcf.te.tcf.launch.ui.PathMapEditorPage">
+      </editorPage>
+
+      <editorPage
+            class="org.eclipse.tcf.te.tcf.launch.ui.editor.SourceLookupEditorPage"
+            name="%SourceLookupEditorPage.name"
+            id="org.eclipse.tcf.te.launch.ui.SourceLookupEditorPage">
+      </editorPage>
+   </extension>
+
+<!-- Editor page binding contributions -->
+   <extension point="org.eclipse.tcf.te.ui.views.editorPageBindings">
+      <editorPageBinding
+            id="org.eclipse.tcf.te.tcf.launch.ui.binding.LaunchEditorPage"
+            pageId="org.eclipse.tcf.te.launch.ui.LaunchEditorPage"
+            insertAfter="last">
+         <enablement>
+            <with variable="activeEditorInput">
+               <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                  <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="Processes"/>
+               </adapt>
+            </with>
+         </enablement>
+      </editorPageBinding>
+      <editorPageBinding
+            id="org.eclipse.tcf.te.tcf.launch.ui.binding.SourceLookupEditorPage"
+            pageId="org.eclipse.tcf.te.launch.ui.SourceLookupEditorPage"
+            insertBefore="org.eclipse.tcf.te.launch.ui.LaunchEditorPage">
+         <enablement>
+            <with variable="activeEditorInput">
+               <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                  <test property="org.eclipse.tcf.te.core.canAdaptTo" value="org.eclipse.debug.core.ILaunchConfiguration" args="forceAdapterLoad"/>
+               </adapt>
+            </with>
+         </enablement>
+      </editorPageBinding>
+      <editorPageBinding
+            id="org.eclipse.tcf.te.tcf.launch.ui.binding.PathMapEditorPage"
+            pageId="org.eclipse.tcf.te.tcf.launch.ui.PathMapEditorPage"
+            insertBefore="org.eclipse.tcf.te.launch.ui.SourceLookupEditorPage,org.eclipse.tcf.te.launch.ui.LaunchEditorPage">
+         <enablement>
+            <with variable="activeEditorInput">
+               <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                  <and>
+                     <test property="org.eclipse.tcf.te.core.canAdaptTo" value="org.eclipse.debug.core.ILaunchConfiguration" args="forceAdapterLoad"/>
+                     <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="PathMap"/>
+                  </and>
+               </adapt>
+            </with>
+         </enablement>
+      </editorPageBinding>
+      <editorPageBinding
+            id="org.eclipse.tcf.te.tcf.launch.ui.binding.MemoryMapEditorPage"
+            pageId="org.eclipse.tcf.te.tcf.launch.ui.MemoryMapEditorPage"
+            insertBefore="org.eclipse.tcf.te.tcf.launch.ui.PathMapEditorPage,org.eclipse.tcf.te.launch.ui.SourceLookupEditorPage,org.eclipse.tcf.te.launch.ui.LaunchEditorPage">
+         <enablement>
+            <with variable="activeEditorInput">
+               <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                  <and>
+                     <test property="org.eclipse.tcf.te.core.canAdaptTo" value="org.eclipse.debug.core.ILaunchConfiguration" args="forceAdapterLoad"/>
+                     <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="MemoryMap"/>
+                  </and>
+               </adapt>
+            </with>
+         </enablement>
+      </editorPageBinding>
+   </extension>
+
+<!-- Navigator viewer contributions -->
+   <extension point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.View">
+         <includes>
+            <contentExtension 
+                  pattern="org.eclipse.tcf.te.tcf.launch.ui.navigator.*"
+                  isRoot="false"/>
+         </includes>
+      </viewerContentBinding>
+   </extension>
+   
+<!-- Navigator content contributions -->
+   <extension point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            id="org.eclipse.tcf.te.tcf.launch.ui.navigator.content"
+            name="%LauchTree.name"
+      		icon="icons/obj16/launches_root.gif"
+            activeByDefault="false"
+            contentProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchNavigatorContentProvider"
+            labelProvider="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeLabelProvider"
+            priority="lowest">
+         <triggerPoints>
+            <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+         </triggerPoints>
+         <possibleChildren>
+            <instanceof value="org.eclipse.tcf.te.launch.ui.model.LaunchNode"/>
+         </possibleChildren>
+         <commonSorter class="org.eclipse.tcf.te.launch.ui.viewer.LaunchTreeViewerSorter"/>
+      </navigatorContent>
+   </extension>
+
+<!-- Menu contributions -->
+   <extension point="org.eclipse.ui.menus">
+     
+   <!-- Target explorer menu contributions -->
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.connection">
+         <menu
+               id="org.eclipse.tcf.te.tcf.launch.ui.menu.diagnostics"
+               label="%menu.diagnostics.label">
+            <command
+                  commandId="org.eclipse.tcf.te.tcf.launch.ui.command.runtests"
+                  id="org.eclipse.tcf.te.tcf.launch.ui.commands.runtests"
+                  label="%command.runtests.label"
+                  tooltip="%command.runtests.tooltip">
+            </command>
+            <command
+                  commandId="org.eclipse.tcf.te.tcf.launch.ui.command.runtestsloop"
+                  id="org.eclipse.tcf.te.tcf.launch.ui.commands.runtestsloop"
+                  label="%command.runtestsloop.label"
+                  tooltip="%command.runtestsloop.tooltip">
+            </command>
+            <separator name="additions"/>
+            
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                        <and>
+                           <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="Diagnostics"/>
+                           <or>
+                              <not>
+                                 <test
+                                       forcePluginActivation="true"
+                                       property="org.eclipse.tcf.te.runtime.services.hasService"
+                                       value="org.eclipse.tcf.te.runtime.services.interfaces.IMenuService"/>
+                              </not>
+                              <test
+                                    property="org.eclipse.tcf.te.runtime.services.menu.isVisible"
+                                    args="org.eclipse.tcf.te.tcf.launch.ui.menu.diagnostics"
+                                    value="true"/>
+                           </or>
+                        </and>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </menu>
+      </menuContribution>
+
+      <!--menuContribution locationURI="toolbar:org.eclipse.tcf.te.tcf.launch.ui.MemoryMapEditorPage?after=group.launch.rundebug">
+         <command commandId="org.eclipse.tcf.te.tcf.ui.editor.command.debug">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="te.expressions.editor.hasRunControl"/>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.tcf.launch.ui.PathMapEditorPage?after=group.launch.rundebug">
+         <command commandId="org.eclipse.tcf.te.tcf.ui.editor.command.debug">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="te.expressions.editor.hasRunControl"/>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.launch.ui.SourceLookupEditorPage?after=group.launch.rundebug">
+         <command commandId="org.eclipse.tcf.te.tcf.ui.editor.command.debug">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="te.expressions.editor.hasRunControl"/>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.tcf.launch.ui.MemoryMapEditorPage?after=group.connect">
+         <command commandId="org.eclipse.tcf.te.ui.editor.command.connect">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="te.expressions.editor.IConnectable"/>
+            </visibleWhen>
+         </command>
+         <command commandId="org.eclipse.tcf.te.ui.editor.command.disconnect">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="te.expressions.editor.IConnectable"/>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.tcf.launch.ui.PathMapEditorPage?after=group.connect">
+         <command commandId="org.eclipse.tcf.te.ui.editor.command.connect">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="te.expressions.editor.IConnectable"/>
+            </visibleWhen>
+         </command>
+         <command commandId="org.eclipse.tcf.te.ui.editor.command.disconnect">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="te.expressions.editor.IConnectable"/>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.launch.ui.SourceLookupEditorPage?after=group.connect">
+         <command commandId="org.eclipse.tcf.te.ui.editor.command.connect">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="te.expressions.editor.IConnectable"/>
+            </visibleWhen>
+         </command>
+         <command commandId="org.eclipse.tcf.te.ui.editor.command.disconnect">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="te.expressions.editor.IConnectable"/>
+            </visibleWhen>
+         </command>
+      </menuContribution-->
+
+   </extension>
+
+<!-- Command contributions -->
+   <extension point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.launch.ui.remote.app.command_Run"
+            id="org.eclipse.tcf.te.tcf.launch.ui.remote.app.command.run"
+            name="%command.run.name"/>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.launch.ui.remote.app.command_RunDebug"
+            id="org.eclipse.tcf.te.tcf.launch.ui.remote.app.command.debug"
+            name="%command.debug.name"/>
+            
+      <!-- "Eclipse Diagnostics Tests" related commands -->
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.launch.ui.command_RunTests"
+            id="org.eclipse.tcf.te.tcf.launch.ui.command.runtests"
+            name="%command.runtests.name"/>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.launch.ui.command_RunTestsLoop"
+            id="org.eclipse.tcf.te.tcf.launch.ui.command.runtestsloop"
+            name="%command.runtestsloop.name"/>
+   </extension>
+
+<!-- Handler contributions -->
+   <extension point="org.eclipse.ui.handlers">
+      <handler commandId="org.eclipse.tcf.te.tcf.launch.ui.remote.app.command.run">
+         <class class="org.eclipse.tcf.te.launch.ui.handler.LaunchShortcutHandler">
+            <parameter name="mode" value="run"/>
+            <parameter name="typeId" value="org.eclipse.tcf.te.tcf.launch.type.remote.app"/>
+         </class>
+         <activeWhen>
+            <with variable="activePartId">
+               <or>
+                  <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                  <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
+               </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <iterate 
+                     operator="and" 
+                     ifEmpty="false">
+                  <test 
+                        forcePluginActivation="true"
+                        property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
+                        value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+                        args="run"/>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler commandId="org.eclipse.tcf.te.tcf.launch.ui.remote.app.command.debug">
+         <class class="org.eclipse.tcf.te.launch.ui.handler.LaunchShortcutHandler">
+            <parameter name="mode" value="debug"/>
+            <parameter name="typeId" value="org.eclipse.tcf.te.tcf.launch.type.remote.app"/>
+         </class>
+         <activeWhen>
+            <with variable="activePartId">
+               <or>
+                  <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                  <equals value="org.eclipse.ui.navigator.ProjectExplorer"/>
+               </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <iterate 
+                     operator="and" 
+                     ifEmpty="false">
+                  <test 
+                        forcePluginActivation="true"
+                        property="org.eclipse.tcf.te.launch.core.isValidLaunchConfigType"
+                        value="org.eclipse.tcf.te.tcf.launch.type.remote.app"
+                        args="debug"/>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      
+      <!-- "Eclipse Diagnostics Tests" related handler -->
+      <handler
+            class="org.eclipse.tcf.te.tcf.launch.ui.handler.RunTestsCommandHandler"
+            commandId="org.eclipse.tcf.te.tcf.launch.ui.command.runtests">
+         <activeWhen>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.View"/>
+            </with>
+         </activeWhen>
+      </handler>
+
+      <handler
+            class="org.eclipse.tcf.te.tcf.launch.ui.handler.RunTestsLoopCommandHandler"
+            commandId="org.eclipse.tcf.te.tcf.launch.ui.command.runtestsloop">
+         <activeWhen>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.View"/>
+            </with>
+         </activeWhen>
+      </handler>
+   </extension>
+
+<!-- Property section contributions -->
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections contributorId="org.eclipse.tcf.te.ui">
+         <propertySection
+               id="org.eclipse.tcf.te.tcf.launch.ui.propertytab.remote.app"
+               class="org.eclipse.tcf.te.tcf.launch.ui.remote.app.RemoteAppPropertiesSection"
+               enablesFor="1"
+               afterSection="org.eclipse.tcf.te.launch.ui.launchcontext"
+               filter="org.eclipse.tcf.te.tcf.launch.ui.remote.app.RemoteAppFilter"
+               tab="org.eclipse.tcf.te.launch.ui.propertytab.general"/>
+      </propertySections>
+   </extension>
+
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections contributorId="org.eclipse.ui.navigator.ProjectExplorer">
+         <propertySection
+               id="org.eclipse.tcf.te.tcf.launch.ui.project.propertytab.remote.app"
+               class="org.eclipse.tcf.te.tcf.launch.ui.remote.app.RemoteAppPropertiesSection"
+               enablesFor="1"
+               afterSection="org.eclipse.tcf.te.launch.ui.project.launchcontext"
+               filter="org.eclipse.tcf.te.tcf.launch.ui.remote.app.RemoteAppFilter"
+               tab="org.eclipse.tcf.te.launch.ui.project.propertytab.general"/>
+      </propertySections>
+   </extension>
+
+<!-- Activity contributions -->
+   <extension point="org.eclipse.ui.activities">
+      <activity
+            description="%activities.activity.systemmanagement.applaunch.description"
+            id="org.eclipse.tcf.te.tcf.launch.ui.activity.systemmanagement.applaunch"
+            name="%activities.activity.systemmanagement.applaunch.name">
+      </activity>
+
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.te.tcf.launch.ui.activity.systemmanagement.applaunch"
+            pattern="org\.eclipse\.tcf\.te\.tcf\.launch\.core/.*\.launch\.type\.remote\.app">
+      </activityPatternBinding>
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.te.tcf.launch.ui.activity.systemmanagement.applaunch"
+            pattern="org\.eclipse\.tcf\.te\.tcf\.launch\.core/.*\.launch\.type\.remote\.app\..*">
+      </activityPatternBinding>
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.te.tcf.launch.ui.activity.systemmanagement.applaunch"
+            pattern="org\.eclipse\.tcf\.te\.tcf\.launch\.ui/.*\.launch\.type\.remote\.app\..*">
+      </activityPatternBinding>
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.te.tcf.launch.ui.activity.systemmanagement.applaunch"
+            pattern="org\.eclipse\.tcf\.te\.tcf\.launch\.ui/.*\.launchshortcut\.remote\.app\..*">
+      </activityPatternBinding>
+      
+      <categoryActivityBinding
+            activityId="org.eclipse.tcf.te.tcf.launch.ui.activity.systemmanagement.applaunch"
+            categoryId="org.eclipse.tcf.te.ui.views.category.systemmanagement">
+      </categoryActivityBinding>
+      
+      <defaultEnablement
+            id="org.eclipse.tcf.te.tcf.launch.ui.activity.systemmanagement.applaunch">
+      </defaultEnablement>
+   </extension>
+</plugin>

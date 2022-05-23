@@ -1,0 +1,402 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Target Communication Framework Services - Processes</title>
+</head>
+
+<body lang="EN-US">
+
+<h1>Target Communication Framework Services - Terminals</h1>
+
+<ul>
+    <li><a href="#VersionHistory">Version History</a>
+    </li><li><a href="#Overview">Overview</a>
+    </li><li><a href="#Cmds">Commands</a>
+    <ul>
+        <li><a href="#CmdGetContext">Get Context</a>
+        </li><li><a href="#CmdExit">Exit</a>
+        </li><li><a href="#CmdSetWinSize">SetWinSize</a>
+        </li><li><a href="#CmdLaunch">Launch</a>
+        </li></ul>
+    </li><li><a href="#Events">Events</a>
+    </li><li><a href="#API">API</a>
+</li></ul>
+
+<h1>Processes Service</h1>
+
+<h2><a name="VersionHistory">Version History</a></h2>
+
+<table border="1" cellpadding="8">
+    <tbody><tr>
+        <th>Version
+        </th><th>Date
+        </th><th>Change
+    </th></tr><tr>
+        <td>0.1
+        </td><td>2010-09-29
+        </td><td>Initial contribution
+    </td></tr></tbody></table>
+
+<h2><a name="Overview">Overview</a></h2>
+
+<p>Terminals service provides access to the target OS's termianl login, allows to start and exit a terminal login, and allows
+to set the terminal's window size. <br>
+</p>
+
+<p>If a terminal is laucnhed by this service, its standard input/output streams are
+available for client to read/write using <a href="TCF Service - Streams.html">Streams Service</a>. Stream type of such
+streams is set to "Terminals".</p>
+
+<p>Command and event parameters are encoded
+as zero terminated <a href='TCF JSON.html'>JSON</a> strings.</p>
+
+<p>The service uses standard format for error reports,
+see <a href="TCF Error Report Format.html">Error Report Format</a>.</p>
+
+<h2><a name="Cmds">Commands</a></h2>
+
+<h3><a name="CmdGetContext">Get Context</a></h3>
+
+<pre><b><font color="#333399" face="Courier New" size="2">
+C &#8226; &lt;token&gt; &#8226; Terminals &#8226; getContext &#8226; &lt;string: context ID&gt; &#8226;<br></font></b></pre>
+
+<p>The command retrieves context info for given context ID. A context
+corresponds to an connected active terminal. Context IDs are valid
+across TCF services, so it is allowed to issue 'Terminals.getContext'
+command with a context that was obtained, for example, from Memory
+service. However, 'Terminals.getContext' is supposed to return only
+process specific data. If the ID is not a process ID,
+'Terminals.getContext' may not return any useful information.
+</p>
+
+<p>Reply:</p>
+
+<pre><b><font color="#333399" face="Courier New" size="2">
+R &#8226; &lt;token&gt; &#8226; &lt;error report&gt; &#8226; &lt;context data&gt; &#8226;<br><br><i>&lt;context data&gt;</i>
+    &#8658; null
+    &#8658; <i>&lt;object&gt;</i>
+</font></b></pre>
+
+<p>Context data object should, at least, contain member
+<b><font color="#333399" face="Courier New" size="2">"ID" : <i>&lt;string&gt;.</i></font></b>
+</p>
+
+<p>Predefined process context properties are:</p>
+<ul>
+    <li><code><b><font color="#333399" face="Courier New" size="2">"ID" : <i>&lt;string&gt;</i></font></b></code>
+    - ID of the context, same as getContext command argument.
+
+    <li><code><b><font color="#333399" face="Courier New" size="2">"ProcessID" : <i>&lt;string&gt;</i></font></b></code>
+    - the process ID of the login process of the terminal.
+
+    </li><li><code><b><font color="#333399" face="Courier New" size="2">"PtyType" : <i>&lt;string&gt;</i></font></b></code>
+    - terminal type.
+
+    </li><li><code><b><font color="#333399" face="Courier New" size="2">"Encoding" : <i>&lt;string&gt;</i></font></b></code>
+    - encoding.
+
+    </li><li><code><b><font color="#333399" face="Courier New" size="2">"Width" : <i>&lt;integer&gt;</i></font></b></code>
+    - width of the terminal.
+
+    </li><li><code><b><font color="#333399" face="Courier New" size="2">"Height" : <i>&lt;integer&gt;</i></font></b></code>
+    - height of the terminal.
+
+    </li><li><code><b><font color="#333399" face="Courier New" size="2">"StdInID" : <i>&lt;string&gt;</i></font></b></code>
+    - terminal standard input stream ID.
+
+    </li><li><code><b><font color="#333399" face="Courier New" size="2">"StdOutID" : <i>&lt;string&gt;</i></font></b></code>
+    - terminal standard output stream ID.
+
+    </li><li><code><b><font color="#333399" face="Courier New" size="2">"StdErrID" : <i>&lt;string&gt;</i></font></b></code>
+    - terminal standard error stream ID.
+</li></ul>
+
+<h3><a name="CmdExit">Exit</a></h3>
+
+<pre><b><font color="#333399" face="Courier New" size="2">
+C &#8226; &lt;token&gt; &#8226; Terminals &#8226; exit&#8226; &lt;string: context ID&gt; &#8226;<br></font></b></pre>The command exits the shell and closes the terminal connection.
+
+<p>Reply:</p>
+
+<pre><b><font color="#333399" face="Courier New" size="2">
+<span style="font-style: italic;">R &#8226; &lt;token&gt; &#8226; &lt;error report&gt; &#8226;</span><i></i>
+</font></b></pre>
+
+<h3><a name="CmdSetWinSize">SetWinSize</a></h3>
+
+<pre><b><font color="#333399" face="Courier New" size="2">
+C &#8226; &lt;token&gt; &#8226; Terminals &#8226; setWinSize &#8226; &lt;string: context ID&gt; &#8226; &lt;integer: newWidth&gt; &#8226; &lt;integer: newHeight&gt; &#8226;<br></font></b></pre>
+
+<p>The command sets the remote terminal windows size.</p>
+
+<p>Reply:</p>
+
+<pre><b><font color="#333399" face="Courier New" size="2">
+R &#8226; <i>&lt;token&gt;</i> &#8226; <i>&lt;error report&gt;</i> &#8226;<br></font></b></pre>
+
+<h3><a name="CmdLaunch">Launch</a></h3>
+
+<pre><b><font color="#333399" face="Courier New" size="2"><br>C &#8226; &lt;token&gt; &#8226; Terminals &#8226; launch&#8226; &lt;string: pty type&gt; &#8226; &lt;string: encoding&gt; &#8226; &lt;string array: environment variables&gt; &#8226;<br></font></b><b><i><span style="font-size: 10pt; font-family: &quot;Courier New&quot;; color: rgb(51, 51, 153);" lang="EN-US"><br>&lt;string array&gt;</span></i><span style="font-size: 10pt; font-family: &quot;Courier New&quot;; color: rgb(51, 51, 153);" lang="EN-US"><br><span style="">&nbsp;&nbsp;&nbsp; </span></span><span style="font-size: 10pt; font-family: &quot;MS Gothic&quot;; color: rgb(51, 51, 153);">&#8658;</span><span style="font-size: 10pt; font-family: &quot;Courier New&quot;; color: rgb(51, 51, 153);" lang="EN-US"> null<br><span style="">&nbsp;&nbsp;&nbsp; </span></span><span style="font-size: 10pt; font-family: &quot;MS Gothic&quot;; color: rgb(51, 51, 153);">&#8658;</span><span style="font-size: 10pt; font-family: &quot;Courier New&quot;; color: rgb(51, 51, 153);" lang="EN-US"> [ ]<br><span style="">&nbsp;&nbsp;&nbsp; </span></span><span style="font-size: 10pt; font-family: &quot;MS Gothic&quot;; color: rgb(51, 51, 153);">&#8658;</span><span style="font-size: 10pt; font-family: &quot;Courier New&quot;; color: rgb(51, 51, 153);" lang="EN-US"> [ <i>&lt;string list&gt;</i> ]</span></b><br></pre>
+<p class="MsoNormal" style="text-align: left;" align="left"><b><i><span style="font-size: 10pt; font-family: &quot;Courier New&quot;; color: rgb(51, 51, 153);" lang="EN-US">&lt;string list&gt;</span></i></b><b><span style="font-size: 10pt; font-family: &quot;Courier New&quot;; color: rgb(51, 51, 153);" lang="EN-US"><br>
+<span style="">&nbsp;&nbsp;&nbsp; </span></span></b><b><span style="font-size: 10pt; font-family: &quot;MS Gothic&quot;; color: rgb(51, 51, 153);">&#8658;</span></b><b><span style="font-size: 10pt; font-family: &quot;Courier New&quot;; color: rgb(51, 51, 153);"> <i><span lang="EN-US">&lt;string&gt;</span></i><span lang="EN-US"><br>
+<span style="">&nbsp;&nbsp;&nbsp; </span></span></span></b><b><span style="font-size: 10pt; font-family: &quot;MS Gothic&quot;; color: rgb(51, 51, 153);">&#8658;</span></b><b><span style="font-size: 10pt; font-family: &quot;Courier New&quot;; color: rgb(51, 51, 153);"> <i><span lang="EN-US">&lt;string list&gt;</span></i><span lang="EN-US"> , <i>&lt;string&gt;</i></span></span></b><b><span style="font-size: 10pt; font-family: &#23435;&#20307;; color: rgb(51, 51, 153);" lang="EN-US"><o:p></o:p></span></b></p>
+
+
+
+
+<p>The command launches a new terminal connection to the remote machine.
+</p><ul>
+        <li><i>&lt;string: pty type&gt;</i> - requested terminal type for the new terminal.
+        </li><li><i>&lt;string: encoding&gt;</i> - requested terminal type for the new terminal.
+        </li><li><i>&lt;string array: environment variables&gt;</i> - list of environment variables for the terminal.
+        </li></ul>
+
+<p>Reply:</p>
+
+<pre><b><font color="#333399" face="Courier New" size="2">
+R &#8226; <i>&lt;token&gt;</i> &#8226; <i>&lt;error report&gt;</i> &#8226; <i>&lt;context data&gt;</i> &#8226;<br></font></b></pre>
+
+<p>On success the command returns context data for created terminal. Context data has same format as Get Context result.</p>
+
+<h2><a name="Events">Events</a></h2>
+
+<p>Terminals service broadcasts notification event when a terminal
+exits, or the terminal window size is changed. Only terminals that were
+launched by the service will get the events.</p>
+
+<pre></pre>
+<p><b><font color="#333399" face="Courier New" size="2">
+E &#8226; Terminals &#8226; exited &#8226; &lt;string: terminal ID&gt; &#8226; &lt;int: exit code&gt; &#8226;</font></b></p>
+Sent when a terminal is exited. "terminal ID" is the ID of the terminal. "exit code" is the terminal exit code.<br>
+<br>
+<p><b><font color="#333399" face="Courier New" size="2">E &#8226; Terminals &#8226; winSizeChanged &#8226; &lt;string: terminal ID&gt; &#8226; &lt;int: newWidth&gt; &#8226; &lt;int: newHeight&gt; &#8226;</font></b></p>
+Sent when a terminal's window size is changed. "terminal ID" is the ID
+of the terminal. "newWidth" is the new width of the terminal,
+"newHight" is the new height of the terminal.<br>
+
+<h2><a name='API'>API</a></h2>
+
+<pre>
+<font color=#3F5FBF>/**
+ * ITerminalsService allows to launch a new terminal on the remote target system.
+ *
+ * <font color=#7F9FBF>@noimplement</font> This interface is not intended to be implemented by clients.
+ */</font>
+<font color=#7F0055>public interface</font> ITerminals <font color=#7F0055>extends</font> IService {
+
+    <font color=#3F5FBF>/**
+     * This service name, as it appears on the wire - a TCF name of the service.
+     */</font>
+    <font color=#7F0055>static final</font> String NAME = "Terminals";
+
+    <font color=#3F5FBF>/**
+     * Retrieve context info for given context ID.
+     * A context corresponds to an terminal.
+     * Context IDs are valid across TCF services, so it is allowed to issue
+     * 'ITerminals.getContext' command with a context that was obtained,
+     * for example, from Memory service.
+     * However, 'ITerminals.getContext' is supposed to return only terminal specific data,
+     * If the ID is not a terminal ID, 'ITerminals.getContext' may not return any
+     * useful information
+     *
+     * <font color=#7F9FBF>@param</font> id - context ID.
+     * <font color=#7F9FBF>@param</font> done - call back interface called when operation is completed.
+     */</font>
+    IToken getContext(String id, DoneGetContext done);
+
+    <font color=#3F5FBF>/**
+     * Client call back interface for getContext().
+     */</font>
+    <font color=#7F0055>interface</font> DoneGetContext {
+        <font color=#3F5FBF>/**
+         * Called when contexts data retrieval is done.
+         * <font color=#7F9FBF>@param</font> error - error description if operation failed, null if succeeded.
+         * <font color=#7F9FBF>@param</font> context - context data.
+         */</font>
+        <font color=#7F0055>void</font> doneGetContext(IToken token, Exception error, TerminalContext context);
+    }
+
+    <font color=#3F5FBF>/**
+     * Context property names.
+     */</font>
+    <font color=#7F0055>static final</font> String
+        <font color=#3F5FBF>/** The TCF context ID of the terminal */</font>
+        PROP_ID = "ID",
+
+        <font color=#3F5FBF>/** The process ID of the login process of the terminal */</font>
+        PROP_PROCESS_ID = "ProcessID",
+
+        <font color=#3F5FBF>/** The PTY type */</font>
+        PROP_PTY_TYPE = "PtyType",
+
+        <font color=#3F5FBF>/** The terminal streams encoding */</font>
+        PROP_ENCODING = "Encoding",
+
+        <font color=#3F5FBF>/** Window width size */</font>
+        PROP_WIDTH = "Width",
+
+        <font color=#3F5FBF>/** Window height size */</font>
+        PROP_HEIGHT = "Height",
+
+        <font color=#3F5FBF>/** Terminal standard input stream ID */</font>
+        PROP_STDIN_ID = "StdInID",
+
+        <font color=#3F5FBF>/** Terminal standard output stream ID */</font>
+        PROP_STDOUT_ID = "StdOutID",
+
+        <font color=#3F5FBF>/** Terminal standard error stream ID */</font>
+        PROP_STDERR_ID = "StdErrID";
+
+    <font color=#7F0055>interface</font> TerminalContext {
+
+        <font color=#3F5FBF>/**
+         * Get context ID.
+         * Same as getProperties().get("ID")
+         */</font>
+        String getID();
+
+        <font color=#3F5FBF>/**
+         * Get process ID of the login process of the terminal.
+         * Same as getProperties().get("ProcessID")
+         */</font>
+        String getProcessID();
+
+        <font color=#3F5FBF>/**
+         * Get terminal type.
+         * Same as getProperties().get("PtyType")
+         */</font>
+        String getPtyType();
+
+        <font color=#3F5FBF>/**
+         * Get encoding.
+         * Same as getProperties().get("Encoding")
+         */</font>
+        String getEncoding();
+
+        <font color=#3F5FBF>/**
+         * Get width.
+         * Same as getProperties().get("Width")
+         */</font>
+        <font color=#7F0055>int</font> getWidth();
+
+        <font color=#3F5FBF>/**
+         * Get height.
+         * Same as getProperties().get("Height")
+         */</font>
+        <font color=#7F0055>int</font> getHeight();
+
+        <font color=#3F5FBF>/**
+         * Get standard input stream ID of the terminal.
+         * Same as getProperties().get("StdInID")
+         */</font>
+        String getStdInID();
+
+        <font color=#3F5FBF>/**
+         * Get standard output stream ID of the terminal.
+         * Same as getProperties().get("StdOutID")
+         */</font>
+        String getStdOutID();
+
+        <font color=#3F5FBF>/**
+         * Get standard error stream ID of the terminal.
+         * Same as getProperties().get("StdErrID")
+         */</font>
+        String getStdErrID();
+
+        <font color=#3F5FBF>/**
+         * Get all available terminal properties.
+         * <font color=#7F9FBF>@return</font> Map 'property name' -&gt; 'property value'
+         */</font>
+        Map&lt;String, Object&gt; getProperties();
+
+        <font color=#3F5FBF>/**
+         * Exit the terminal.
+         * <font color=#7F9FBF>@param</font> done - call back interface called when operation is completed.
+         * <font color=#7F9FBF>@return</font> pending command handle, can be used to cancel the command.
+         */</font>
+        IToken exit(DoneCommand done);
+    }
+
+    <font color=#3F5FBF>/**
+     * Call-back interface to be called when "setWinSize" or "exit" command is complete.
+     */</font>
+    <font color=#7F0055>interface</font> DoneCommand {
+        <font color=#7F0055>void</font> doneCommand(IToken token, Exception error);
+    }
+
+    <font color=#3F5FBF>/**
+     * Launch a new terminal to remote machine.
+     * <font color=#7F9FBF>@param</font> type - requested terminal type for the new terminal.
+     * <font color=#7F9FBF>@param</font> encoding - requested encoding for the new terminal.
+     * <font color=#7F9FBF>@param</font> environment - Array of environment variable strings.
+     * if null then default set of environment variables will be used.
+     * <font color=#7F9FBF>@param</font> done - call back interface called when operation is completed.
+     * <font color=#7F9FBF>@return</font> pending command handle, can be used to cancel the command.
+     */</font>
+    IToken launch(String type, String encoding, String[] environment, DoneLaunch done);
+
+    <font color=#3F5FBF>/**
+     * Call-back interface to be called when "launch" command is complete.
+     */</font>
+    <font color=#7F0055>interface</font> DoneLaunch {
+        <font color=#7F0055>void</font> doneLaunch(IToken token, Exception error, TerminalContext terminal);
+    }
+
+    <font color=#3F5FBF>/**
+     * Set the terminal widow size
+     * <font color=#7F9FBF>@param</font> id - context ID.
+     * <font color=#7F9FBF>@param</font> col - number of columns.
+     * <font color=#7F9FBF>@param</font> row - number of rows.
+     * <font color=#7F9FBF>@param</font> done - call back interface called when operation is completed.
+     * <font color=#7F9FBF>@return</font> pending command handle, can be used to cancel the command.
+     */</font>
+    IToken setWinSize(String id, <font color=#7F0055>int</font> col, <font color=#7F0055>int</font> row, DoneCommand done);
+
+    <font color=#3F5FBF>/**
+     * Exit a terminal.
+     * <font color=#7F9FBF>@param</font> id - context ID.
+     * <font color=#7F9FBF>@param</font> done - call back interface called when operation is completed.
+     * <font color=#7F9FBF>@return</font> pending command handle, can be used to cancel the command.
+     */</font>
+    IToken exit(String id, DoneCommand done);
+
+    <font color=#3F5FBF>/**
+     * Add terminals service event listener.
+     * <font color=#7F9FBF>@param</font> listener - event listener implementation.
+     */</font>
+    <font color=#7F0055>void</font> addListener(TerminalsListener listener);
+
+    <font color=#3F5FBF>/**
+     * Remove terminals service event listener.
+     * <font color=#7F9FBF>@param</font> listener - event listener implementation.
+     */</font>
+    <font color=#7F0055>void</font> removeListener(TerminalsListener listener);
+
+    <font color=#3F5FBF>/**
+     * Process event listener is notified when a terminal changes or exits.
+     * Event are reported only for terminals that were started by 'launch' command.
+     */</font>
+    <font color=#7F0055>interface</font> TerminalsListener {
+
+        <font color=#3F5FBF>/**
+         * Called when a terminal exits.
+         * <font color=#7F9FBF>@param</font> terminal_id - terminal context ID
+         * <font color=#7F9FBF>@param</font> exit_code - terminal exit code
+         */</font>
+        <font color=#7F0055>void</font> exited(String terminal_id, <font color=#7F0055>int</font> exit_code);
+
+        <font color=#3F5FBF>/**
+         * Called when a terminal windows size changes.
+         * <font color=#7F9FBF>@param</font> terminal_id - terminal context ID
+         * <font color=#7F9FBF>@param</font> new_width - new terminal width
+         * <font color=#7F9FBF>@param</font> new_height - new terminal height
+         */</font>
+        <font color=#7F0055>void</font> winSizeChanged(String terminal_id, <font color=#7F0055>int</font> new_width, <font color=#7F0055>int</font> new_height);
+    }
+}
+</pre>
+
+</body>
+</html>

@@ -1,0 +1,280 @@
+/*******************************************************************************
+ * Copyright (c) 2007, 2015 Wind River Systems, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License 2.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-2.0/
+ *
+ * Contributors:
+ *     Wind River Systems - initial API and implementation
+ *******************************************************************************/
+package org.eclipse.tcf.internal.cdt.ui.breakpoints;
+
+import java.math.BigInteger;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.eclipse.cdt.debug.core.CDIDebugModel;
+import org.eclipse.cdt.debug.core.model.ICBreakpointType;
+import org.eclipse.cdt.debug.core.model.ICEventBreakpoint;
+import org.eclipse.cdt.debug.core.model.ICFunctionBreakpoint;
+import org.eclipse.cdt.debug.core.model.ICLineBreakpoint;
+import org.eclipse.cdt.debug.core.model.ICWatchpoint;
+import org.eclipse.cdt.debug.ui.breakpoints.AbstractToggleBreakpointAdapter;
+import org.eclipse.cdt.dsf.debug.internal.ui.disassembly.provisional.IDisassemblyPart;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.debug.ui.DebugUITools;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.tcf.internal.cdt.ui.Activator;
+import org.eclipse.tcf.internal.cdt.ui.preferences.PreferenceConstants;
+import org.eclipse.tcf.internal.debug.model.TCFBreakpointsModel;
+import org.eclipse.tcf.internal.debug.model.TCFLaunch;
+import org.eclipse.tcf.internal.debug.ui.model.TCFNode;
+import org.eclipse.ui.IWorkbenchPart;
+
+/**
+ * Toggles a TCF Scoped breakpoint in a C/C++ editor.
+ */
+public class TCFToggleBreakpointAdapter extends AbstractToggleBreakpointAdapter {
+
+    private final String TOGGLE_TYPE;
+
+    private final TCFDisassemblyToggleBreakpointAdapter fDisassemblyToggleDelegate;
+
+    TCFToggleBreakpointAdapter(String toggle_type) {
+        TOGGLE_TYPE = toggle_type;
+        fDisassemblyToggleDelegate = new TCFDisassemblyToggleBreakpointAdapter(toggle_type);
+    }
+
+    static IStructuredSelection getDebugContext(IWorkbenchPart part) {
+        ISelection selection = DebugUITools.getDebugContextManager().
+            getContextService(part.getSite().getWorkbenchWindow()).getActiveContext();
+        if (selection instanceof IStructuredSelection) {
+            return (IStructuredSelection)selection;
+        }
+        return StructuredSelection.EMPTY;
+    }
+
+    static boolean isDefaultBPContextQueryEnabled() {
+        return Platform.getPreferencesService().getBoolean(
+                Activator.PLUGIN_ID,
+                PreferenceConstants.PREF_DEFAULT_TRIGGER_SCOPE_ENABLED,
+                false,
+                null);
+    }
+
+    static String getDefaultBPContextQuery() {
+        return Platform.getPreferencesService().getString(
+                Activator.PLUGIN_ID,
+                PreferenceConstants.PREF_DEFAULT_TRIGGER_SCOPE,
+                null,
+                null);
+    }
+
+    static boolean isLineOffsetLimitEnabled() {
+        return Platform.getPreferencesService().getBoolean(
+                Activator.PLUGIN_ID,
+                PreferenceConstants.PREF_LINE_OFFSET_LIMIT_ENABLED,
+                false,
+                null);
+    }
+
+    static String getLineOffsetLimit() {
+        return Platform.getPreferencesService().getString(
+                Activator.PLUGIN_ID,
+                PreferenceConstants.PREF_LINE_OFFSET_LIMIT,
+                "0",
+                null);
+    }
+
+    static Map<String, Object> getDefaultAttributes(IWorkbenchPart part, final String toggleType) {
+        Map<String, Object> attributes = new TreeMap<String, Object>();
+        if (part != null) {
+            Object obj = getDebugContext(part).getFirstElement();
+            if (obj instanceof TCFNode || obj instanceof TCFLaunch) {
+                if (toggleType.length() != 0) {
+                    if (isDefaultBPContextQueryEnabled()) {
+                        String query = getDefaultBPContextQuery();
+                        attributes.put(TCFBreakpointsModel.ATTR_CONTEXT_QUERY, query);
+                    }
+                    if (isLineOffsetLimitEnabled()) {
+                        BigInteger n = null;
+                        try {
+                            n = new BigInteger(getLineOffsetLimit());
+                        }
+                        catch (Exception x) {
+                            n = BigInteger.ZERO;
+                        }
+                        attributes.put(TCFBreakpointsModel.ATTR_LINE_OFFSET, n.intValue());
+                    }
+                }
+            }
+        }
+        return attributes;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.cdt.debug.internal.ui.actions.AbstractToggleBreakpointAdapter#findLineBreakpoint(java.lang.String, org.eclipse.core.resources.IResource, int)
+     */
+    @Override
+    protected ICLineBreakpoint findLineBreakpoint( String sourceHandle, IResource resource, int lineNumber ) throws CoreException {
+            return CDIDebugModel.lineBreakpointExists( sourceHandle, resource, lineNumber );
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.cdt.debug.internal.ui.actions.AbstractToggleBreakpointAdapter#createLineBreakpoint(java.lang.String, org.eclipse.core.resources.IResource, int)
+     */
+    @Override
+    protected void createLineBreakpoint( boolean interactive, IWorkbenchPart part, final String sourceHandle, final IResource resource, final int lineNumber ) throws CoreException {
+        Map<String, Object> attributes = getDefaultAttributes(part, TOGGLE_TYPE);
+        ICLineBreakpoint lineBp = CDIDebugModel.createBlankLineBreakpoint();
+        CDIDebugModel.setLineBreakpointAttributes(
+                attributes, sourceHandle, getBreakpointType(), lineNumber, true, 0, "" ); //$NON-NLS-1$
+        if ( !interactive ) {
+            CDIDebugModel.createBreakpointMarker(lineBp, resource, attributes, true);
+        }
+        else {
+            openBreakpointPropertiesDialog(lineBp, part, resource, attributes);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.cdt.debug.internal.ui.actions.AbstractToggleBreakpointAdapter#findFunctionBreakpoint(java.lang.String, org.eclipse.core.resources.IResource, java.lang.String)
+     */
+    @Override
+    protected ICFunctionBreakpoint findFunctionBreakpoint(String sourceHandle, IResource resource, String functionName) throws CoreException {
+        return CDIDebugModel.functionBreakpointExists(sourceHandle, resource, functionName);
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.cdt.debug.internal.ui.actions.AbstractToggleBreakpointAdapter#createFunctionBreakpoint(java.lang.String, org.eclipse.core.resources.IResource, java.lang.String, int, int, int)
+     */
+    @Override
+    protected void createFunctionBreakpoint(boolean interactive, IWorkbenchPart part, String sourceHandle, IResource resource, String functionName, int charStart, int charEnd,
+            int lineNumber) throws CoreException
+    {
+        Map<String, Object> attributes = getDefaultAttributes(part, TOGGLE_TYPE);
+        ICFunctionBreakpoint bp = CDIDebugModel.createBlankFunctionBreakpoint();
+        CDIDebugModel.setFunctionBreakpointAttributes( attributes, sourceHandle, getBreakpointType(), functionName,
+                charStart, charEnd, lineNumber, true, 0, "" ); //$NON-NLS-1$
+        if (!interactive) {
+            CDIDebugModel.createBreakpointMarker(bp, resource, attributes, true);
+        }
+        else {
+            openBreakpointPropertiesDialog(bp, part, resource, attributes);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.cdt.debug.internal.ui.actions.AbstractToggleBreakpointAdapter#findWatchpoint(java.lang.String, org.eclipse.core.resources.IResource, java.lang.String)
+     */
+    @Override
+    protected ICWatchpoint findWatchpoint( String sourceHandle, IResource resource, String expression ) throws CoreException {
+            return CDIDebugModel.watchpointExists( sourceHandle, resource, expression );
+    }
+
+    protected int getBreakpointType() {
+            return ICBreakpointType.REGULAR;
+    }
+
+    @Override
+    protected void createWatchpoint(boolean interactive, IWorkbenchPart part, String sourceHandle, IResource resource, int charStart, int charEnd, int lineNumber,
+            String expression, String memorySpace, String range) throws CoreException
+    {
+        Map<String, Object> attributes = getDefaultAttributes(part, TOGGLE_TYPE);
+        ICWatchpoint bp = CDIDebugModel.createBlankWatchpoint();
+        CDIDebugModel.setWatchPointAttributes(attributes, sourceHandle, resource, true, false,
+            expression, memorySpace, new BigInteger(range), true, 0, ""); //$NON-NLS-1$
+        openBreakpointPropertiesDialog(bp, part, resource, attributes);
+    }
+
+    @Override
+    protected void createEventBreakpoint(boolean interactive, IWorkbenchPart part, IResource resource, String type, String arg) throws CoreException {
+        Map<String, Object> attributes = getDefaultAttributes(part, TOGGLE_TYPE);
+        ICEventBreakpoint bp = CDIDebugModel.createBlankEventBreakpoint();
+        CDIDebugModel.setEventBreakpointAttributes(attributes,type, arg);
+        openBreakpointPropertiesDialog(bp, part, resource, attributes);
+    }
+
+    @Override
+    @SuppressWarnings("restriction")
+    public void toggleLineBreakpoints( IWorkbenchPart part, ISelection selection ) throws CoreException {
+        if (part instanceof IDisassemblyPart) {
+            fDisassemblyToggleDelegate.toggleLineBreakpoints(part, selection);
+        }
+        else {
+            super.toggleLineBreakpoints(part, selection);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("restriction")
+    public boolean canToggleLineBreakpoints( IWorkbenchPart part, ISelection selection ) {
+        if (part instanceof IDisassemblyPart) {
+            return fDisassemblyToggleDelegate.canToggleLineBreakpoints(part, selection);
+        }
+        else {
+            return super.canToggleLineBreakpoints(part, selection);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("restriction")
+    public void toggleBreakpoints( IWorkbenchPart part, ISelection selection ) throws CoreException {
+        if (part instanceof IDisassemblyPart) {
+            fDisassemblyToggleDelegate.toggleBreakpoints(part, selection);
+        }
+        else {
+            super.toggleBreakpoints(part, selection);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("restriction")
+    public boolean canToggleBreakpoints( IWorkbenchPart part, ISelection selection ) {
+        if (part instanceof IDisassemblyPart) {
+            return fDisassemblyToggleDelegate.canToggleBreakpoints(part, selection);
+        }
+        else {
+            return super.canToggleBreakpoints(part, selection);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("restriction")
+    public void toggleBreakpointsWithEvent(IWorkbenchPart part, ISelection selection, Event event) throws CoreException {
+        if (part instanceof IDisassemblyPart) {
+            fDisassemblyToggleDelegate.toggleBreakpointsWithEvent(part, selection, event);
+        }
+        else {
+            super.toggleBreakpointsWithEvent(part, selection, event);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("restriction")
+    public void createLineBreakpointsInteractive(IWorkbenchPart part, ISelection selection) throws CoreException {
+        if (part instanceof IDisassemblyPart) {
+            fDisassemblyToggleDelegate.createLineBreakpointsInteractive(part, selection);
+        }
+        else {
+            super.createLineBreakpointsInteractive(part, selection);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("restriction")
+    public boolean canCreateLineBreakpointsInteractive(IWorkbenchPart part, ISelection selection) {
+        if (part instanceof IDisassemblyPart) {
+            return fDisassemblyToggleDelegate.canCreateLineBreakpointsInteractive(part, selection);
+        }
+        else {
+            return super.canCreateLineBreakpointsInteractive(part, selection);
+        }
+    }
+}

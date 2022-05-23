@@ -1,0 +1,77 @@
+import utils.build.PipelineUtil
+import utils.build.MavenUtil
+
+PIPELINE_UTIL = new utils.build.PipelineUtil()
+
+pipeline {
+    agent {
+        label "LinuxDocker"
+    }
+    parameters {
+        string name: 'GERRIT_REFSPEC', defaultValue: 'master'
+    }
+    options {
+        buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10')
+    }
+    triggers {
+        gerrit gerritProjects: [[pattern: 'org.eclipse.tcf', branches: [[compareType: 'ANT', pattern: '**']], triggerOnEvents: [draftPublished(), patchsetCreated()], compareType: 'PLAIN', disableStrictForbiddenFileVerification: false]], serverName: 'defaultServer'
+    }
+    stages {
+        stage("Clean ws") {
+            steps {
+                cleanWs()
+            }
+        }
+        stage("Checkout Repository") {
+            steps {
+                script {
+                    if (env.GERRIT_REFSPEC.equals("master") || env.GERRIT_REFSPEC.equals("") || env.GERRIT_REFSPEC.isEmpty()) {
+                        checkout poll: false,
+                            scm: [$class: 'GitSCM', branches: [[name: 'master']],
+                                    doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                                    userRemoteConfigs: [[url: 'http://gerrit.ow.ks:9000/org.eclipse.tcf']]]
+                        sh "git submodule update --init --recursive"
+                    } else {
+                        println "Checking out $GERRIT_REFSPEC"
+                        checkout poll: false,
+                            scm: [$class: 'GitSCM', branches: [[name: '$GERRIT_REFSPEC']],
+                                doGenerateSubmoduleConfigurations: false,
+                                extensions: [[$class: 'BuildChooserSetting',
+                                                buildChooser: [$class: 'GerritTriggerBuildChooser']]],
+                                                submoduleCfg: [],
+                                                userRemoteConfigs: [[refspec: '$GERRIT_REFSPEC',
+                                                                    url: 'http://gerrit.ow.ks:9000/org.eclipse.tcf']]]
+                        sh "git submodule update --init --recursive"
+                    }
+                }
+            }
+        }
+        stage("Build") {
+            steps {
+                timestamps {
+                    withCredentials([
+                        [$class: 'UsernamePasswordMultiBinding', credentialsId: '323d7685-d554-4c46-ab0b-e69673a6c893', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME']
+                    ]) {
+                        script {
+
+                            try {
+                                sh '''
+                                set +x
+                                echo $USERNAME:$PASSWORD > artifactory.txt
+                                '''
+
+                                configFileProvider([configFile(fileId: '2dc6b3a9-ae0b-446b-81d2-a8884c8223c1', targetLocation: 'docker/settings.xml', variable: 'SETTINGS')]) {
+                                    sh 'docker build --secret id=artifactory,src=artifactory.txt -f docker/Dockerfile -t org.eclipse.tcf-gerrit:$BUILD_NUMBER .'
+                                }
+
+                                sh 'docker run -t org.eclipse.tcf-gerrit:$BUILD_NUMBER'
+                            } finally {
+                                sh 'rm artifactory.txt'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

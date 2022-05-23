@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Extension point declarations -->
+   <extension-point id="factoryDelegates" name="Notification Form Text Factory Delegates" schema="schema/factoryDelegates.exsd"/>
+   
+<!-- Event listener contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.eventListeners">
+      <eventListener
+            class="org.eclipse.tcf.te.ui.notifications.internal.events.EventListener"
+            forcePluginActivation="true">
+         <eventType
+               bundleId="org.eclipse.tcf.te.runtime"
+               class="org.eclipse.tcf.te.runtime.events.NotifyEvent">
+         </eventType>
+      </eventListener>
+   </extension>   
+
+<!-- Preference contributions -->
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.tcf.te.ui.notifications.internal.preferences.PreferencesInitializer"/>
+   </extension>
+</plugin>

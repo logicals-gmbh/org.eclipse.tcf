@@ -1,0 +1,352 @@
+<FindBugsFilter>
+	<!-- Set maximum rank level to 16 -->
+	<Match>
+		<Rank value="17"/>
+	</Match>
+
+	<!-- Ignore all I18N Internationalization bugs -->
+	<Match>
+		<Bug category="I18N"/>
+	</Match>
+	
+	<!-- Ignore all NM_SAME_SIMPLE_NAME_AS_SUPERCLASS or NM_SAME_SIMPLE_NAME_AS_INTERFACE violations -->
+	<Match>
+		<Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+	</Match>
+	<Match>
+		<Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE"/>
+	</Match>
+
+	<!-- Ignore everything from org.eclipse.tcf.rse -->
+	<Match>
+		<Package name="~org\.eclipse\.tcf\.internal\.rse\..*"/>
+	</Match>
+	
+	<!-- Ignore NM_CLASS_NOT_EXCEPTION -->
+	<Match>
+		<Bug pattern="NM_CLASS_NOT_EXCEPTION"/>
+		<Or>
+			<Class name="org.eclipse.tcf.te.tcf.core.va.ValueAddException"/>
+			<Class name="org.eclipse.tcf.te.tcf.core.channelmanager.OpenChannelException"/>
+		</Or>
+	</Match>
+
+	<!-- Ignore ES_COMPARING_PARAMETER_STRING_WITH_EQ -->
+	<Match>
+		<Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
+		<Class name="org.eclipse.tcf.te.ui.terminals.manager.ConsoleManager"/>
+	</Match>
+	
+	<!-- Ignore all SF_SWITCH_NO_DEFAULT violations -->
+	<Match>
+		<Bug pattern="SF_SWITCH_NO_DEFAULT"/>
+	</Match>
+
+	<!-- Ignore all serialization violations -->
+	<Match>
+		<Or>
+			<Bug pattern="SE_BAD_FIELD"/>
+			<Bug pattern="SE_BAD_FIELD_INNER_CLASS"/>
+			<Bug pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE"/>
+		</Or>
+	</Match>
+	
+	<!-- Ignore all inner class should be static violations -->
+	<Match>
+		<Or>
+			<Bug pattern="SIC_INNER_SHOULD_BE_STATIC"/>
+			<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON"/>
+			<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_NEEDS_THIS"/>
+		</Or>
+	</Match>
+	
+	<!-- Ignore all REC_CATCH_EXCEPTION -->
+	<Match>
+		<Bug pattern="REC_CATCH_EXCEPTION"/>
+	</Match>
+	
+	<!-- Ignore all STCAL_INVOKE_ON_STATIC_DATE_FORMAT_INSTANCE -->
+	<Match>
+		<Bug pattern="STCAL_INVOKE_ON_STATIC_DATE_FORMAT_INSTANCE"/>
+	</Match>
+	
+	<!-- Ignore all EQ_DOESNT_OVERRIDE_EQUALS -->
+	<Match>
+		<Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
+		<Package name="~org\.eclipse\.tcf\.te\..*"/>
+	</Match>
+	
+	<!-- Ignore all ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD violations in bundle activators -->
+	<Match>
+		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+		<Or>
+			<Method name="start" params="org.osgi.framework.BundleContext" returns="void"/>
+			<Method name="stop" params="org.osgi.framework.BundleContext" returns="void"/>
+			<Class name="~.*\.Activator"/>
+			<Class name="org.eclipse.tcf.te.runtime.properties.PropertiesContainer"/>
+			<Class name="~org\.eclipse\.tcf\.te\.ui\.utils\.TreeViewerUtil.*"/>
+		</Or>
+	</Match>
+	
+	<!-- Ignore NP_NULL_ON_SOME_PATH_MIGHT_BE_INFEASIBLE -->
+	<Match>
+		<Bug pattern="NP_NULL_ON_SOME_PATH_MIGHT_BE_INFEASIBLE"/>
+		<Class name="org.eclipse.tcf.te.ui.trees.TreeViewerSorter"/>
+	</Match>
+	
+	<!-- Ignore RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE -->
+	<Match>
+		<Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+		<Or>
+			<Method name="hasString" params="java.lang.String" returns="boolean"/>
+			<And>
+				<Class name="org.eclipse.tcf.te.tcf.terminals.core.launcher.TerminalsLauncher"/>
+				<Method name="executeLaunch"/>
+			</And>
+			<And>
+				<Class name="org.eclipse.tcf.te.tcf.processes.core.launcher.ProcessLauncher"/>
+				<Method name="executeLaunch"/>
+			</And>
+		</Or>
+	</Match>
+	
+	<!-- Ignore EI_EXPOSE_REP -->
+	<Match>
+		<Bug pattern="EI_EXPOSE_REP"/>
+		<Or>
+			<Method name="getAdapterList"/>
+			<Package name="~org\.eclipse\.tcf\.te\..*"/>
+		</Or>
+	</Match>
+	
+	<!-- Ignore EI_EXPOSE_REP2 -->
+	<Match>
+		<Bug pattern="EI_EXPOSE_REP2"/>
+		<Package name="~org\.eclipse\.tcf\.te\..*"/>
+	</Match>
+	
+	<!-- Ignore PZLA_PREFER_ZERO_LENGTH_ARRAYS -->
+	<Match>
+		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS"/>
+		<Package name="~org\.eclipse\.tcf\.te\..*"/>
+	</Match>
+	
+	<!-- Ignore LI_LAZY_INIT_UPDATE_STATIC in Model.java -->
+	<Match>
+		<Bug pattern="LI_LAZY_INIT_UPDATE_STATIC"/>
+		<And>
+			<Class name="org.eclipse.tcf.te.tcf.locator.model.Model"/>
+			<Method name="initialize"/>
+		</And>
+	</Match>
+	
+	<!-- Ignore URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD -->
+	<Match>
+		<Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"/>
+		<Or>
+			<Class name="org.eclipse.tcf.te.launch.ui.tabs.filetransfers.AbstractFileTransferSection"/>
+			<Class name="org.eclipse.tcf.te.ui.tables.properties.NodePropertiesTableTableNode"/>
+			<Class name="~org\.eclipse\.tcf\.te\.tcf\.terminals\.core\.launcher\.TerminalsStreamsListener.*"/>
+			<Class name="~org\.eclipse\.tcf\.te\.tcf\.processes\.core\.launcher\.ProcessStreamsListener.*"/>
+			<Class name="org.eclipse.tcf.te.tcf.processes.core.model.ProcessTreeNode"/>
+		</Or>
+	</Match>
+
+	<!-- Ignore UW_UNCOND_WAIT -->
+	<Match>
+		<Bug pattern="UW_UNCOND_WAIT"/>
+		<Or>
+			<Class name="org.eclipse.tcf.te.ui.terminals.streams.InputStreamMonitor"/>
+			<Class name="org.eclipse.tcf.te.runtime.processes.ProcessOutputReaderThread"/>
+		</Or>
+	</Match>
+	
+	<!-- Ignore BC_UNCONFIRMED_CAST -->
+	<Match>
+		<Bug pattern="BC_UNCONFIRMED_CAST"/>
+		<Or>
+			<Package name="~org\.eclipse\.tcf\.te\.ui\.trees"/>
+			<Class name="org.eclipse.tcf.te.ui.controls.BaseWizardConfigurationPanelControl"/>
+		</Or>
+	</Match>
+
+	<!-- Ignore BC_UNCONFIRMED_CAST_OF_RETURN_VALUE -->
+	<Match>
+		<Bug pattern="BC_UNCONFIRMED_CAST_OF_RETURN_VALUE"/>
+		<Or>
+			<Class name="org.eclipse.tcf.te.launch.ui.tabs.launchcontext.AbstractContextSelectorControl"/>
+			<Class name="org.eclipse.tcf.te.runtime.stepper.extensions.manager.StepGroupExtensionPointManager"/>
+			<Class name="org.eclipse.tcf.te.tcf.core.util.ExceptionUtils"/>
+		</Or>
+	</Match>
+
+	<!-- Ignore BC_VACUOUS_INSTANCEOF -->
+	<Match>
+		<Bug pattern="BC_VACUOUS_INSTANCEOF"/>
+		<Class name="org.eclipse.tcf.te.runtime.stepper.extensions.StepGroup"/>
+	</Match>
+
+	<!-- Ignore RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE -->
+	<Match>
+		<Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+	</Match>
+	
+	<!-- Ignore DMI_HARDCODED_ABSOLUTE_FILENAME in Host -->
+	<Match>
+		<Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME"/>
+		<Class name="org.eclipse.tcf.te.runtime.utils.Host"/>
+	</Match>
+	
+	<!-- Ignore WA_NOT_IN_LOOP in ProcessOutputReaderThread -->
+	<Match>
+		<Bug pattern="WA_NOT_IN_LOOP"/>
+		<Or>
+			<Class name="org.eclipse.tcf.te.runtime.processes.ProcessOutputReaderThread"/>
+			<Class name="org.eclipse.tcf.te.tcf.launch.cdt.utils.TEHelper"/>
+		</Or>
+	</Match>
+	
+	<!-- Ignore UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR -->
+	<Match>
+		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
+		<Or>
+			<And>
+				<Class name="org.eclipse.tcf.te.ui.internal.utils.BreadthFirstSearcher"/>
+				<Method name="searchNext"/>
+			</And>
+			<And>
+				<Class name="~org\.eclipse\.tcf\.te\.tcf\.processes\.core\.launcher\.ProcessLauncher.*"/>
+				<Or>
+					<Method name="run"/>
+					<Method name="onChannelOpenDone"/>
+				</Or>
+			</And>
+			<And>
+				<Class name="~org\.eclipse\.tcf\.te\.tcf\.processes\.ui\.internal\.properties\.GeneralInformationPage.*"/>
+				<Method name="run"/>
+			</And>
+			<And>
+				<Class name="~org\.eclipse\.tcf\.te\.ui\.views\.editor\.controls\.ButtonPanelControl.*"/>
+				<Method name="propertyChanged"/>
+			</And>
+		</Or>
+	</Match>
+	
+	<!-- Ignore FE_FLOATING_POINT_EQUALITY -->
+	<Match>
+		<Bug pattern="FE_FLOATING_POINT_EQUALITY"/>
+		<Class name="org.eclipse.tcf.te.runtime.properties.PropertiesContainer"/>
+	</Match>
+
+	<!-- Ignore IS2_INCONSISTENT_SYNC -->
+	<Match>
+		<Bug pattern="IS2_INCONSISTENT_SYNC"/>
+		<Or>
+			<Class name="org.eclipse.tcf.te.core.async.AsyncCallbackCollector"/>
+			<Class name="org.eclipse.tcf.te.tcf.filesystem.core.internal.utils.FileState"/>
+			<Class name="org.eclipse.tcf.te.ui.controls.BaseWizardConfigurationPanelControl"/>
+		</Or>
+	</Match>
+
+	<!-- Ignore RV_RETURN_VALUE_IGNORED_BAD_PRACTICE -->
+	<Match>
+		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
+		<Or>
+			<Class name="org.eclipse.tcf.te.tcf.filesystem.ui.internal.columns.FileExtBasedImageUpdater"/>
+			<Class name="~org\.eclipse\.tcf\.te\.tcf\.filesystem\.ui\.internal\.handlers\.OpenFileHandler.*"/>
+			<Package name="~org\.eclipse\.tcf\.te\.tests\..*"/>
+            <Class name="org.eclipse.tcf.te.ui.terminals.local.showin.ExternalExecutablesManager"/>
+            <Class name="org.eclipse.tcf.te.tcf.launch.cdt.utils.TEHelper"/>
+		</Or>
+	</Match>
+
+	<!-- Ignore NP_LOAD_OF_KNOWN_NULL_VALUE -->
+	<Match>
+		<Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE"/>
+        <Or>
+            <Class name="~org\.eclipse\.tcf\.te\.tcf\.core\.internal\.ChannelManager.*"/>
+            <Class name="org.eclipse.tcf.te.ui.terminals.local.showin.ExternalExecutablesDialog"/>
+        </Or>
+	</Match>
+	
+	<!-- Filters for org.eclipse.tcf bundle -->
+	<Match>
+		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+		<Class name="org.eclipse.tcf.Activator"/>
+		<Method name="initialize"/>
+	</Match>
+
+	<!-- Filters for org.eclipse.tcf.core bundle -->
+	<Match>
+		<Bug pattern="EI_EXPOSE_REP2"/>
+		<Class name="org.eclipse.tcf.core.Command"/>
+		<Method name="initialize"/>
+	</Match>
+	<Match>
+		<Bug pattern="STCAL_INVOKE_ON_STATIC_DATE_FORMAT_INSTANCE"/>
+		<Class name="org.eclipse.tcf.core.Command"/>
+		<Method name="appendErrorProps"/>
+	</Match>
+	<Match>
+		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS"/>
+		<Package name="org.eclipse.tcf.internal.services.remote"/>
+	</Match>
+	<Match>
+		<Bug pattern="NN_NAKED_NOTIFY"/>
+		<Class name="org.eclipse.tcf.protocol.Protocol$3"/>
+		<Method name="run"/>
+	</Match>
+	<Match>
+		<Bug pattern="UW_UNCOND_WAIT"/>
+		<Class name="org.eclipse.tcf.protocol.Protocol"/>
+		<Method name="invokeAndWait"/>
+	</Match>
+	<Match>
+		<Bug pattern="WA_NOT_IN_LOOP"/>
+		<Class name="org.eclipse.tcf.protocol.Protocol"/>
+		<Method name="invokeAndWait"/>
+	</Match>
+
+
+	<!-- Filters for org.eclipse.tcf.debug bundle -->
+	<Match>
+		<Bug pattern="LI_LAZY_INIT_STATIC"/>
+		<Class name="org.eclipse.tcf.internal.debug.model.TCFLaunch"/>
+		<Method name="getListeners"/>
+	</Match>
+	<Match>
+		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
+		<Class name="org.eclipse.tcf.internal.debug.launch.TCFLocalAgent"/>
+		<Method name="runLocalAgent"/>
+	</Match>
+	<Match>
+		<Bug pattern="DM_EXIT"/>
+		<Class name="~org\.eclipse\.tcf\.internal\.debug\.tests\.Main.*"/>
+	</Match>
+
+	<!-- Filters for org.eclipse.tcf.debug.ui bundle -->
+	<Match>
+		<Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+		<Class name="org.eclipse.tcf.internal.debug.ui.model.TCFNodeSymbol"/>
+	</Match>
+	<Match>
+		<Bug pattern="LI_LAZY_INIT_STATIC"/>
+		<Class name="org.eclipse.tcf.internal.debug.ui.Activator"/>
+	</Match>
+	<Match>
+		<Bug pattern="NP_BOOLEAN_RETURN_NULL"/>
+		<Class name="org.eclipse.tcf.internal.debug.ui.model.TCFChildrenStackTrace"/>
+		<Method name="checkHasChildren"/>
+	</Match>
+	<Match>
+		<Bug pattern="LI_LAZY_INIT_UPDATE_STATIC"/>
+		<Class name="org.eclipse.tcf.internal.debug.ui.model.TCFModelFonts"/>
+		<Method name="getNormalFontData"/>
+	</Match>
+	<Match>
+		<Bug pattern="NP_BOOLEAN_RETURN_NULL"/>
+		<Class name="org.eclipse.tcf.internal.debug.ui.model.TCFNodeExpression"/>
+		<Method name="usePrevValue"/>
+	</Match>
+
+</FindBugsFilter>

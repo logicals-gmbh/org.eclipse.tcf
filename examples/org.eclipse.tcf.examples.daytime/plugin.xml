@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+<!-- TCF service provider contributions -->
+   <extension point="org.eclipse.tcf.serviceProviders">
+      <serviceProvider
+            class="org.eclipse.tcf.internal.examples.daytime.DaytimeServiceProvider">
+      </serviceProvider>
+   </extension>
+
+</plugin>

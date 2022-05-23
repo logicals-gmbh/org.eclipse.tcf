@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.eclipse.tcf.core.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.core.feature" version="0.0.0">
+      <category name="org.eclipse.tcf"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.core.sdk.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.core.sdk.feature" version="0.0.0">
+      <category name="org.eclipse.tcf"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.feature" version="0.0.0">
+      <category name="org.eclipse.tcf"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.sdk.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.sdk.feature" version="0.0.0">
+      <category name="org.eclipse.tcf"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.cdt.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.cdt.feature" version="0.0.0">
+      <category name="org.eclipse.tcf"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.cdt.sdk.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.cdt.sdk.feature" version="0.0.0">
+      <category name="org.eclipse.tcf"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.rse.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.rse.feature" version="0.0.0">
+      <category name="org.eclipse.tcf"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.rse.sdk.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.rse.sdk.feature" version="0.0.0">
+      <category name="org.eclipse.tcf"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.te.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.te.feature" version="0.0.0">
+      <category name="org.eclipse.tcf.te"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.te.sdk.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.te.sdk.feature" version="0.0.0">
+      <category name="org.eclipse.tcf.te"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.te.tcf.core.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.te.tcf.core.feature" version="0.0.0">
+      <category name="org.eclipse.tcf.te"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.te.tcf.core.sdk.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.te.tcf.core.sdk.feature" version="0.0.0">
+      <category name="org.eclipse.tcf.te"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.te.tcf.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.te.tcf.feature" version="0.0.0">
+      <category name="org.eclipse.tcf.te"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.te.tcf.sdk.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.te.tcf.sdk.feature" version="0.0.0">
+      <category name="org.eclipse.tcf.te"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.te.tcf.launch.cdt.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.te.tcf.launch.cdt.feature" version="0.0.0">
+      <category name="org.eclipse.tcf.te"/>
+   </feature>
+   <feature url="features/org.eclipse.tcf.te.tcf.launch.cdt.sdk.feature_0.0.0.qualifier.jar" id="org.eclipse.tcf.te.tcf.launch.cdt.sdk.feature" version="0.0.0">
+      <category name="org.eclipse.tcf.te"/>
+   </feature>
+   
+   <bundle id="com.google.gson" version="2.2.4.v201311231704">
+      <category name="org.eclipse.tcf.te"/>
+   </bundle>
+   <bundle id="com.google.gson.source" version="2.2.4.v201311231704">
+      <category name="org.eclipse.tcf.te"/>
+   </bundle>
+   <category-def name="org.eclipse.tcf" label="Target Communication Framework">
+      <description>
+         Target Communication Framework
+      </description>
+   </category-def>
+   <category-def name="org.eclipse.tcf.te" label="Target Explorer">
+      <description>
+         Target Explorer
+      </description>
+   </category-def>
+</site>

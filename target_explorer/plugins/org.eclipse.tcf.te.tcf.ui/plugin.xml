@@ -1,0 +1,1249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Adapter factory contributions -->
+   <extension point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"
+            class="org.eclipse.tcf.te.tcf.ui.internal.adapters.AdapterFactory">
+         <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
+         <adapter type="org.eclipse.ui.IPersistableElement"/>
+         <adapter type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
+      </factory>
+      
+      <factory
+            adaptableType="org.eclipse.tcf.protocol.IPeer"
+            class="org.eclipse.tcf.te.tcf.ui.internal.adapters.AdapterFactory">
+         <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
+      </factory>
+      
+      <factory
+            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorNode"
+            class="org.eclipse.tcf.te.tcf.ui.internal.adapters.AdapterFactory">
+         <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
+      </factory>
+      
+      <factory
+            adaptableType="org.eclipse.tcf.te.ui.views.editor.EditorInput"
+            class="org.eclipse.tcf.te.tcf.ui.internal.adapters.AdapterFactory">
+         <adapter type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+         <adapter type="org.eclipse.tcf.te.ui.views.interfaces.IEditorSaveAsAdapter"/>
+      </factory>
+   </extension>   
+
+<!-- Preference contributions -->
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.tcf.te.tcf.ui.internal.PreferencesInitializer">
+      </initializer>
+   </extension>
+
+
+<!-- Source provider contributions -->
+   <extension point="org.eclipse.ui.services">
+      <sourceProvider provider="org.eclipse.tcf.te.tcf.ui.internal.SourceProvider">
+         <variable name="defaultContextSelection" priorityLevel="workbench"/>
+      </sourceProvider>
+   </extension>
+
+<!-- Element factory contributions -->   
+   <extension point="org.eclipse.ui.elementFactories">
+      <factory
+            class="org.eclipse.tcf.te.tcf.ui.internal.adapters.PeerNodeFactory"
+            id="org.eclipse.tcf.te.ui.views.peerFactory">
+      </factory>
+   </extension>
+
+<!-- Eclipse core expressions property tester -->
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.ui.internal.PropertyTester"
+            id="org.eclipse.tcf.te.tcf.ui.propertyTester"
+            namespace="org.eclipse.tcf.te.tcf.ui"
+            properties="canChangeDefaultContext"
+            type="java.lang.Object">
+      </propertyTester>
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.ui.internal.PropertyTester"
+            id="org.eclipse.tcf.te.tcf.ui.propertyTester"
+            namespace="org.eclipse.tcf.te.tcf.ui"
+            properties="canDelete,canRename"
+            type="org.eclipse.jface.viewers.ISelection">
+      </propertyTester>
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.ui.internal.PropertyTester"
+            id="org.eclipse.tcf.te.tcf.ui.propertyTester.wizard"
+            namespace="org.eclipse.tcf.te.tcf.ui"
+            properties="isWizardId"
+            type="org.eclipse.tcf.te.ui.views.navigator.nodes.NewWizardNode">
+      </propertyTester>
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.ui.internal.PropertyTester"
+            id="org.eclipse.tcf.te.tcf.ui.propertyTester.simulator"
+            namespace="org.eclipse.tcf.te.tcf.ui"
+            properties="isValidSimulatorConfig,canDelete,hasHistory,canRename"
+            type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+      </propertyTester>
+   </extension>
+
+<!-- Service contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.services.services">
+      <service
+            class="org.eclipse.tcf.te.tcf.ui.internal.services.MenuService"
+            id="org.eclipse.tcf.te.tcf.ui.services.MenuService">
+         <serviceType
+               bundleId="org.eclipse.tcf.te.runtime.services"
+               class="org.eclipse.tcf.te.runtime.services.interfaces.IMenuService"/>
+         <enablement>
+            <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorNode"/>
+         </enablement>
+      </service>
+
+      <service
+            class="org.eclipse.tcf.te.tcf.ui.internal.services.DefaultContextService"
+            id="org.eclipse.tcf.te.tcf.ui.services.DefaultContextService">
+         <serviceType
+               bundleId="org.eclipse.tcf.te.tcf.locator"
+               class="org.eclipse.tcf.te.tcf.locator.interfaces.services.IDefaultContextService"/>
+      </service>
+
+      <service
+            class="org.eclipse.tcf.te.tcf.ui.internal.services.UIService"
+            id="org.eclipse.tcf.te.tcf.ui.services.UIService">
+         <serviceType class="org.eclipse.tcf.te.runtime.services.interfaces.IUIService"/>
+         <enablement>
+            <and>
+               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+               <test property="org.eclipse.tcf.te.tcf.locator.isOfType" value="null"/>
+            </and>
+         </enablement>
+      </service>
+   </extension>
+   
+<!-- Preference contributions -->   
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.tcf.te.tcf.ui.internal.preferences.PreferencesInitializer"/>
+   </extension>
+
+<!-- Event listener contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.eventListeners">
+      <eventListener
+            class="org.eclipse.tcf.te.tcf.ui.navigator.events.EventListener">
+         <eventSourceType
+               bundleId="org.eclipse.tcf.te.tcf.locator"
+               class="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+         </eventSourceType>
+      </eventListener>
+   </extension>
+
+<!-- New target wizard contributions -->
+   <extension point="org.eclipse.tcf.te.ui.newWizards">
+      <category
+            id="org.eclipse.tcf.te.tcf.ui.newWizards.category.configurations"
+            name="%NewWizards.category.configurations.name">
+      </category>
+   </extension>
+
+<!-- Common navigator contributions -->
+   <extension point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.View">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.tcf.te.tcf.ui.navigator.*"/>
+         </includes>
+      </viewerContentBinding>
+      <dragAssistant
+            class="org.eclipse.tcf.te.tcf.ui.navigator.dnd.DragAssistant"
+            viewerId="org.eclipse.tcf.te.ui.views.View">
+      </dragAssistant>
+   </extension>
+   
+   <extension point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            activeByDefault="true"
+            contentProvider="org.eclipse.tcf.te.tcf.ui.navigator.ContentProvider"
+            icon="icons/obj16/rootNode_obj.gif"
+            id="org.eclipse.tcf.te.tcf.ui.navigator.content"
+            labelProvider="org.eclipse.tcf.te.ui.views.navigator.DelegatingLabelProvider"
+            name="%navigatorContent.name"
+            priority="normal">
+            <triggerPoints>
+               <or>
+                  <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.IRoot"/>
+                  <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorNode"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPendingOperationNode"/>
+               </or>
+            </triggerPoints>
+            <possibleChildren>
+               <or>
+                  <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorNode"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPendingOperationNode"/>
+               </or>
+            </possibleChildren>
+            <commonSorter
+                  class="org.eclipse.tcf.te.tcf.ui.navigator.ViewerSorter"
+                  id="org.eclipse.tcf.te.tcf.ui.navigator.sorter"/>
+            <commonWizard
+                  type="new"
+                  wizardId="org.eclipse.tcf.te.tcf.ui.wizards.NewTargetWizard">
+               <enablement>
+                  <or>
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorNode"/>
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.isOfType" value="null"/>
+                     </and>
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
+                        <or>
+                           <test property="org.eclipse.tcf.te.ui.views.isCategoryID" value="org.eclipse.tcf.te.ui.views.category.neighborhood"/>
+                           <test property="org.eclipse.tcf.te.ui.views.isCategoryID" value="org.eclipse.tcf.te.ui.views.category.mytargets"/>
+                        </or>
+                     </and>
+                  </or>
+               </enablement>
+            </commonWizard>
+            <dropAssistant
+                  class="org.eclipse.tcf.te.tcf.ui.navigator.dnd.DropAssistant"
+                  id="org.eclipse.tcf.te.tcf.ui.navigator.dnd">
+               <possibleDropTargets>
+                  <or>
+                     <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
+                     <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.IRoot"/>
+                  </or>
+               </possibleDropTargets>
+            </dropAssistant>
+      </navigatorContent>
+      <commonFilter
+            activeByDefault="false"
+            class="org.eclipse.tcf.te.tcf.ui.filter.PeersByCurrentUserFilter"
+            id="org.eclipse.tcf.te.tcf.ui.navigator.PeersByCurrentUserFilter"
+            name="%PeersByCurrentUserFilter.name"
+            visibleInUI="true">
+      </commonFilter>
+   </extension>
+
+<!-- Label provider delegates -->
+   <extension point="org.eclipse.tcf.te.ui.views.labelProviderDelegates">
+      <labelProviderDelegate
+            class="org.eclipse.tcf.te.tcf.ui.navigator.PeerLabelProviderDelegate"
+            id="org.eclipse.tcf.te.tcf.ui.peerLabelProviderDelegate">
+         <enablement>
+            <or>
+               <instanceof value="org.eclipse.tcf.protocol.IPeer"/>
+               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorNode"/>
+               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPendingOperationNode"/>
+            </or>
+         </enablement>
+      </labelProviderDelegate>
+   </extension>
+
+<!-- Decorator contributions -->   
+   <extension point="org.eclipse.ui.decorators">
+      <decorator
+            class="org.eclipse.tcf.te.ui.views.navigator.DelegatingLabelProvider"
+            id="org.eclipse.tcf.te.tcf.ui.decorators.peerHost"
+            label="%peerhost.decorator.label"
+            state="true">
+         <enablement>
+            <objectClass name="org.eclipse.tcf.te.core.interfaces.IDecoratable"/>
+         </enablement>
+      </decorator>
+   </extension>
+
+<!-- New target wizard contributions -->
+   <extension point="org.eclipse.tcf.te.ui.newWizards">
+      <category
+            id="org.eclipse.tcf.te.tcf.ui.newWizards.category"
+            name="%NewWizards.category.name">
+      </category>
+      <wizard
+            canFinishEarly="false"
+            category="org.eclipse.tcf.te.tcf.ui.newWizards.category.configurations"
+            class="org.eclipse.tcf.te.tcf.ui.wizards.NewWizard"
+            hasPages="true"
+            icon="icons/elcl16/newTarget_wiz.gif"
+            id="org.eclipse.tcf.te.tcf.ui.wizards.NewTargetWizard"
+            name="%NewTargetWizard.name">
+            <description>
+               %NewTargetWizard.description
+            </description>
+      </wizard>
+   </extension>
+   
+<!-- Import/Export wizard contributions -->
+   <extension point="org.eclipse.ui.importWizards">
+      <category
+            name="%ImportWizards.Category.TCF"
+            id="org.eclipse.tcf.te.tcf.ui.wizard.category.import.tcf">
+      </category>
+      
+      <wizard
+            name="%ImportWizards.Peer"
+            icon="icons/obj16/peer.gif"
+            id="org.eclipse.tcf.te.tcf.ui.wizards.import.tcf"
+            category="org.eclipse.tcf.te.tcf.ui.wizard.category.import.tcf"            
+            class="org.eclipse.tcf.te.tcf.ui.wizards.PeerImportWizard">
+         <description>
+            %ImportWizards.PeerDescription
+         </description>
+      </wizard>
+   </extension>
+   
+   <extension point="org.eclipse.ui.exportWizards">
+      <category
+            name="%ExportWizards.Category.TCF"
+            id="org.eclipse.tcf.te.tcf.ui.wizard.category.export.tcf">
+      </category>
+      
+      <wizard
+            name="%ExportWizards.Peer"
+            icon="icons/obj16/peer.gif"
+            id="org.eclipse.tcf.te.tcf.ui.wizards.export.tcf"
+            category="org.eclipse.tcf.te.tcf.ui.wizard.category.export.tcf"            
+            class="org.eclipse.tcf.te.tcf.ui.wizards.PeerExportWizard">
+         <description>
+            %ExportWizards.PeerDescription
+         </description>
+      </wizard>
+   </extension>
+
+<!-- Editor page contributions -->
+   <extension point="org.eclipse.tcf.te.ui.views.editorPages">
+      <editorPage
+            class="org.eclipse.tcf.te.tcf.ui.editor.OverviewEditorPage"
+            name="%OverviewEditorPage.name"
+            id="org.eclipse.tcf.te.tcf.ui.OverviewEditorPage">
+      </editorPage>
+   </extension>
+
+<!-- Editor page binding contributions -->
+   <extension point="org.eclipse.tcf.te.ui.views.editorPageBindings">
+      <editorPageBinding
+            id="org.eclipse.tcf.te.tcf.ui.binding.OverviewEditorPage"
+            pageId="org.eclipse.tcf.te.tcf.ui.OverviewEditorPage"
+            insertBefore="first">
+         <enablement>
+            <with variable="activeEditorInput">
+               <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                  <test property="org.eclipse.tcf.te.tcf.locator.isOfType" value="null"/>
+               </adapt>
+            </with>
+         </enablement>
+      </editorPageBinding>
+   </extension>
+
+<!-- Preference page contributions -->
+   <extension point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.tcf.te.ui.preferences.general"
+            class="org.eclipse.tcf.te.tcf.ui.preferences.LoggingPreferencePage"
+            id="org.eclipse.tcf.te.ui.preferences.tcf.logging"
+            name="%preference.page.name">
+      </page>
+   </extension>
+
+<!-- Menu contributions -->
+   <extension point="org.eclipse.ui.menus">
+
+   <!-- Main menu contributions -->
+      <menuContribution locationURI="menu:org.eclipse.ui.main.menu">
+         <menu
+               id="org.eclipse.tcf.te.tcf.ui.main.menu.system"
+               label="%menu.system.label"
+               mnemonic="%menu.system.mnemonic">
+	         <separator name="group.connect" visible="false"/>
+	         <separator name="group.launch" visible="true"/>
+	         <separator name="group.launch.rundebug" visible="true"/>
+	         <separator name="group.history" visible="true"/>
+	         <separator name="group.open" visible="true"/>
+	         <separator name="group.delete" visible="false"/>
+	         <separator name="group.rename" visible="false"/>
+	         <separator name="group.new" visible="false"/>
+	         <separator name="group.additions" visible="true"/>
+         </menu>
+      </menuContribution>
+
+   <!-- View context menu contributions -->
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.delete">
+         <command
+               commandId="org.eclipse.ui.edit.delete"
+               disabledIcon="icons/dtool16/delete.png"
+               helpContextId="org.eclipse.tcf.te.ui.command_Delete"
+               icon="icons/etool16/delete.png"
+               id="org.eclipse.tcf.te.ui.commands.delete"
+               label="%command.delete.label"
+               mnemonic="%command.delete.mnemonic"
+               tooltip="%command.delete.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.ui.edit.rename"
+               helpContextId="org.eclipse.tcf.te.tcf.ui.command_Rename"
+               icon="icons/elcl16/rename.gif"
+               id="org.eclipse.tcf.te.tcf.ui.commands.rename"
+               label="%command.rename.label"
+               mnemonic="%command.rename.mnemonic"
+               tooltip="%command.rename.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               label="%command.refresh.label"
+               mnemonic="%command.refresh.mnemonic"
+               style="push"
+               tooltip="%command.refresh.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                        <or>
+                           <not>
+                              <test
+                                    forcePluginActivation="true"
+                                    property="org.eclipse.tcf.te.runtime.services.hasService"
+                                    value="org.eclipse.tcf.te.runtime.services.interfaces.IMenuService"/>
+                           </not>
+                           <test
+                                 property="org.eclipse.tcf.te.runtime.services.menu.isVisible"
+                                 args="org.eclipse.tcf.te.ui.command.refresh"
+                                 value="true"/>
+                        </or>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               label="%command.refresh.label"
+               mnemonic="%command.refresh.mnemonic"
+               style="push"
+               tooltip="%command.refresh.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorNode"/>
+                        <or>
+                           <not>
+                              <test
+                                    forcePluginActivation="true"
+                                    property="org.eclipse.tcf.te.runtime.services.hasService"
+                                    value="org.eclipse.tcf.te.runtime.services.interfaces.IMenuService"/>
+                           </not>
+                           <test
+                                 property="org.eclipse.tcf.te.runtime.services.menu.isVisible"
+                                 args="org.eclipse.tcf.te.ui.command.refresh"
+                                 value="true"/>
+                        </or>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.launch.rundebug">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.command.debug"
+               mnemonic="%command.debug.mnemonic">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <and>
+                           <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                           <or>
+                              <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="RunControl"/>
+                              <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="RunControl"/>
+                           </or>
+                        </and>
+                        <or>
+                           <not>
+                              <test
+                                    forcePluginActivation="true"
+                                    property="org.eclipse.tcf.te.runtime.services.hasService"
+                                    value="org.eclipse.tcf.te.runtime.services.interfaces.IMenuService"/>
+                           </not>
+                           <test
+                                 property="org.eclipse.tcf.te.runtime.services.menu.isVisible"
+                                 args="org.eclipse.tcf.te.tcf.ui.command.debug"
+                                 value="true"/>
+                        </or>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command> 
+      </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.importexport">
+          <command commandId="org.eclipse.ui.file.import">
+             <visibleWhen checkEnabled="false">
+                <with variable="selection">
+                   <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                         <or>
+                            <not>
+                               <test
+                                     forcePluginActivation="true"
+                                     property="org.eclipse.tcf.te.runtime.services.hasService"
+                                     value="org.eclipse.tcf.te.runtime.services.interfaces.IMenuService"/>
+                            </not>
+                            <test
+                                  property="org.eclipse.tcf.te.runtime.services.menu.isVisible"
+                                  args="org.eclipse.ui.file.import"
+                                  value="true"/>
+                         </or>
+                      </and>
+                   </iterate>
+                </with>
+             </visibleWhen>
+          </command>
+          <command commandId="org.eclipse.ui.file.export">
+             <visibleWhen checkEnabled="false">
+                <with variable="selection">
+                   <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                         <or>
+                            <not>
+                               <test
+                                     forcePluginActivation="true"
+                                     property="org.eclipse.tcf.te.runtime.services.hasService"
+                                     value="org.eclipse.tcf.te.runtime.services.interfaces.IMenuService"/>
+                            </not>
+                            <test
+                                  property="org.eclipse.tcf.te.runtime.services.menu.isVisible"
+                                  args="org.eclipse.ui.file.export"
+                                  value="true"/>
+                         </or>
+                      </and>
+                   </iterate>
+                </with>
+             </visibleWhen>
+          </command>
+      </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.launch">
+         <command
+               commandId="org.eclipse.tm.terminal.view.ui.command.launch"
+               helpContextId="org.eclipse.tm.terminal.view.ui.command_Launch"
+               icon="icons/eview16/console_view.gif"
+               id="org.eclipse.tcf.te.tcf.ui.commands.launch"
+               label="%command.launch.label"
+               mnemonic="%command.launch.mnemonic"
+               style="push"
+               tooltip="%command.launch.tooltip">
+               <visibleWhen checkEnabled="false">
+                  <with variable="selection">
+                     <count value="1"/>
+                     <iterate operator="and" ifEmpty="false">
+                        <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                           <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="Terminals"/>
+                        </adapt>
+                     </iterate>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.ui.terminals.hasApplicableLauncherDelegates"
+                           value="true"/>
+                  </with>
+               </visibleWhen>
+         </command>
+      </menuContribution>      
+
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?before=group.goto">
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.connect"
+               mnemonic="%command.connect.mnemonic">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorNode"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+   <!-- Editor page toolbar contributions -->
+   <!-- Main toolbar contribution -->
+      <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?before=additions">
+         <toolbar
+               id="org.eclipse.tcf.te.tcf.ui.toolbar"
+               label="%toolbar.label">
+            <separator name="group.selector" visible="false"/>
+            <separator name="group.connect" visible="false"/>
+            <separator name="group.actions" visible="true"/>
+            <separator name="group.additions" visible="false"/>
+            <separator name="group.global" visible="true"/>
+         </toolbar>
+      </menuContribution>
+
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.tcf.ui.toolbar?after=group.selector">
+         <control
+               class="org.eclipse.tcf.te.tcf.ui.handler.DefaultContextSelectorToolbarContribution"
+               id="org.eclipse.tcf.te.tcf.ui.DefaultContextSelectorToolbarContribution"/>
+      </menuContribution>
+
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.tcf.ui.toolbar?after=group.connect">
+         <command
+               commandId="org.eclipse.tcf.te.ui.toolbar.command.connect"
+               id="org.eclipse.tcf.te.tcf.ui.toolbar.commands.connect"/>
+         <command
+               commandId="org.eclipse.tcf.te.ui.toolbar.command.disconnect"
+               id="org.eclipse.tcf.te.tcf.ui.toolbar.commands.disconnect"/>
+      </menuContribution>
+
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.DefaultContextSelectorToolbarContribution?after=group.open">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.open"
+               mnemonic="%command.open.mnemonic"/>
+      </menuContribution>
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.DefaultContextSelectorToolbarContribution?after=group.delete">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.delete"
+               mnemonic="%command.delete.mnemonic"/>
+      </menuContribution>
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.DefaultContextSelectorToolbarContribution?after=group.rename">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.rename"
+               mnemonic="%command.rename.mnemonic"/>
+      </menuContribution>
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.DefaultContextSelectorToolbarContribution?after=group.new">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.new"
+               mnemonic="%command.new.mnemonic"/>
+      </menuContribution>
+
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.tcf.ui.toolbar?after=group.actions">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.DefaultContextActionsToolbarContribution"
+               style="pulldown"
+               icon="icons/obj16/targets_view.gif"
+               tooltip="%command.defaultContextActions.tooltip">
+         </command>
+      </menuContribution>
+      
+      <menuContribution
+            locationURI="menu:org.eclipse.tcf.te.tcf.ui.DefaultContextActionsToolbarContribution"
+            class="org.eclipse.tcf.te.tcf.ui.handler.DefaultContextActionsMenuContribution">
+      </menuContribution>
+
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.DefaultContextActionsToolbarContribution?after=group.history">
+         <dynamic
+               class="org.eclipse.tcf.te.tcf.ui.handler.ActionHistoryToolbarContribution"
+               id="org.eclipse.tcf.te.tcf.ui.ActionHistoryToolbarContribution">
+            <visibleWhen checkEnabled="false">
+               <with variable="defaultContextSelection">
+                  <and>
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                     <or>
+                        <test property="org.eclipse.tcf.te.tcf.locator.hasAttribute" args="SupportsRecentActionHistory" value="false"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.isAttribute" args="SupportsRecentActionHistory" value="true"/>
+                     </or>
+                  </and>
+               </with>
+            </visibleWhen>
+         </dynamic>
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.history"
+               mnemonic="%command.history.mnemonic">
+            <visibleWhen checkEnabled="false">
+               <with variable="defaultContextSelection">
+                  <and>
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                     <or>
+                        <test property="org.eclipse.tcf.te.tcf.locator.hasAttribute" args="SupportsRecentActionHistory" value="false"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.isAttribute" args="SupportsRecentActionHistory" value="true"/>
+                     </or>
+                  </and>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.DefaultContextActionsToolbarContribution?after=group.launch.rundebug">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.debug"
+               mnemonic="%command.debug.mnemonic">
+            <visibleWhen checkEnabled="false">
+               <with variable="defaultContextSelection">
+                  <and>
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                     <or>
+                        <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="RunControl"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="RunControl"/>
+                     </or>
+                  </and>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+   <!-- System menu contribution -->
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.main.menu.system?after=group.connect">
+         <command
+               commandId="org.eclipse.tcf.te.ui.toolbar.command.connect"
+               mnemonic="%command.connect.mnemonic"/>
+         <command
+               commandId="org.eclipse.tcf.te.ui.toolbar.command.disconnect"
+               mnemonic="%command.disconnect.mnemonic"/>
+      </menuContribution>
+
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.main.menu.system?after=group.launch.rundebug">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.debug"
+               mnemonic="%command.debug.mnemonic">
+            <visibleWhen checkEnabled="false">
+               <with variable="defaultContextSelection">
+                  <and>
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                     <or>
+                        <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="RunControl"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="RunControl"/>
+                     </or>
+                  </and>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.main.menu.system?after=group.open">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.open"
+               mnemonic="%command.open.mnemonic"/>
+      </menuContribution>
+
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.main.menu.system?after=group.delete">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.delete"
+               mnemonic="%command.delete.mnemonic"/>
+      </menuContribution>
+
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.main.menu.system?after=group.history">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.history"
+               mnemonic="%command.history.mnemonic"/>
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.historyLast"
+               mnemonic="%command.historyLast.mnemonic"/>
+      </menuContribution>
+
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.main.menu.system?after=group.new">
+         <separator name="group.connections" visible="true"/>
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.select"
+               mnemonic="%command.select.mnemonic"/>
+         <command
+               commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.new"
+               mnemonic="%command.new.mnemonic"/>
+      </menuContribution>
+
+   </extension>
+
+<!-- Command contributions -->
+   <extension point="org.eclipse.ui.commands">
+      <command
+            id="org.eclipse.tcf.te.tcf.ui.toolbar.command.select"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_Select"
+            name="%command.select.label"
+            description="%command.select.toolbar.tooltip">
+      </command>
+      <command
+            id="org.eclipse.tcf.te.tcf.ui.toolbar.command.new"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_New"
+            name="%command.new.label"
+            description="%command.new.toolbar.tooltip">
+      </command>
+      <command
+            id="org.eclipse.tcf.te.tcf.ui.toolbar.command.open"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_Open"
+            name="%command.open.label"
+            description="%command.open.toolbar.tooltip">
+      </command>
+      <command
+            id="org.eclipse.tcf.te.tcf.ui.toolbar.command.delete"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_Delete"
+            name="%command.delete.label"
+            description="%command.delete.toolbar.tooltip">
+      </command>
+      <command
+            id="org.eclipse.tcf.te.tcf.ui.toolbar.command.rename"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_Rename"
+            name="%command.rename.label"
+            description="%command.rename.toolbar.tooltip">
+      </command>
+      <command
+            id="org.eclipse.tcf.te.tcf.ui.command.debug"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_Debug"
+            name="%command.debug.label"
+            description="%command.debug.tooltip">
+      </command>
+      <command
+            id="org.eclipse.tcf.te.tcf.ui.editor.command.debug"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_Debug"
+            name="%command.debug.label"
+            description="%command.debug.tooltip">
+      </command>
+      <command
+            id="org.eclipse.tcf.te.tcf.ui.toolbar.command.debug"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_Debug"
+            name="%command.debug.label"
+            description="%command.debug.tooltip">
+      </command>
+      <command
+            id="org.eclipse.tcf.te.tcf.ui.toolbar.command.history"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_History"
+            name="%command.history.label"
+            description="%command.history.tooltip">
+      </command>
+      <command
+            id="org.eclipse.tcf.te.tcf.ui.toolbar.command.historyLast"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.ui.command_HistoryLast"
+            name="%command.historyLast.label">
+      </command>
+      <command
+            id="org.eclipse.tcf.te.tcf.ui.DefaultContextActionsToolbarContribution"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            name="%command.defaultContextActions.label"
+            description="%command.defaultContextActions.tooltip">
+   	  </command>
+   </extension>
+
+<!-- Command shortcuts -->
+   <extension point="org.eclipse.ui.bindings">
+      <key  commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.select"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+C"/>
+      <key  commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.history"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+F11"/>
+      <!-- bug 516908 - M1+M2+F11 == Cmd+Shift+F11 already taken by Debug:Run Last on OSX -->
+      <key
+            commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.historyLast"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="win32"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+F11"/>
+      <key
+            commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.historyLast"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="gtk"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+F11"/>
+      <key
+            commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.historyLast"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+F11"/>
+   </extension>
+
+<!-- Command image contributions -->
+   <extension point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.new"
+            icon="icons/etool16/newConfig.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.delete"
+            icon="icons/etool16/delete.gif">
+      </image>
+      <image
+      		commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.rename"
+      		icon="icons/elcl16/rename.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.tcf.ui.command.debug"
+            icon="icons/etool16/debug_exc.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.tcf.ui.editor.command.debug"
+            icon="icons/etool16/debug_exc.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.debug"
+            icon="icons/etool16/debug_exc.gif">
+      </image>
+   </extension>
+
+<!-- Handler contributions -->
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            commandId="org.eclipse.tcf.te.ui.command.connect"
+            class="org.eclipse.tcf.te.tcf.ui.handler.ConnectLocatorNodeCommandHandler">
+            <activeWhen>
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorNode"/>
+                  </iterate>
+               </with>
+            </activeWhen>
+      </handler>
+      
+      <handler
+            commandId="org.eclipse.ui.edit.delete"
+            class="org.eclipse.tcf.te.tcf.ui.handler.DeleteHandler">
+            <activeWhen>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                  </iterate>
+               </with>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <test property="org.eclipse.tcf.te.tcf.ui.canDelete" value="true"/>
+               </with>
+            </enabledWhen>
+      </handler>
+
+      <handler
+            commandId="org.eclipse.ui.edit.rename"
+            class="org.eclipse.tcf.te.tcf.ui.handler.RenameHandler">
+            <activeWhen>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                  </iterate>
+               </with>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <test property="org.eclipse.tcf.te.tcf.ui.canRename" value="true"/>
+               </with>
+            </enabledWhen>
+      </handler>
+
+      <handler
+            commandId="org.eclipse.tcf.te.ui.command.refresh"
+            class="org.eclipse.tcf.te.tcf.ui.handler.RefreshPeerNodeHandler">
+            <activeWhen>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                  </iterate>
+               </with>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                        <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+                     </and>
+                  </iterate>
+               </with>
+            </enabledWhen>
+      </handler>
+
+      <handler
+            commandId="org.eclipse.tcf.te.ui.command.refresh"
+            class="org.eclipse.tcf.te.tcf.ui.handler.RefreshLocatorNodeHandler">
+            <activeWhen>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorNode"/>
+                  </iterate>
+               </with>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorNode"/>
+                  </iterate>
+               </with>
+            </enabledWhen>
+      </handler>
+
+      <handler
+            commandId="org.eclipse.tcf.te.tcf.ui.command.debug"
+            class="org.eclipse.tcf.te.tcf.ui.handler.StartDebugCommandHandler">
+         <activeWhen>
+            <with variable="selection">
+               <iterate operator="and" ifEmpty="false">
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+               </iterate>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <iterate operator="and" ifEmpty="false">
+                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                     <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="RunControl"/>
+                     <test property="org.eclipse.tcf.te.launch.core.isLaunched" value="false"/>
+                  </adapt>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+
+      <handler
+            commandId="org.eclipse.tcf.te.tcf.ui.editor.command.debug"
+            class="org.eclipse.tcf.te.tcf.ui.handler.StartDebugCommandHandler">
+            <activeWhen>
+               <with variable="activeEditorInput">
+                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+               </with>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="activeEditorInput">
+                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                     <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="RunControl"/>
+                     <test property="org.eclipse.tcf.te.launch.core.isLaunched" value="false"/>
+                  </adapt>
+               </with>
+            </enabledWhen>
+      </handler>
+
+      <handler
+            commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.new"
+            class="org.eclipse.tcf.te.tcf.ui.handler.NewToolbarWizardHandler">
+      </handler>
+
+      <handler
+            commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.select"
+            class="org.eclipse.tcf.te.tcf.ui.handler.SelectDefaultContextHandler">
+            <enabledWhen>
+               <test property="org.eclipse.tcf.te.tcf.ui.canChangeDefaultContext"/>
+            </enabledWhen>
+      </handler>
+
+      <handler
+            commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.open"
+            class="org.eclipse.tcf.te.tcf.ui.handler.OpenEditorToolbarCommandHandler">
+            <activeWhen>
+               <with variable="defaultContextSelection">
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+               </with>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="defaultContextSelection">
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+               </with>
+            </enabledWhen>
+      </handler>
+
+      <handler
+            commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.delete"
+            class="org.eclipse.tcf.te.tcf.ui.handler.DeleteToolbarCommandHandler">
+            <activeWhen>
+               <with variable="defaultContextSelection">
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+               </with>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="defaultContextSelection">
+                  <test property="org.eclipse.tcf.te.tcf.ui.canDelete" value="true"/>
+               </with>
+            </enabledWhen>
+      </handler>
+      
+      <handler
+            commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.rename"
+            class="org.eclipse.tcf.te.tcf.ui.handler.RenameToolbarCommandHandler">
+            <activeWhen>
+               <with variable="defaultContextSelection">
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+               </with>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="defaultContextSelection">
+                  <test property="org.eclipse.tcf.te.tcf.ui.canRename" value="true"/>
+               </with>
+            </enabledWhen>
+      </handler>   
+
+      <handler
+            commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.debug"
+            class="org.eclipse.tcf.te.tcf.ui.handler.StartDebugToolbarCommandHandler">
+            <activeWhen>
+               <with variable="defaultContextSelection">
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+               </with>
+            </activeWhen>
+            <enabledWhen>
+               <with variable="defaultContextSelection">
+                  <and>
+                     <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="RunControl"/>
+                     <test property="org.eclipse.tcf.te.launch.core.isLaunched" value="false"/>
+                  </and>
+               </with>
+            </enabledWhen>
+      </handler>
+
+      <handler commandId="org.eclipse.tcf.te.ui.toolbar.command.connect">
+         <class class="org.eclipse.tcf.te.tcf.ui.handler.ConnectableToolbarCommandHandler">
+            <parameter name="action" value="connect"/>
+            <parameter name="handleDirty" value="true"/>
+         </class>
+         <enabledWhen>
+            <with variable="defaultContextSelection">
+               <adapt type="org.eclipse.tcf.te.core.interfaces.IConnectable">
+                  <test forcePluginActivation="true"
+                        property="org.eclipse.tcf.te.core.isConnectStateChangeActionAllowed"
+                        value="connect"/>
+               </adapt>
+            </with>
+         </enabledWhen>
+      </handler>
+
+      <handler commandId="org.eclipse.tcf.te.ui.toolbar.command.disconnect">
+         <class class="org.eclipse.tcf.te.tcf.ui.handler.ConnectableToolbarCommandHandler">
+            <parameter name="action" value="disconnect"/>
+         </class>
+         <enabledWhen>
+            <with variable="defaultContextSelection">
+               <adapt type="org.eclipse.tcf.te.core.interfaces.IConnectable">
+                  <test forcePluginActivation="true"
+                        property="org.eclipse.tcf.te.core.isConnectStateChangeActionAllowed"
+                        value="disconnect"/>
+               </adapt>
+            </with>
+         </enabledWhen>
+      </handler>
+
+      <handler commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.history">
+         <class class="org.eclipse.tcf.te.tcf.ui.handler.ActionHistoryHandler"/>
+         <activeWhen>
+            <with variable="defaultContextSelection">
+               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+            </with>
+         </activeWhen> 
+         <enabledWhen>
+            <with variable="defaultContextSelection">
+               <and>
+                  <test property="org.eclipse.tcf.te.tcf.ui.hasHistory"/>
+                  <adapt type="org.eclipse.tcf.te.core.interfaces.IConnectable">
+                     <test forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.core.isConnectState"
+                           value="connect"/>
+                  </adapt>
+               </and>
+            </with>
+         </enabledWhen>
+      </handler>
+
+      <handler commandId="org.eclipse.tcf.te.tcf.ui.toolbar.command.historyLast">
+         <class class="org.eclipse.tcf.te.tcf.ui.handler.ExecuteLastHistoryActionHandler"/>
+         <activeWhen>
+            <with variable="defaultContextSelection">
+               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+            </with>
+         </activeWhen> 
+         <enabledWhen>
+            <with variable="defaultContextSelection">
+               <and>
+                  <test property="org.eclipse.tcf.te.tcf.ui.hasHistory"/>
+                  <adapt type="org.eclipse.tcf.te.core.interfaces.IConnectable">
+                     <test forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.core.isConnectState"
+                           value="connect"/>
+                  </adapt>
+               </and>
+            </with>
+         </enabledWhen>
+      </handler>
+      
+      <handler
+            commandId="org.eclipse.tcf.te.tcf.ui.DefaultContextActionsToolbarContribution"
+            class="org.eclipse.tcf.te.tcf.ui.handler.DefaultContextActionsCommandHandler">
+            <activeWhen>
+            	<with variable="defaultContextSelection">
+					<instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+				</with>
+            </activeWhen>
+      </handler>
+   </extension>
+   
+<!-- Tabbed properties view contributions -->   
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs contributorId="org.eclipse.tcf.te.ui">
+         <propertyTab
+               category="org.eclipse.tcf.te"
+               id="org.eclipse.tcf.te.ui.views.propertyTab.locator.general"
+               label="%propertyTab.general.label"/>
+      </propertyTabs>
+   </extension>
+   
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections contributorId="org.eclipse.tcf.te.ui">
+         <propertySection
+               class="org.eclipse.tcf.te.tcf.ui.internal.tabbed.PeerNodePropertiesSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.ui.internal.tabbed.PeerNodeSectionFilter"
+               id="org.eclipse.tcf.te.ui.views.propertysections.peerNode.general"
+               tab="org.eclipse.tcf.te.ui.views.propertyTab.locator.general"/>
+         <propertySection
+               class="org.eclipse.tcf.te.tcf.ui.internal.tabbed.PeerPropertiesSection"
+               enablesFor="1"
+               filter="org.eclipse.tcf.te.tcf.ui.internal.tabbed.PeerSectionFilter"
+               id="org.eclipse.tcf.te.ui.views.propertysections.peer.general"
+               tab="org.eclipse.tcf.te.ui.views.propertyTab.locator.general"/>
+      </propertySections>
+   </extension>
+
+<!-- Activity contributions -->
+   <extension point="org.eclipse.ui.activities">
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.te.ui.views.activity.systemmanagement.views"
+            pattern="org\.eclipse\.tcf\.te\.tcf\.ui/org\.eclipse\.tcf\.te\.tcf\.ui\..*">
+      </activityPatternBinding>
+   </extension>
+   
+<!-- Perspective contributions -->   
+   <extension point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="*">
+         <hiddenMenuItem id="org.eclipse.tcf.te.tcf.ui.main.menu.system"/>
+      </perspectiveExtension>
+   </extension>
+   
+<!-- Themes contributions -->
+	<extension point="org.eclipse.ui.themes">
+		<themeElementCategory label="%toolbar.label" id="org.eclipse.ui.themes.presentation" />
+		<colorDefinition label="%matchColors.toolbarWarningBackground.label" categoryId="org.eclipse.ui.themes.presentation" value="255,250,150" id="org.eclipse.ui.themes.matchColors.toolbarWarningBackground">
+	  		<description>%matchColors.toolbarWarningBackground.description</description> 
+	  	</colorDefinition>
+	</extension>
+
+</plugin>

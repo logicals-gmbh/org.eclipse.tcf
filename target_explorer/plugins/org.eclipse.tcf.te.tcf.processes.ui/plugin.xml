@@ -1,0 +1,970 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Adapter factory contributions -->
+   <extension point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.adapters.AdapterFactory">
+         <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
+         <adapter type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+         <adapter type="org.eclipse.tcf.te.ui.interfaces.ISearchable"/>
+      </factory>
+
+      <factory
+            adaptableType="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.runtime.IRuntimeModel"
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.adapters.AdapterFactory">
+         <adapter type="org.eclipse.tcf.te.ui.interfaces.ISearchable"/>
+      </factory>
+   </extension>
+
+<!-- Event listener contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.eventListeners">
+      <eventListener
+            class="org.eclipse.tcf.te.tcf.ui.navigator.events.EventListener">
+         <eventSourceType
+               bundleId="org.eclipse.tcf.te.tcf.processes.core"
+               class="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.runtime.IRuntimeModel">
+         </eventSourceType>
+         <eventSourceType
+               bundleId="org.eclipse.tcf.te.tcf.processes.core"
+               class="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode">
+         </eventSourceType>
+      </eventListener>
+   </extension>
+
+<!-- Service contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.services.services">
+      <service
+            class="org.eclipse.tcf.te.tcf.processes.ui.services.UIService"
+            id="org.eclipse.tcf.te.tcf.processes.uiservice">
+         <serviceType class="org.eclipse.tcf.te.runtime.services.interfaces.IUIService"/>
+         <enablement>
+            <or>
+               <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.runtime.IRuntimeModel"/>
+               <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+            </or>
+         </enablement>
+      </service>
+
+      <service
+            class="org.eclipse.tcf.te.tcf.processes.ui.services.DelegateService"
+            id="org.eclipse.tcf.te.tcf.processes.ui.services.Delegate">
+         <serviceType class="org.eclipse.tcf.te.runtime.services.interfaces.IDelegateService"/>
+         <enablement>
+            <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+         </enablement>
+      </service>
+   </extension>
+
+<!-- Eclipse core expressions property tester -->
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.processes.ui.internal.properties.PropertyTester"
+            id="org.eclipse.tcf.te.tcf.processes.ui.properties"
+            namespace="processMonitor.delegatedActivation"
+            properties="isColumnActive,isFilterActive"
+            type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+      </propertyTester>
+   </extension>
+
+<!-- Common navigator contributions -->
+   <extension point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding
+            viewerId="org.eclipse.tcf.te.ui.views.View">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.tcf.te.tcf.processes.ui.navigator.*">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+   </extension>
+
+   <extension point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            activeByDefault="false"
+            contentProvider="org.eclipse.tcf.te.tcf.processes.ui.navigator.runtime.ContentProvider"
+            icon="icons/obj16/process_root.gif"
+            id="org.eclipse.tcf.te.tcf.processes.ui.navigator.content"
+            labelProvider="org.eclipse.tcf.te.ui.views.navigator.DelegatingLabelProvider"
+            name="%navigatorContent.name"
+            priority="normal">
+            
+            <triggerPoints>
+               <or>
+                  <and>
+                     <reference definitionId="te.expressions.IConnectable.connected"/>
+                     <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                     <and>
+                        <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="Processes"/>
+                        <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="SysMonitor"/>
+                     </and>
+                  </and>
+                  <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.runtime.IRuntimeModel"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IPendingOperationNode"/>
+               </or>
+            </triggerPoints>
+            <possibleChildren>
+               <or>
+                  <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.runtime.IRuntimeModel"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IPendingOperationNode"/>
+               </or>
+            </possibleChildren>
+            <commonSorter
+                  class="org.eclipse.tcf.te.ui.trees.TreeViewerSorterCaseInsensitive">
+            </commonSorter>
+      </navigatorContent>
+
+      <commonFilter
+            activeByDefault="true"
+            class="org.eclipse.tcf.te.tcf.processes.ui.filters.SingleThreadFilter"
+            id="org.eclipse.tcf.te.tcf.processes.ui.navigator.filter.singleThread"
+            name="%commonFilter.singlethread.name"
+            visibleInUI="false">
+      </commonFilter>
+
+   </extension>
+
+<!-- Label provider delegates -->
+   <extension point="org.eclipse.tcf.te.ui.views.labelProviderDelegates">
+      <labelProviderDelegate
+            class="org.eclipse.tcf.te.tcf.processes.ui.navigator.runtime.LabelProviderDelegate"
+            id="org.eclipse.tcf.te.tcf.processes.ui.labelProviderDelegate" 
+            rank="10">
+         <enablement>
+            <or>
+               <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+               <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.runtime.IRuntimeModel"/>
+               <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IPendingOperationNode"/>
+            </or>
+         </enablement>
+      </labelProviderDelegate>
+   </extension>
+
+<!-- Editor page contributions -->
+   <extension point="org.eclipse.tcf.te.ui.views.editorPages">
+      <editorPage
+            class="org.eclipse.tcf.te.tcf.processes.ui.editor.ProcessMonitorEditorPage"
+            icon="icons/obj16/process_root.gif"
+            id="org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage"
+            name="%ProcessExplorerEditorPage.name">
+      </editorPage>
+   </extension>
+
+<!-- Editor page binding contributions -->
+   <extension point="org.eclipse.tcf.te.ui.views.editorPageBindings">
+      <editorPageBinding
+            id="org.eclipse.tcf.te.tcf.processes.ui.binding.ProcessExplorerEditorPage"
+            pageId="org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage"
+            insertBefore="org.eclipse.tcf.te.tcf.launch.ui.MemoryMapEditorPage,org.eclipse.tcf.te.tcf.launch.ui.PathMapEditorPage,org.eclipse.tcf.te.launch.ui.SourceLookupEditorPage,org.eclipse.tcf.te.launch.ui.LaunchEditorPage">
+         <enablement>
+            <with variable="activeEditorInput">
+               <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                  <and>
+                     <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="Processes"/>
+                     <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="SysMonitor"/>
+                  </and>
+               </adapt>
+            </with>
+         </enablement>
+      </editorPageBinding>
+   </extension>
+
+<!-- Processes menu contributions -->
+   <extension point="org.eclipse.ui.menus">
+
+   <!-- System Managegement View context menu contributions -->
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.launch.rundebug">
+         <separator
+               name="group.launch.rundebug.commands"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.tcf.te.launch.command.attach"
+               disabledIcon="icons/dlcl16/attach.gif"
+               icon="icons/elcl16/attach.gif"
+               id="org.eclipse.tcf.te.tcf.processes.ui.commands.attach"
+               label="%command.attach.label"
+               mnemonic="%command.attach.mnemonic"
+               style="push"
+               tooltip="%command.attach.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+                        <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                           <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="RunControl"/>
+                           <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="Processes"/>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.eclipse.tcf.te.runtime.services.hasService"
+                                 value="org.eclipse.tcf.te.runtime.services.interfaces.IDebugService"/>
+                        </adapt>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.tcf.te.launch.command.detach"
+               disabledIcon="icons/dlcl16/detach.gif"
+               icon="icons/elcl16/detach.gif"
+               id="org.eclipse.tcf.te.tcf.processes.ui.commands.detach"
+               label="%command.detach.label"
+               mnemonic="%command.detach.mnemonic"
+               style="push"
+               tooltip="%command.detach.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+                        <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                           <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="RunControl"/>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.eclipse.tcf.te.runtime.services.hasService"
+                                 value="org.eclipse.tcf.te.runtime.services.interfaces.IDebugService"/>
+                        </adapt>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.tcf.te.launch.command.terminate"
+               icon="icons/elcl16/terminate_co.png"
+               id="org.eclipse.tcf.te.launch.menu.terminate"
+               label="%command.terminate.label"
+               mnemonic="%command.terminate.mnemonic"
+               style="push"
+               tooltip="%command.terminate.tooltip">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="te.expressions.processes.isProcessTreeNode"/>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.refresh">
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               id="org.eclipse.tcf.te.ui.commands.refresh"
+               label="%command.refresh.label"
+               mnemonic="%command.refresh.mnemonic"
+               style="push"
+               tooltip="%command.refresh.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <or>
+                        <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.runtime.IRuntimeModel"/>
+                        <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+                     </or>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+   <!-- Editor page toolbar contributions -->
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage?after=group.additions">
+         <command
+               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshViewer"
+               icon="icons/obj16/refresh.gif"
+               label="%command.refreshviewer.label"
+               style="push"
+               tooltip="%command.refreshviewer.tooltip">
+         </command>
+         <command
+               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshInterval"
+               icon="icons/obj16/refresh_interval.png"
+               id="org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage.refreshInterval"
+               label="%command.configure.label"
+               style="pulldown"
+               tooltip="%command.configure.tooltip">
+         </command>
+      </menuContribution>
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage.refreshInterval">
+         <dynamic
+               class="org.eclipse.tcf.te.tcf.processes.ui.handler.ConfigIntervalDynamicContribution"
+               id="org.eclipse.tcf.te.tcf.processes.ui.menu.refreshIntervalDynamic">
+         </dynamic>
+      </menuContribution>
+
+   <!-- Editor page toolbar menu contributions -->
+      <!--menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage?after=group.additions">
+         <command commandId="org.eclipse.tcf.te.ui.command.showIn.systemManagement"/>
+      </menuContribution-->
+      
+   <!-- Editor page context menu contributions -->
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.tcf.processes.ui.ProcessExplorerEditorPage?after=additions">
+         <separator
+               name="group.showIn"
+               visible="true">
+         </separator>
+         <menu
+               id="org.eclipse.tcf.te.launch.ui.editor.menu.showIn"
+               label="%ShowIn.menu.name"
+               mnemonic="%ShowIn.menu.mnemonic">
+               <command
+                     commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
+                     id="org.eclipse.tcf.te.launch.ui.editor.commands.showInProperties"
+                     icon="icons/eview16/prop_ps.gif"
+                     label="%Properties.menu.name"
+                     mnemonic="%Properties.menu.mnemonic"
+                     style="push">
+                  <visibleWhen>
+                     <reference definitionId="te.expressions.processes.isProcessTreeNode"/>
+                  </visibleWhen>
+               </command>
+            <visibleWhen checkEnabled="true"/>
+         </menu>
+         <separator
+               name="group.launch"
+               visible="true">
+         </separator>
+         <separator
+               name="group.launch.rundebug"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.tcf.te.launch.command.attach"
+               disabledIcon="icons/dlcl16/attach.gif"
+               icon="icons/elcl16/attach.gif"
+               id="org.eclipse.tcf.te.tcf.processes.ui.commands.attach"
+               label="%command.attach.label"
+               mnemonic="%command.attach.mnemonic"
+               style="push"
+               tooltip="%command.attach.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+                        <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                           <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="RunControl"/>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.eclipse.tcf.te.runtime.services.hasService"
+                                 value="org.eclipse.tcf.te.runtime.services.interfaces.IDebugService"/>
+                        </adapt>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.tcf.te.launch.command.detach"
+               disabledIcon="icons/dlcl16/detach.gif"
+               icon="icons/elcl16/detach.gif"
+               id="org.eclipse.tcf.te.tcf.processes.ui.commands.detach"
+               label="%command.detach.label"
+               style="push"
+               tooltip="%command.detach.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+                        <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                           <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="RunControl"/>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.eclipse.tcf.te.runtime.services.hasService"
+                                 value="org.eclipse.tcf.te.runtime.services.interfaces.IDebugService"/>
+                        </adapt>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.tcf.te.launch.command.terminate"
+               icon="icons/elcl16/terminate_co.png"
+               id="org.eclipse.tcf.te.launch.menu.terminate"
+               label="%command.terminate.label"
+               style="push"
+               tooltip="%command.terminate.tooltip">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="te.expressions.processes.isProcessTreeNode"/>
+            </visibleWhen>
+         </command>
+         <separator
+               name="group.refresh"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.refresh"
+               label="%command.refresh.label"
+               mnemonic="%command.refresh.mnemonic"
+               style="push"
+               tooltip="%command.refresh.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate ifEmpty="false" operator="and">
+                     <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="group.search"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.tcf.te.ui.views.command.find"
+               label="%command.search.label"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <iterate>
+                     <adapt type="org.eclipse.tcf.te.ui.interfaces.ISearchable">
+                        <instanceof value="org.eclipse.tcf.te.ui.interfaces.ISearchable"/>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <separator
+               name="group.filter"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.tcf.te.ui.views.command.quickfilter"
+               label="%command.filter.label"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <iterate>
+                     <adapt type="org.eclipse.tcf.te.core.interfaces.IFilterable">
+                        <instanceof value="org.eclipse.tcf.te.core.interfaces.IFilterable"/>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.tcf.te.ui.views.command.resetfilter"
+               label="%command.reset.label"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <iterate>
+                     <adapt type="org.eclipse.tcf.te.core.interfaces.IFilterable">
+                        <instanceof value="org.eclipse.tcf.te.core.interfaces.IFilterable"/>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+   <!-- Main toolbar contributions -->
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.DefaultContextActionsToolbarContribution?after=group.launch.rundebug">
+         <command commandId="org.eclipse.tcf.te.tcf.processes.ui.command.attach">
+            <visibleWhen checkEnabled="false">
+               <with variable="defaultContextSelection">
+                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                     <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="RunControl"/>
+                     <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="Processes"/>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.runtime.services.hasService"
+                           value="org.eclipse.tcf.te.runtime.services.interfaces.IDebugService"/>
+                  </adapt>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+   <!-- System menu contributions -->
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.tcf.ui.main.menu.system?after=group.launch.rundebug">
+         <command 
+               commandId="org.eclipse.tcf.te.tcf.processes.ui.command.attach"
+               mnemonic="%command.attach.mnemonic">
+            <visibleWhen checkEnabled="false">
+               <with variable="defaultContextSelection">
+                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                     <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="RunControl"/>
+                     <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="Processes"/>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.runtime.services.hasService"
+                           value="org.eclipse.tcf.te.runtime.services.interfaces.IDebugService"/>
+                  </adapt>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+   </extension>
+
+<!-- Command contributions -->
+   <extension point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_Refresh"
+            id="org.eclipse.tcf.te.tcf.processes.ui.command.refreshViewer"
+            name="%command.refreshviewer.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_RefreshInterval"
+            id="org.eclipse.tcf.te.tcf.processes.ui.command.refreshInterval"
+            name="%command.configure.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.launch.command_Terminate"
+            id="org.eclipse.tcf.te.launch.command.terminate"
+            name="%command.terminate.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.tcf.processes.ui.command_Attach"
+            id="org.eclipse.tcf.te.tcf.processes.ui.command.attach"
+            description="%command.attach.tooltip"
+            name="%command.attach.label">
+      </command>
+   </extension>
+
+<!-- Command image contributions -->
+   <extension point="org.eclipse.ui.commandImages">
+      <image commandId="org.eclipse.tcf.te.tcf.processes.ui.command.attach"
+            icon="icons/obj16/attach.gif"/>
+   </extension>
+
+<!-- Handler contributions -->
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.tcf.te.tcf.processes.ui.handler.RefreshProcessListHandler"
+            commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshViewer">
+      </handler>
+
+      <handler
+            class="org.eclipse.tcf.te.tcf.processes.ui.handler.ConfigRefreshIntervalHandler"
+            commandId="org.eclipse.tcf.te.tcf.processes.ui.command.refreshInterval">
+      </handler>
+
+      <handler commandId="org.eclipse.tcf.te.launch.command.attach">
+         <class class="org.eclipse.tcf.te.tcf.processes.ui.handler.AttachContextHandler">
+            <parameter name="operation" value="attach"/>
+         </class>
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <or>
+                     <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                     <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                  </or>
+               </with>
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+                     <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                        <test
+                              forcePluginActivation="true"
+                              property="org.eclipse.tcf.te.runtime.services.hasService"
+                              value="org.eclipse.tcf.te.runtime.services.interfaces.IDebugService"/>
+                     </adapt>
+                  </iterate>
+               </with>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <count value="+"/>
+               <iterate operator="and" ifEmpty="false">
+                  <adapt type="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode">
+                     <and>
+                        <test property="org.eclipse.tcf.te.tcf.processes.core.hasProcessContext" value="true"/>
+                        <test property="org.eclipse.tcf.te.tcf.processes.core.canAttach" value="true"/>
+                        <test property="org.eclipse.tcf.te.tcf.processes.core.isAttached" value="false"/>
+                     </and>
+                  </adapt>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+
+      <handler commandId="org.eclipse.tcf.te.tcf.processes.ui.command.attach">
+         <class class="org.eclipse.tcf.te.tcf.processes.ui.handler.AttachContextToolbarHandler">
+            <parameter name="operation" value="attach"/>
+         </class>
+         <activeWhen>
+            <with variable="defaultContextSelection">
+               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="defaultContextSelection">
+               <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                  <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="RunControl"/>
+                  <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="Processes"/>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.tcf.te.runtime.services.hasService"
+                        value="org.eclipse.tcf.te.runtime.services.interfaces.IDebugService"/>
+               </adapt>
+            </with>
+         </enabledWhen>
+      </handler>
+
+      <handler
+            class="org.eclipse.tcf.te.tcf.processes.ui.handler.DetachHandler"
+            commandId="org.eclipse.tcf.te.launch.command.detach">
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <or>
+                     <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                     <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                  </or>
+               </with>
+               <with variable="selection">
+                  <count value="+"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+                     <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                        <test
+                              forcePluginActivation="true"
+                              property="org.eclipse.tcf.te.runtime.services.hasService"
+                              value="org.eclipse.tcf.te.runtime.services.interfaces.IDebugService"/>
+                     </adapt>
+                  </iterate>
+               </with>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <count value="+"/>
+               <iterate operator="and" ifEmpty="false">
+                  <adapt type="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode">
+                     <and>
+                        <test property="org.eclipse.tcf.te.tcf.processes.core.hasProcessContext" value="true"/>
+                        <test property="org.eclipse.tcf.te.tcf.processes.core.isAttached" value="true"/>
+                     </and>
+                  </adapt>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.tcf.processes.ui.handler.TerminateHandler"
+            commandId="org.eclipse.tcf.te.launch.command.terminate">
+         <activeWhen>
+            <with variable="activePartId">
+               <or>
+                  <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                  <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+               </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <count value="+"/>
+               <iterate operator="and" ifEmpty="false">
+                  <adapt type="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode">
+                     <and>
+                        <test property="org.eclipse.tcf.te.tcf.processes.core.hasProcessContext" value="true"/>
+                        <test property="org.eclipse.tcf.te.tcf.processes.core.canTerminate" value="true"/>
+                     </and>
+                  </adapt>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler 
+            class="org.eclipse.tcf.te.tcf.processes.ui.handler.TerminateHandler"
+            commandId="org.eclipse.ui.edit.delete">
+         <activeWhen>
+            <with variable="activePartId">
+               <or>
+                  <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                  <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+               </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <count value="+"/>
+               <iterate operator="and" ifEmpty="false">
+                  <adapt type="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode">
+                     <and>
+                        <test property="org.eclipse.tcf.te.tcf.processes.core.hasProcessContext" value="true"/>
+                        <test property="org.eclipse.tcf.te.tcf.processes.core.canTerminate" value="true"/>
+                     </and>
+                  </adapt>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.tcf.processes.ui.handler.RefreshHandler"
+            commandId="org.eclipse.tcf.te.ui.command.refresh">
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <or>
+                     <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                     <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+                  </or>
+               </with>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <or>
+                        <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.runtime.IRuntimeModel"/>
+                        <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+                     </or>
+                  </iterate>
+               </with>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <count value="+"/>
+               <iterate ifEmpty="false" operator="and">
+                  <or>
+                     <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.runtime.IRuntimeModel"/>
+                     <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+                  </or>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+   </extension>
+
+<!-- Reusable core expression fragments -->   
+   <extension point="org.eclipse.core.expressions.definitions">
+      
+      <!-- 
+         Expression to test if the selection contains single process tree nodes only.
+      -->
+      <definition id="te.expressions.processes.isProcessTreeNode">
+         <with variable="selection">
+            <count value="+"/>
+            <iterate operator="and" ifEmpty="false">
+               <instanceof value="org.eclipse.tcf.te.tcf.processes.core.model.interfaces.IProcessContextNode"/>
+            </iterate>
+         </with>
+      </definition>
+
+   </extension>
+
+<!-- Column viewer contributions -->
+   <extension point="org.eclipse.tcf.te.ui.viewers">
+      <viewer
+            autoExpandLevel="0"
+            contentProvider="org.eclipse.tcf.te.tcf.processes.ui.editor.tree.ContentProvider"
+            id="org.eclipse.tcf.te.ui.controls.viewer.processes"
+            persistent="true">
+         <creation>
+            <style name="SWT.FULL_SELECTION"/>
+            <style name="SWT.MULTI"/>
+         </creation>
+      </viewer>
+      <columnContribution viewerId="org.eclipse.tcf.te.ui.controls.viewer.processes">
+         <column
+               id="name"
+               labelProvider="org.eclipse.tcf.te.tcf.processes.ui.navigator.runtime.LabelProviderDelegate"
+               moveable="true"
+               name="%column.name.name"
+               resizable="true"
+               visible="true"
+               width="250">
+            <activation>
+               <with variable="input">
+                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                     <test property="processMonitor.delegatedActivation.isColumnActive" args="name" value="true"/>
+                  </adapt>
+               </with>
+            </activation>
+         </column>
+         <column
+               id="pid"
+               labelProvider="org.eclipse.tcf.te.tcf.processes.ui.editor.tree.columns.PIDLabelProvider"
+               moveable="true"
+               name="%column.name.pid"
+               resizable="true"
+               visible="true"
+               width="50">
+            <activation>
+               <with variable="input">
+                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                     <test property="processMonitor.delegatedActivation.isColumnActive" args="PID" value="true"/>
+                  </adapt>
+               </with>
+            </activation>
+         </column>
+         <column
+               id="ppid"
+               labelProvider="org.eclipse.tcf.te.tcf.processes.ui.editor.tree.columns.PPIDLabelProvider"
+               moveable="true"
+               name="%column.name.ppid"
+               resizable="true"
+               visible="false"
+               width="50">
+            <activation>
+               <with variable="input">
+                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                     <test property="processMonitor.delegatedActivation.isColumnActive" args="PPID" value="true"/>
+                  </adapt>
+               </with>
+            </activation>
+         </column>
+         <column
+               id="state"
+               labelProvider="org.eclipse.tcf.te.tcf.processes.ui.editor.tree.columns.StateLabelProvider"
+               moveable="true"
+               name="%column.name.state"
+               resizable="true"
+               visible="true"
+               width="50">
+            <activation>
+               <with variable="input">
+                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                     <test property="processMonitor.delegatedActivation.isColumnActive" args="state" value="true"/>
+                  </adapt>
+               </with>
+            </activation>
+         </column>
+         <column
+               id="user"
+               labelProvider="org.eclipse.tcf.te.tcf.processes.ui.editor.tree.columns.UserLabelProvider"
+               moveable="true"
+               name="%column.name.user"
+               resizable="true"
+               visible="true"
+               width="50">
+            <activation>
+               <with variable="input">
+                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                     <test property="processMonitor.delegatedActivation.isColumnActive" args="user" value="true"/>
+                  </adapt>
+               </with>
+            </activation>
+         </column>
+         <column
+               id="cmdline"
+               labelProvider="org.eclipse.tcf.te.tcf.processes.ui.editor.tree.columns.CommandLineLabelProvider"
+               moveable="true"
+               name="%column.name.cmdline"
+               resizable="true"
+               visible="true"
+               width="100">
+            <activation>
+               <with variable="input">
+                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                     <test property="processMonitor.delegatedActivation.isColumnActive" args="cmdline" value="true"/>
+                  </adapt>
+               </with>
+            </activation>
+         </column>
+      </columnContribution>
+      
+      <filterContribution viewerId="org.eclipse.tcf.te.ui.controls.viewer.processes">
+         <filter
+               class="org.eclipse.tcf.te.tcf.processes.ui.filters.SingleThreadFilter"
+               description="%singlethreadfilter.description"
+               enabled="true"
+               id="org.eclipse.tcf.te.tcf.processes.ui.navigator.filter.singleThread"
+               name="%singlethreadfilter.name">
+            <activation>
+               <with variable="input">
+                  <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+                     <test property="processMonitor.delegatedActivation.isFilterActive" args="singleThread" value="true"/>
+                  </adapt>
+               </with>
+            </activation>
+         </filter>
+      </filterContribution>
+   </extension>
+
+<!-- Preference contributions -->
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.tcf.te.tcf.processes.ui.internal.preferences.PreferencesInitializer"/>
+   </extension>
+   
+<!-- Tabbed properties view contributions -->   
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs contributorId="org.eclipse.tcf.te.ui">
+         <propertyTab
+               category="org.eclipse.tcf.te"
+               id="org.eclipse.tcf.te.tcf.processes.ui.propertytab.general"
+               label="%propertyTab.general.label"/>
+         <propertyTab
+               afterTab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.general"
+               category="org.eclipse.tcf.te"
+               id="org.eclipse.tcf.te.tcf.processes.ui.propertytab.context"
+               label="%propertyTab.context.label"/>
+         <propertyTab
+               afterTab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.context"
+               category="org.eclipse.tcf.te"
+               id="org.eclipse.tcf.te.tcf.processes.ui.propertytab.properties"
+               label="%propertyTab.properties.label"/>
+      </propertyTabs>
+   </extension>
+   
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections contributorId="org.eclipse.tcf.te.ui">
+         <propertySection
+               class="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.BasicInformationSection"
+               enablesFor="1"
+               id="org.eclipse.tcf.te.tcf.processes.ui.propertysection.general.basic"
+               filter="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessContextFilter"
+               tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.general"/>
+         <propertySection
+               afterSection="org.eclipse.tcf.te.tcf.processes.ui.propertysection.general.basic"
+               class="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.IDSection"
+               enablesFor="1"
+               id="org.eclipse.tcf.te.tcf.processes.ui.propertysection.general.id"
+               filter="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessContextFilter"
+               tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.general"/>
+         <propertySection
+               class="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.BasicContextSection"
+               enablesFor="1"
+               id="org.eclipse.tcf.te.tcf.processes.ui.propertysection.context.basicContext"
+               filter="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessContextFilter"
+               tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.context"/>
+         <propertySection
+               afterSection="org.eclipse.tcf.te.tcf.processes.ui.propertysection.context.basicContext"
+               class="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ContextIDSection"
+               enablesFor="1"
+               id="org.eclipse.tcf.te.tcf.processes.ui.propertysection.context.contextId"
+               filter="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessContextFilter"
+               tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.context"/>
+         <propertySection
+               afterSection="org.eclipse.tcf.te.tcf.processes.ui.propertysection.context.contextId"
+               class="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.MemorySection"
+               enablesFor="1"
+               id="org.eclipse.tcf.te.tcf.processes.ui.propertysection.context.memory"
+               filter="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessContextFilter"
+               tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.context"/>
+         <propertySection
+               class="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessNodePropertiesSection"
+               enablesFor="1"
+               id="org.eclipse.tcf.te.tcf.processes.ui.propertysection.advanced"
+               filter="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessPropertiesFilter"
+               tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.properties"/>
+         <propertySection
+               class="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.SystemMonitorContextPropertiesSection"
+               enablesFor="1"
+               id="org.eclipse.tcf.te.tcf.processes.ui.propertysection.advanced"
+               filter="org.eclipse.tcf.te.tcf.processes.ui.internal.tabbed.ProcessPropertiesFilter"
+               tab="org.eclipse.tcf.te.tcf.processes.ui.propertytab.properties"/>
+      </propertySections>
+   </extension>
+  
+</plugin>

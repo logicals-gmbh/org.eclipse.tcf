@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Protocol state change listener contributions -->
+   <extension point="org.eclipse.tcf.te.tcf.core.listeners">
+      <protocolStateChangeListener
+            class="org.eclipse.tcf.te.tcf.locator.listener.ProtocolStateChangeListener"
+            id="org.eclipse.tcf.te.tcf.locator.protocolStateChangeListener">
+      </protocolStateChangeListener>
+   </extension>
+
+<!-- Adapter factory contributions -->
+   <extension point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"
+            class="org.eclipse.tcf.te.tcf.locator.internal.adapters.AdapterFactory">
+         <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableURIProvider"/>
+         <adapter type="org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext"/>
+         <adapter type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerModel"/>
+      </factory>
+      <factory
+            adaptableType="org.eclipse.tcf.protocol.IPeer"
+            class="org.eclipse.tcf.te.tcf.locator.internal.adapters.AdapterFactory">
+         <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableURIProvider"/>
+         <adapter type="org.eclipse.tcf.te.runtime.stepper.interfaces.IStepContext"/>
+         <adapter type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+      </factory>
+      <factory
+            adaptableType="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNodeProvider"
+            class="org.eclipse.tcf.te.tcf.locator.internal.adapters.AdapterFactory">
+         <adapter type="org.eclipse.tcf.te.runtime.persistence.interfaces.IPersistableURIProvider"/>
+         <adapter type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+      </factory>
+   </extension>
+
+<!-- Model node factory delegate contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.model.factoryDelegates">
+      <delegate
+            class="org.eclipse.tcf.te.tcf.locator.internal.ModelNodeFactoryDelegate"
+            id="org.eclipse.tcf.te.tcf.locator.model.factory.delegate">
+         <nodeType class="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+      </delegate>
+   </extension>
+
+<!-- Eclipse core expressions property tester -->
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.locator.internal.PeerModelPropertyTester"
+            id="org.eclipse.tcf.te.tcf.locator.LocatorModelPropertyTester"
+            namespace="org.eclipse.tcf.te.tcf.locator"
+            properties="name,nameRegex,osName,osNameRegex,hasLocalService,hasRemoteService,hasOfflineService,hasAttribute,isAttribute,isProxy,isValid,isValueAdd,isOfType,isOfSubType,isRemotePeer,containsPlatform"
+            type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+      </propertyTester>
+
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.locator.internal.PeerModelPropertyTester"
+            id="org.eclipse.tcf.te.tcf.locator.LocatorModelPropertyTester2"
+            namespace="org.eclipse.tcf.te.tcf.locator"
+            properties="name,nameRegex,osName,osNameRegex,hasLocalService,hasRemoteService,hasOfflineService,hasAttribute,isAttribute,isProxy,isValueAdd,isOfType,isOfSubType,isRemotePeer,containsPlatform"
+            type="org.eclipse.tcf.protocol.IPeer">
+      </propertyTester>
+
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.locator.internal.PeerModelPropertyTester"
+            id="org.eclipse.tcf.te.tcf.locator.LocatorModelPropertyTester2"
+            namespace="org.eclipse.tcf.te.tcf.locator"
+            properties="name,nameRegex,osName,osNameRegex,hasLocalService,hasRemoteService,hasOfflineService,hasAttribute,isAttribute,isProxy,isValueAdd,isOfType,isOfSubType,isRemotePeer,containsPlatform"
+            type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.ILocatorNode">
+      </propertyTester>
+
+      <propertyTester
+            class="org.eclipse.tcf.te.tcf.locator.internal.SimulatorPropertyTester"
+            id="org.eclipse.tcf.te.tcf.locator.SimulatorPropertyTester"
+            namespace="org.eclipse.tcf.te.tcf.locator"
+            properties="isSimulatorState,canStartSimulator,isSimulator"
+            type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+      </propertyTester>
+   </extension>
+
+<!-- Persistence delegate contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.persistence.delegates">
+      <delegate 
+            id="org.eclipse.tcf.te.tcf.locator.persistence.gson.peer"
+            class="org.eclipse.tcf.te.tcf.locator.persistence.GsonPeerPersistenceDelegate">
+      </delegate>
+   </extension>
+
+<!-- Persistence delegate bindings contributions -->
+   <extension
+         point="org.eclipse.tcf.te.runtime.persistence.bindings">
+      <binding
+            delegateId="org.eclipse.tcf.te.tcf.locator.persistence.gson.peer"
+            id="org.eclipse.tcf.te.tcf.locator.binding.gson.peer">
+         <enablement>
+            <with variable="container">
+               <or>
+                  <instanceof value="java.net.URI"/>
+                  <instanceof value="java.lang.String"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="containerClass">
+                        <equals value="java.lang.String"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+            <with variable="context">
+               <or>
+                  <instanceof value="org.eclipse.tcf.protocol.IPeer"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+                  <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNodeProvider"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="contextClass">
+                        <equals value="org.eclipse.tcf.protocol.IPeer"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+         </enablement>
+      </binding>
+   </extension>
+
+<!-- Service contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.services.services">
+      <service
+            class="org.eclipse.tcf.te.tcf.locator.services.PropertiesAccessService"
+            id="org.eclipse.tcf.te.runtime.services.tcf.propertiesAccess">
+         <serviceType
+               bundleId="org.eclipse.tcf.te.runtime.services"
+               class="org.eclipse.tcf.te.runtime.services.interfaces.IPropertiesAccessService"/>
+         <enablement>
+            <or>
+               <instanceof value="org.eclipse.tcf.protocol.IPeer"/>
+               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+            </or>
+         </enablement>
+      </service>
+
+      <service
+            class="org.eclipse.tcf.te.tcf.locator.services.StepperOperationService"
+            id="org.eclipse.tcf.te.tcf.locator.services.stepperOperation">
+         <serviceType
+               bundleId="org.eclipse.tcf.te.runtime.stepper"
+               class="org.eclipse.tcf.te.runtime.stepper.interfaces.IStepperOperationService">
+         </serviceType>
+         <enablement>
+            <or>
+               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+               <instanceof value="org.eclipse.tcf.protocol.IPeer"/>
+            </or>
+            <test forcePluginActivation="true" property="org.eclipse.tcf.te.tcf.locator.isOfType" value="null"/>
+         </enablement>
+      </service>
+
+      <service
+            class="org.eclipse.tcf.te.tcf.locator.services.PeerNodeDelegateService"
+            id="org.eclipse.tcf.te.tcf.locator.services.PeerNodeDelegate">
+         <serviceType class="org.eclipse.tcf.te.runtime.services.interfaces.IDelegateService"/>
+         <enablement>
+            <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+            <test forcePluginActivation="true" property="org.eclipse.tcf.te.tcf.locator.isOfType" value="null"/>
+         </enablement>
+      </service>
+   </extension>
+
+<!-- Terminal context properties provider contributions -->
+   <extension point="org.eclipse.tm.terminal.view.core.contextPropertiesProviders">
+      <contextPropertiesProvider
+            class="org.eclipse.tcf.te.tcf.locator.services.TerminalContextPropertiesProvider">
+         <enablement>
+            <or>
+               <instanceof value="org.eclipse.tcf.protocol.IPeer"/>
+               <instanceof value="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode"/>
+            </or>
+         </enablement>
+      </contextPropertiesProvider>
+   </extension>
+ 
+<!-- Step contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.stepper.steps">
+      <step
+            id="org.eclipse.tcf.te.tcf.locator.checkServiceStep"
+            class="org.eclipse.tcf.te.tcf.locator.steps.CheckServiceStep"
+            label="%CheckServiceStep.name">
+         <requires id="org.eclipse.tcf.te.tcf.core.openChannelStep"/>
+      </step>
+      <step
+            id="org.eclipse.tcf.te.tcf.locator.startSimulatorStep"
+            class="org.eclipse.tcf.te.tcf.locator.steps.StartSimulatorStep"
+            label="%StartSimulatorStep.name"/>
+      <step
+            id="org.eclipse.tcf.te.tcf.locator.stopSimulatorStep"
+            class="org.eclipse.tcf.te.tcf.locator.steps.StopSimulatorStep"
+            label="%StopSimulatorStep.name"/>
+      <step
+            id="org.eclipse.tcf.te.tcf.locator.startDebuggerStep"
+            class="org.eclipse.tcf.te.tcf.locator.steps.StartDebuggerStep"
+            label="%StartDebuggerStep.name"/>
+      <step
+            id="org.eclipse.tcf.te.tcf.locator.stopDebuggerStep"
+            class="org.eclipse.tcf.te.tcf.locator.steps.StopDebuggerStep"
+            label="%StopDebuggerStep.name"/>
+      <step
+            id="org.eclipse.tcf.te.tcf.locator.waitForReadyStep"
+            class="org.eclipse.tcf.te.tcf.locator.steps.WaitForReadyStep"
+            label="%WaitForReadyStep.name"/>
+      <step
+            id="org.eclipse.tcf.te.tcf.locator.startPingTimerStep"
+            class="org.eclipse.tcf.te.tcf.locator.steps.StartPingTimerStep"
+            label="%StartPingTimerStep.name"/>
+      <step
+            id="org.eclipse.tcf.te.tcf.locator.removeExternalPathMapsStep"
+            class="org.eclipse.tcf.te.tcf.locator.steps.RemoveExternalPathMapsStep"
+            label="%RemoveExternalPathMapsStep.name"/>
+   </extension>
+
+<!-- Step group contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.stepper.stepGroups">
+      <stepGroup
+            id="org.eclipse.tcf.te.tcf.locator.connectStepGroup"
+            iterator="org.eclipse.tcf.te.tcf.locator.iterators.ConnectIterator">
+         <references>
+            <reference id="org.eclipse.tcf.te.tcf.locator.connectNoAttachStepGroup"/>
+            <reference id="org.eclipse.tcf.te.tcf.locator.startDebuggerStepGroup"/>
+         </references>
+      </stepGroup>
+
+      <stepGroup
+            id="org.eclipse.tcf.te.tcf.locator.connectNoAttachStepGroup"
+            iterator="org.eclipse.tcf.te.tcf.locator.iterators.ConnectIterator">
+         <references>
+            <reference id="org.eclipse.tcf.te.core.setConnectStateStep" secondaryId="connecting">
+            	<parameter name="state" value="connecting"/>
+            	<parameter name="stateOnCancel" value="disconnected" />
+            	<parameter name="stateOnError" value="disconnected" />
+            </reference>
+            <reference id="org.eclipse.tcf.te.tcf.locator.startSimulatorStepGroup"/>
+            <reference id="org.eclipse.tcf.te.tcf.locator.waitForReadyStepGroup"/>
+            <reference id="org.eclipse.tcf.te.core.setConnectStateStep" secondaryId="connected">
+            	<parameter name="state" value="connected"/>
+            </reference>
+            <reference id="org.eclipse.tcf.te.tcf.locator.startPingTimerStep"/>
+         </references>
+      </stepGroup>
+
+      <stepGroup
+            id="org.eclipse.tcf.te.tcf.locator.disconnectStepGroup">
+         <references>
+            <reference id="org.eclipse.tcf.te.core.setConnectStateStep" secondaryId="disconnecting">
+            	<parameter name="state" value="disconnecting"/>
+            	<parameter name="stateOnError" value="disconnected"/>
+            </reference>
+            <reference id="org.eclipse.tcf.te.runtime.stepper.cancelJobsStep"/>
+            <reference id="org.eclipse.tcf.te.tcf.core.getChannelStep"/>
+            <reference id="org.eclipse.tcf.te.tcf.locator.stopDebuggerStep"/>
+            <reference id="org.eclipse.tcf.te.tcf.core.shutDownStep"/>
+            <reference id="org.eclipse.tcf.te.tcf.locator.stopSimulatorStep"/>
+            <reference id="org.eclipse.tcf.te.tcf.locator.removeExternalPathMapsStep"/>
+            <reference id="org.eclipse.tcf.te.core.setConnectStateStep" secondaryId="disconnected">
+            	<parameter name="state" value="disconnected"/>
+            </reference>
+         </references>
+      </stepGroup>
+      
+      <stepGroup
+            id="org.eclipse.tcf.te.tcf.locator.connectionLostStepGroup">
+         <references>
+            <reference id="org.eclipse.tcf.te.core.setConnectStateStep" secondaryId="disconnecting">
+            	<parameter name="state" value="connection_lost"/>
+            	<parameter name="stateOnError" value="disconnected"/>
+            </reference>
+            <reference id="org.eclipse.tcf.te.runtime.stepper.cancelJobsStep"/>
+            <reference id="org.eclipse.tcf.te.tcf.locator.stopDebuggerStep"/>
+            <reference id="org.eclipse.tcf.te.tcf.core.shutDownStep"/>
+            <reference id="org.eclipse.tcf.te.core.setConnectStateStep" secondaryId="lost">
+            	<parameter name="state" value="connection_lost"/>
+            </reference>
+         </references>
+      </stepGroup>
+      
+      <stepGroup
+            id="org.eclipse.tcf.te.tcf.locator.connectionRecoveringStepGroup">
+         <references>
+            <reference id="org.eclipse.tcf.te.core.setConnectStateStep" secondaryId="recovering">
+            	<parameter name="state" value="connection_recovering"/>
+            	<parameter name="stateOnCancel" value="disconnected"/>
+            	<parameter name="stateOnError" value="disconnected"/>
+            </reference>
+            <reference id="org.eclipse.tcf.te.tcf.locator.waitForReadyNoTimeoutStepGroup"/>
+            <reference id="org.eclipse.tcf.te.core.setConnectStateStep" secondaryId="connected">
+            	<parameter name="state" value="connected"/>
+            </reference>
+            <reference id="org.eclipse.tcf.te.tcf.locator.startPingTimerStep"/>
+            <reference id="org.eclipse.tcf.te.tcf.locator.startDebuggerStep">
+               <parameter name="forceStart" value="true"/>
+               <parameter name="reAttach" value="true"/>
+               <parameter name="autoAttachAll" value="true"/>
+            </reference>
+         </references>
+      </stepGroup>
+
+      <stepGroup
+            id="org.eclipse.tcf.te.tcf.locator.startSimulatorStepGroup"
+            iterator="org.eclipse.tcf.te.tcf.locator.iterators.StartSimulatorIterator">
+         <references>
+            <reference id="org.eclipse.tcf.te.tcf.locator.startSimulatorStep"/>
+         </references>
+      </stepGroup>
+
+      <stepGroup
+            id="org.eclipse.tcf.te.tcf.locator.waitForReadyStepGroup">
+         <references>
+            <reference id="org.eclipse.tcf.te.tcf.locator.waitForReadyStep"/>
+         </references>
+      </stepGroup>
+
+      <stepGroup
+            id="org.eclipse.tcf.te.tcf.locator.waitForReadyNoTimeoutStepGroup">
+         <references>
+            <reference id="org.eclipse.tcf.te.tcf.locator.waitForReadyStep">
+               <parameter name="noTimeout" value="true"/>
+            </reference>
+         </references>
+      </stepGroup>
+
+      <stepGroup
+            id="org.eclipse.tcf.te.tcf.locator.startDebuggerStepGroup"
+            iterator="org.eclipse.tcf.te.tcf.locator.iterators.StartDebuggerIterator">
+         <references>
+            <reference id="org.eclipse.tcf.te.tcf.locator.startDebuggerStep">
+               <parameter name="autoAttachAll" value="true"/>
+            </reference>
+         </references>
+      </stepGroup>
+   </extension>
+
+<!-- Reusable core expression fragments -->   
+   <extension point="org.eclipse.core.expressions.definitions">
+   
+      <!-- Expression to test if current variable 
+           is adaptable to IPeerNode and has a simulator service
+      -->
+      <definition id="te.expressions.peerModel.hasSimulatorService">
+         <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+            <test property="org.eclipse.tcf.te.runtime.services.hasService" 
+                  value="org.eclipse.tcf.te.runtime.services.interfaces.ISimulatorService"/>
+            <test property="org.eclipse.tcf.te.tcf.locator.isAttribute"
+                  args="SimulatorEnabled" value="true"/>
+         </adapt>
+      </definition>
+
+      <!-- Expression to test if the active editor input 
+           is adaptable to IPeerNode and has a simulator service
+      -->
+      <definition id="te.expressions.editor.hasSimulatorService">
+         <with variable="activeEditorInput">
+            <reference definitionId="te.expressions.peerModel.hasSimulatorService"/>
+         </with>
+      </definition>
+
+      <!-- Expression to test if the selection 
+           is adaptable to IPeerNode and has a simulator service
+      -->
+      <definition id="te.expressions.selection.hasSimulatorService">
+         <with variable="selection">
+            <count value="1"/>
+            <iterate operator="and" ifEmpty="false">
+               <reference definitionId="te.expressions.peerModel.hasSimulatorService"/>
+            </iterate>
+         </with>
+      </definition>
+
+      <!-- Expression to test if current variable 
+           is adaptable to IPeerNode and has remote or offline run control
+      -->
+      <definition id="te.expressions.peerModel.hasRunControl">
+         <adapt type="org.eclipse.tcf.te.tcf.locator.interfaces.nodes.IPeerNode">
+            <or>
+               <test property="org.eclipse.tcf.te.tcf.locator.hasRemoteService" value="RunControl"/>
+               <test property="org.eclipse.tcf.te.tcf.locator.hasOfflineService" value="RunControl"/>
+            </or>
+         </adapt>
+      </definition>
+
+      <!-- Expression to test if the active editor input 
+           is adaptable to IPeerNode and has remote or offline run control
+      -->
+      <definition id="te.expressions.editor.hasRunControl">
+         <with variable="activeEditorInput">
+            <reference definitionId="te.expressions.peerModel.hasSimulatorService"/>
+         </with>
+      </definition>
+
+      <!-- Expression to test if the selection 
+           is adaptable to IPeerNode and has remote or offline run control
+      -->
+      <definition id="te.expressions.selection.hasRunControl">
+         <with variable="selection">
+            <count value="1"/>
+            <iterate operator="and" ifEmpty="false">
+               <reference definitionId="te.expressions.peerModel.hasSimulatorService"/>
+            </iterate>
+         </with>
+      </definition>
+
+   </extension>
+
+</plugin>

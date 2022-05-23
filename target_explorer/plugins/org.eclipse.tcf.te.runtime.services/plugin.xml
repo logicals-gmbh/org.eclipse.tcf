@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Extension points -->
+   <extension-point id="services" name="%ExtensionPoint.service" schema="schema/services.exsd"/>
+
+<!-- Property tester contributions -->
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.runtime.services.internal.PropertyTester"
+            id="org.eclipse.tcf.te.runtime.services.PropertyTester"
+            namespace="org.eclipse.tcf.te.runtime.services"
+            properties="hasService"
+            type="java.lang.Object">
+      </propertyTester>
+
+      <propertyTester
+            class="org.eclipse.tcf.te.runtime.services.internal.MenuServicePropertyTester"
+            id="org.eclipse.tcf.te.runtime.services.MenuServicePropertyTester"
+            namespace="org.eclipse.tcf.te.runtime.services.menu"
+            properties="isVisible"
+            type="java.lang.Object">
+      </propertyTester>
+      
+      <propertyTester
+            class="org.eclipse.tcf.te.runtime.services.internal.PropertiesContainerPropertyTester"
+            id="org.eclipse.tcf.te.runtime.services.PropertiesContainerPropertyTester"
+            namespace="org.eclipse.tcf.te.runtime"
+            properties="isProperty"
+            type="org.eclipse.tcf.te.runtime.interfaces.properties.IPropertiesContainer">
+      </propertyTester>
+   </extension>
+
+</plugin>

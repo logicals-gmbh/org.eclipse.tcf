@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Preference contributions -->
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.tcf.te.tcf.log.core.internal.PreferencesInitializer">
+      </initializer>
+   </extension>
+
+<!-- Event listener contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.eventListeners">
+      <eventListener
+            class="org.eclipse.tcf.te.tcf.log.core.internal.listener.EventListener"
+            forcePluginActivation="true">
+         <eventType
+               bundleId="org.eclipse.tcf.te.tcf.core"
+               class="org.eclipse.tcf.te.tcf.core.events.ChannelEvent">
+         </eventType>
+      </eventListener>
+   </extension>
+</plugin>

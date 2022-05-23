@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, 2015 PalmSource, Inc. and others
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License 2.0
+which accompanies this distribution, and is available at
+https://www.eclipse.org/legal/epl-2.0/
+
+Contributors:
+Ewa Matejska     (PalmSource)      - initial API and implementation
+Martin Oberhuber (Wind River)      - fix 158529: Migrate docs to HTML / TOC format
+Anna Dushistova  (Mentor Graphics) - [314659] added launch delegate for dsf
+Anna Dushistova  (Mentor Graphics) - code restructuring
+Anna Dushistova  (MontaVista)      - adapted from org.eclipse.cdt.launch.remote
+-->
+<?eclipse version="3.0"?>
+<plugin>
+   <extension point="org.eclipse.debug.core.launchDelegates">
+      <launchDelegate
+            id="org.eclipse.tcf.te.remotecdt.debug"
+            type="org.eclipse.cdt.launch.remoteApplicationLaunchType"
+            modes="debug"
+            delegate="org.eclipse.tcf.te.tcf.launch.cdt.launching.TEGdbLaunchDelegate"
+            name="%tedsfLaunchDelegate.name"
+            delegateDescription="%tedsfLaunchDelegate.description"
+            sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
+            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
+      </launchDelegate>
+      <launchDelegate
+            id="org.eclipse.tcf.te.remotecdt.run"
+            type="org.eclipse.cdt.launch.remoteApplicationLaunchType"
+            modes="run"
+            delegate="org.eclipse.tcf.te.tcf.launch.cdt.launching.TERunLaunchDelegate"
+            name="%terunLaunchDelegate.name"
+            delegateDescription="%terunLaunchDelegate.description">
+      </launchDelegate>
+      <launchDelegate
+            id="org.eclipse.tcf.te.remotecdt.attach"
+            type="org.eclipse.cdt.launch.attachLaunchType"
+            modes="debug"
+            delegate="org.eclipse.tcf.te.tcf.launch.cdt.launching.TEGdbAttachLaunchDelegate"
+            name="%teattachLaunchDelegate.name"
+            delegateDescription="%teattachLaunchDelegate.description"
+            sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
+            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
+      </launchDelegate>
+
+   </extension>
+
+   <extension point="org.eclipse.debug.ui.launchConfigurationTabs">
+      <!-- Remote Application (Run) -->
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.run.mainTab"
+            group="org.eclipse.cdt.launch.remoteApplicationRunLaunchTabGroup"
+            name="Main"
+            class="org.eclipse.tcf.te.tcf.launch.cdt.tabs.TEApplicationMainTab">
+         <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.run"/>
+      </tab>
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.run.argumentsTab"
+            group="org.eclipse.cdt.launch.remoteApplicationRunLaunchTabGroup"
+            name="Arguments"
+            class="org.eclipse.cdt.dsf.gdb.internal.ui.launching.CArgumentsTab">
+         <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.run"/>
+         <placement after="org.eclipse.tcf.te.remotecdt.debug.mainTab"/>
+      </tab>
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.run.environmentTab"
+            group="org.eclipse.cdt.launch.remoteApplicationRunLaunchTabGroup"
+            name="Environment"
+            class="org.eclipse.tcf.te.tcf.launch.cdt.tabs.TEEnvironmentTab">
+        <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.run"/>
+        <placement after="org.eclipse.cdt.dsf.gdb.launch.argumentsTab"/>
+      </tab>
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.CommonTab"
+            group="org.eclipse.cdt.launch.remoteApplicationRunLaunchTabGroup"
+            name="Common"
+            class="org.eclipse.debug.ui.CommonTab">
+         <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.run"/>
+         <placement after="org.eclipse.tcf.te.remotecdt.run.argumentsTab"/>
+      </tab>
+
+      <!-- Remote Application (Debug) -->
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.debug.mainTab"
+            group="org.eclipse.cdt.launch.remoteApplicationLaunchTabGroup"
+            name="Main"
+            class="org.eclipse.tcf.te.tcf.launch.cdt.tabs.TEApplicationMainTab">
+         <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.debug"/>
+      </tab>
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.debug.argumentsTab"
+            group="org.eclipse.cdt.launch.remoteApplicationLaunchTabGroup"
+            name="Arguments"
+            class="org.eclipse.cdt.dsf.gdb.internal.ui.launching.CArgumentsTab">
+         <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.debug"/>
+         <placement after="org.eclipse.tcf.te.remotecdt.debug.mainTab"/>
+      </tab>
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.debug.debuggerTab"
+            group="org.eclipse.cdt.launch.remoteApplicationLaunchTabGroup"
+            name="Debugger"
+            class="org.eclipse.tcf.te.tcf.launch.cdt.tabs.TEApplicationDebuggerTab">
+        <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.debug"/>
+        <placement after="org.eclipse.cdt.dsf.gdb.launch.argumentsTab"/>
+      </tab>
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.debug.sourceLookupTab"
+            group="org.eclipse.cdt.launch.remoteApplicationLaunchTabGroup"
+            name="Source"
+            class="org.eclipse.debug.ui.sourcelookup.SourceLookupTab">
+        <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.debug"/>
+        <placement after="org.eclipse.tcf.te.remotecdt.debug.debuggerTab"/>
+      </tab>
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.debug.environmentTab"
+            group="org.eclipse.cdt.launch.remoteApplicationLaunchTabGroup"
+            name="Environment"
+            class="org.eclipse.tcf.te.tcf.launch.cdt.tabs.TEEnvironmentTab">
+        <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.debug"/>
+        <placement after="org.eclipse.debug.ui.sourceLookupTab"/>
+      </tab>
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.debug.commonTab"
+            group="org.eclipse.cdt.launch.remoteApplicationLaunchTabGroup"
+            name="Common"
+            class="org.eclipse.debug.ui.CommonTab">
+        <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.debug"/>
+        <placement after="org.eclipse.debug.ui.environmentTab"/>
+      </tab>
+
+      <!-- Attach Launch -->
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.attach.mainTab"
+            group="org.eclipse.cdt.launch.attachLaunchTabGroup"
+            name="Main"
+            class="org.eclipse.tcf.te.tcf.launch.cdt.tabs.TEAttachMainTab">
+         <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.attach"/>
+      </tab>
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.attach.debuggerTab"
+            group="org.eclipse.cdt.launch.attachLaunchTabGroup"
+            name="Debugger"
+            class="org.eclipse.tcf.te.tcf.launch.cdt.tabs.TEAttachDebuggerTab">
+        <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.attach"/>
+        <placement after="org.eclipse.tcf.te.remotecdt.attach.mainTab"/>
+      </tab>
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.attach.sourceLookupTab"
+            group="org.eclipse.cdt.launch.attachLaunchTabGroup"
+            name="Source"
+            class="org.eclipse.debug.ui.sourcelookup.SourceLookupTab">
+        <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.attach"/>
+        <placement after="org.eclipse.tcf.te.remotecdt.attach.debuggerTab"/>
+      </tab>
+      <tab
+            id="org.eclipse.tcf.te.remotecdt.attach.commonTab"
+            group="org.eclipse.cdt.launch.attachLaunchTabGroup"
+            name="Common"
+            class="org.eclipse.debug.ui.CommonTab">
+        <associatedDelegate delegate="org.eclipse.tcf.te.remotecdt.attach"/>
+        <placement after="org.eclipse.debug.ui.sourceLookupTab"/>
+      </tab>
+
+   </extension>
+
+<!-- Preference contributions -->
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.tcf.te.tcf.launch.cdt.preferences.PreferencesInitializer">
+      </initializer>
+   </extension>
+   
+<!-- Preference page contributions -->
+   <extension point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.tcf.te.ui.preferences.general"
+            class="org.eclipse.tcf.te.tcf.launch.cdt.preferences.GdbPreferencePage"
+            id="org.eclipse.tcf.te.tcf.launch.cdt.preferences.gdb"
+            name="%preference.page.name">
+      </page>
+   </extension>
+
+</plugin>

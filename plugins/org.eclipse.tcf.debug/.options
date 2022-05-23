@@ -1,0 +1,2 @@
+org.eclipse.tcf.debug/debug = false
+org.eclipse.tcf.debug/debug/tests/runcontrol = false

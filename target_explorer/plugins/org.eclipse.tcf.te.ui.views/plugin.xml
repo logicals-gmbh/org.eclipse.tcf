@@ -1,0 +1,1043 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Extension Points -->
+   <extension-point id="editorPageBindings" name="%ExtensionPoint.editorPageBindings.name" schema="schema/editorPageBindings.exsd"/>
+   <extension-point id="editorPages" name="%ExtensionPoint.editorPages.name" schema="schema/editorPages.exsd"/>
+   <extension-point id="categories" name="%ExtensionPoint.categories.name" schema="schema/categories.exsd"/>
+   <extension-point id="labelProviderDelegates" name="%ExtensionPoint.labelProviderDelegates.name" schema="schema/labelProviderDelegates.exsd"/>
+
+<!-- Common Navigator contributions -->
+   <extension point="org.eclipse.ui.navigator.viewer">
+      <viewer
+            helpContext="org.eclipse.tcf.te.ui.views.View"
+            viewerId="org.eclipse.tcf.te.ui.views.View">
+            <popupMenu
+                  id="org.eclipse.tcf.te.ui.views.View#Popup"
+                  allowsPlatformContributions="true">
+                  <insertionPoint name="group.new" separator="true"/>
+                  <insertionPoint name="group.goto"/>
+                  <insertionPoint name="group.expandto" separator="true"/>
+                  <insertionPoint name="group.expand"/>
+                  <insertionPoint name="group.open" separator="true"/>
+                  <insertionPoint name="group.openWith"/>
+                  <insertionPoint name="group.showIn"/>
+                  <insertionPoint name="group.connect" separator="true"/>
+                  <insertionPoint name="group.redirect" separator="true"/>
+                  <insertionPoint name="group.symbols" separator="true"/>
+                  <insertionPoint name="group.symbols.rd"/>
+                  <insertionPoint name="group.symbols.loadunload"/>
+                  <insertionPoint name="group.symbols.additions"/>
+                  <insertionPoint name="group.launch" separator="true"/>
+                  <insertionPoint name="group.launch.rundebug"/>
+                  <insertionPoint name="group.launch.modes"/>
+                  <insertionPoint name="group.launch.additions"/>
+                  <insertionPoint name="group.show" separator="true"/>
+                  <insertionPoint name="group.edit" separator="true"/>
+                  <insertionPoint name="group.delete"/>
+                  <insertionPoint name="group.build" separator="true"/>
+                  <insertionPoint name="group.importexport" separator="true"/>
+                  <insertionPoint name="group.refresh" separator="true"/>
+                  <insertionPoint name="group.syncop"/>
+                  <insertionPoint name="group.categories" separator="true"/>
+                  <insertionPoint name="group.reorganize"/>
+                  <insertionPoint name="group.reorder"/>
+                  <insertionPoint name="group.port"/>
+                  <insertionPoint name="group.generate" separator="true"/>
+                  <insertionPoint name="group.search" separator="true"/>
+                  <insertionPoint name="group.connection" separator="true"/>
+                  <insertionPoint name="group.operations" separator="true"/>
+                  <insertionPoint name="group.analysis" separator="true"/>
+                  <insertionPoint name="group.filter" separator="true"/>
+                  <insertionPoint name="additions" separator="true"/>
+                  <insertionPoint name="group.properties" separator="true"/>
+            </popupMenu>
+            <options>
+               <property
+                     name="org.eclipse.ui.navigator.hideLinkWithEditorAction"
+                     value="true">
+               </property>
+               <property
+                     name="org.eclipse.ui.navigator.hideAvailableCustomizationsDialog"
+                     value="true">
+               </property>
+               <property
+                     name="org.eclipse.ui.navigator.enforceHasChildren"
+                     value="true">
+               </property>
+            </options>
+      </viewer>
+
+      <viewerContentBinding viewerId="org.eclipse.tcf.te.ui.views.View">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.tcf.te.ui.views.navigator.*">
+            </contentExtension>
+            
+         </includes>
+      </viewerContentBinding>
+      
+      <viewerActionBinding
+            viewerId="org.eclipse.tcf.te.ui.views.View">
+            <includes>
+               <actionExtension
+                     pattern="org.eclipse.tcf.te.ui.views.navigator.actions.*">
+               </actionExtension>
+            </includes>
+      </viewerActionBinding>
+   </extension>
+   
+<!-- Common navigator contributions -->
+   <extension point="org.eclipse.ui.navigator.navigatorContent">
+
+   <!-- Default navigator content contibutions -->
+      <navigatorContent
+            activeByDefault="true"
+            contentProvider="org.eclipse.tcf.te.ui.views.navigator.ViewerContentProvider"
+            icon="icons/eview16/targets_view.gif"
+            id="org.eclipse.tcf.te.ui.views.navigator.content"
+            labelProvider="org.eclipse.tcf.te.ui.views.navigator.DelegatingLabelProvider"
+            name="%navigatorContent.name"
+            priority="highest">
+            <triggerPoints>
+               <or>
+                  <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.IRoot"/>
+                  <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
+               </or>
+            </triggerPoints>
+            <possibleChildren>
+               <or>
+                  <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
+                  <instanceof value="org.eclipse.tcf.te.ui.views.navigator.nodes.NewWizardNode"/>
+               </or>
+            </possibleChildren>
+            <commonSorter
+                  class="org.eclipse.tcf.te.ui.views.navigator.ViewerSorter"
+                  id="org.eclipse.tcf.te.ui.views.navigator.sorter"/>
+      </navigatorContent>
+      <commonFilter
+            activeByDefault="false"
+            class="org.eclipse.tcf.te.ui.views.navigator.filter.CreateNewConnectionFilter"
+            id="org.eclipse.tcf.te.ui.views.navigator.CreateNewConnectionFilter"
+            name="%CreateNewConnectionFilter.name"
+            visibleInUI="true"/>
+
+   <!-- Default navigator action contributions -->
+      <actionProvider
+            class="org.eclipse.tcf.te.ui.views.actions.NewActionProvider"
+            id="org.eclipse.tcf.te.ui.views.navigator.actions.NewActionProvider">
+         <enablement>
+            <or>
+               <not>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.tcf.te.runtime.services.hasService"
+                        value="org.eclipse.tcf.te.runtime.services.interfaces.IMenuService"/>
+               </not>
+               <test
+                     property="org.eclipse.tcf.te.runtime.services.menu.isVisible"
+                     args="org.eclipse.tcf.te.ui.views.navigator.actions.NewActionProvider"
+                     value="true"/>
+            </or>
+         </enablement>
+      </actionProvider>
+
+      <actionProvider
+            class="org.eclipse.tcf.te.ui.views.actions.GoIntoActionProvider"
+            id="org.eclipse.tcf.te.ui.views.navigator.actions.GoIntoActionProvider">
+         <enablement>
+            <or>
+               <not>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.tcf.te.runtime.services.hasService"
+                        value="org.eclipse.tcf.te.runtime.services.interfaces.IMenuService"/>
+               </not>
+               <test
+                     property="org.eclipse.tcf.te.runtime.services.menu.isVisible"
+                     args="org.eclipse.tcf.te.ui.views.navigator.actions.GoIntoActionProvider"
+                     value="true"/>
+            </or>
+         </enablement>
+      </actionProvider>
+      
+   </extension>
+
+
+<!-- Label provider delegates -->
+   <extension point="org.eclipse.tcf.te.ui.views.labelProviderDelegates">
+      <labelProviderDelegate
+            class="org.eclipse.tcf.te.ui.views.navigator.LabelProviderDelegate"
+            id="org.eclipse.tcf.te.ui.views.labelProviderDelegate">
+         <enablement>
+            <or>
+               <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
+               <instanceof value="org.eclipse.tcf.te.ui.views.navigator.nodes.NewWizardNode"/>
+            </or>
+         </enablement>
+      </labelProviderDelegate>
+   </extension>
+
+<!-- View contributions -->
+   <extension point="org.eclipse.ui.views">
+      <view
+            category="org.eclipse.tcf.te.ui.views.category"
+            class="org.eclipse.tcf.te.ui.views.internal.View"
+            icon="icons/eview16/targets_view.gif"
+            id="org.eclipse.tcf.te.ui.views.View"
+            name="%View.name"
+            restorable="true">
+      </view>
+   </extension>
+
+<!-- View categories contributions -->
+   <extension point="org.eclipse.tcf.te.ui.views.categories">
+      <category
+            class="org.eclipse.tcf.te.ui.views.categories.Category"
+            icon="icons/obj16/favorites.gif"
+            id="org.eclipse.tcf.te.ui.views.category.favorites"
+            label="%category.favorites.name"
+            rank="1">
+         <enablement>
+            <test property="org.eclipse.tcf.te.ui.views.isHiddenByPreferences" value="false"/>
+         </enablement>
+      </category>
+
+      <category
+            class="org.eclipse.tcf.te.ui.views.categories.Category"
+            icon="icons/obj16/connections.gif"
+            id="org.eclipse.tcf.te.ui.views.category.mytargets"
+            label="%category.mytargets.name"
+            rank="10">
+         <enablement>
+            <test property="org.eclipse.tcf.te.ui.views.isHiddenByPreferences" value="false"/>
+         </enablement>
+      </category>
+
+      <category
+            class="org.eclipse.tcf.te.ui.views.categories.Category"
+            icon="icons/obj16/neighborhood.gif"
+            id="org.eclipse.tcf.te.ui.views.category.neighborhood"
+            label="%category.neighborhood.name"
+            rank="20">
+         <enablement>
+            <test property="org.eclipse.tcf.te.ui.views.isHiddenByPreferences" value="false"/>
+         </enablement>
+      </category>
+   </extension>
+
+<!-- Perspective -->
+   <extension point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.tcf.te.ui.views.perspective.PerspectiveFactory"
+            icon="icons/eview16/editor.gif"
+            id="org.eclipse.tcf.te.ui.perspective"
+            name="%Perspective.name">
+      </perspective>
+   </extension>
+
+<!-- Perspective contributions -->
+   <extension point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.tcf.te.ui.perspective">
+      	 <!-- Run/Debug actions should be available -->
+         <actionSet id="org.eclipse.debug.ui.launchActionSet"/>
+		 <!-- Register the view shortcuts -->
+         <viewShortcut id="org.eclipse.tcf.te.ui.views.View"/>
+         <viewShortcut id="org.eclipse.debug.ui.DebugView"/>
+         <viewShortcut id="org.eclipse.ui.views.PropertySheet"/>
+         <!-- Register the perspective shortcuts -->
+         <perspectiveShortcut id="org.eclipse.debug.ui.DebugPerspective"/>
+      </perspectiveExtension>
+      
+      <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
+      	 <!-- Run/Debug actions should be available -->
+         <actionSet id="org.eclipse.debug.ui.launchActionSet"/>
+		 <!-- Register the view shortcuts -->
+         <viewShortcut id="org.eclipse.tcf.te.ui.views.View"/>
+         <!-- Register the perspective shortcuts -->
+         <perspectiveShortcut id="org.eclipse.tcf.te.ui.perspective"/>
+         <!-- System management view is placed relative to the Project Explorer -->
+         <view
+               id="org.eclipse.tcf.te.ui.views.View"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.navigator.ProjectExplorer"
+               visible="false">
+         </view>
+      </perspectiveExtension>
+
+      <perspectiveExtension targetID="org.eclipse.debug.ui.DebugPerspective">
+		 <!-- Register the view shortcuts -->
+         <viewShortcut id="org.eclipse.tcf.te.ui.views.View"/>
+         <!-- Register the perspective shortcuts -->
+         <perspectiveShortcut id="org.eclipse.tcf.te.ui.perspective"/>
+         <!-- System management view is placed relative to the Debug View -->
+         <view
+               id="org.eclipse.tcf.te.ui.views.View"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.debug.ui.DebugView"
+               visible="false">
+         </view>
+      </perspectiveExtension>
+
+      <perspectiveExtension targetID="org.eclipse.cdt.ui.CPerspective">
+		 <!-- Register the view shortcuts -->
+         <viewShortcut id="org.eclipse.tcf.te.ui.views.View"/>
+         <!-- Register the perspective shortcuts -->
+         <perspectiveShortcut id="org.eclipse.tcf.te.ui.perspective"/>
+         <!-- System management view is placed relative to the C/C++ View -->
+         <view
+               id="org.eclipse.tcf.te.ui.views.View"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.cdt.ui.CView"
+               visible="false">
+         </view>
+      </perspectiveExtension>
+   </extension>
+
+<!-- Editor contributions -->
+   <extension point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.tcf.te.ui.views.editor.Editor"
+            default="false"
+            icon="icons/eview16/prop_ps.gif"
+            id="org.eclipse.tcf.te.ui.views.Editor"
+            name="%Editor.name">
+      </editor>
+   </extension>
+
+<!-- Tabbed properties view contributions -->   
+   <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+      <propertyContributor
+            contributorId="org.eclipse.tcf.te.ui"
+            labelProvider="org.eclipse.tcf.te.ui.views.internal.PropertyContributorLabelProvider">
+         <propertyCategory category="org.eclipse.tcf.te"/>
+      </propertyContributor>
+   </extension>
+
+<!-- Service contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.services.services">
+      <service
+            class="org.eclipse.tcf.te.ui.views.internal.services.MenuService"
+            id="org.eclipse.tcf.te.ui.views.services.MenuService">
+         <serviceType
+               bundleId="org.eclipse.tcf.te.runtime.services"
+               class="org.eclipse.tcf.te.runtime.services.interfaces.IMenuService"/>
+         <enablement>
+            <instanceof value="org.eclipse.tcf.te.ui.views.interfaces.ICategory"/>
+         </enablement>
+      </service>
+   </extension>
+
+<!-- Menu contributions -->
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.open">
+         <command
+               commandId="org.eclipse.ui.navigator.Open"
+               helpContextId="org.eclipse.tcf.te.ui.views.command_Open"
+               id="properties"
+               label="%command.open.label"
+               mnemonic="%command.open.mnemonic"
+               tooltip="%command.open.tooltip">
+            <visibleWhen>
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <and>
+                        <test property="org.eclipse.tcf.te.ui.views.hasApplicableEditorBindings" value="true"/>
+                        <or>
+                           <not>
+                              <test
+                                    forcePluginActivation="true"
+                                    property="org.eclipse.tcf.te.runtime.services.hasService"
+                                    value="org.eclipse.tcf.te.runtime.services.interfaces.IMenuService"/>
+                           </not>
+                           <test
+                                 property="org.eclipse.tcf.te.runtime.services.menu.isVisible"
+                                 args="org.eclipse.tcf.te.ui.views.View.menu.open"
+                                 value="true"/>
+                        </or>
+                     </and> 
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.showIn">
+         <menu
+               commandId="org.eclipse.tcf.te.ui.views.command.ShowInGroup"
+               id="org.eclipse.tcf.te.ui.views.View.menu.showIn"
+               label="%menu.showIn.label"
+               mnemonic="%menu.showIn.mnemonic">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <or>
+                        <not>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.eclipse.tcf.te.runtime.services.hasService"
+                                 value="org.eclipse.tcf.te.runtime.services.interfaces.IMenuService"/>
+                        </not>
+                        <test
+                              property="org.eclipse.tcf.te.runtime.services.menu.isVisible"
+                              args="org.eclipse.tcf.te.ui.views.View.menu.showIn"
+                              value="true"/>
+                     </or>
+                  </iterate>
+               </with>
+            </visibleWhen>
+               
+            <command
+                  commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
+                  icon="icons/eview16/prop_ps.gif"
+                  label="%menu.showIn.properties.label"
+                  mnemonic="%menu.showIn.properties.mnemonic"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+      
+      <menuContribution locationURI="menu:org.eclipse.tcf.te.ui.views.View?after=additions">
+         <separator
+               name="group.filters"
+               visible="true">
+         </separator>
+         <dynamic
+               class="org.eclipse.tcf.te.ui.views.handler.FilterMRUContribution"
+               id="org.eclipse.tcf.te.ui.views.dynamic.filterMRU">
+         </dynamic>
+         <command
+               commandId="org.eclipse.tcf.te.ui.views.command.filters"
+               icon="icons/elcl16/filter_ps.gif"
+               id="org.eclipse.tcf.te.ui.views.command.filters"
+               label="%command.filters.label"
+               style="push">
+         </command>
+         <separator
+               name="group.content"
+               visible="true">
+         </separator>
+         <dynamic
+               class="org.eclipse.tcf.te.ui.views.handler.ContentMRUContribution"
+               id="org.eclipse.tcf.te.ui.views.dynamic.contentMRU">
+         </dynamic>
+         <command
+               commandId="org.eclipse.tcf.te.ui.views.command.content"
+               icon="icons/elcl16/content.gif"
+               id="org.eclipse.tcf.te.ui.views.command.content"
+               label="%command.content.label"
+               style="push">
+         </command>
+      </menuContribution>
+      
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.categories">
+         <menu
+               id="org.eclipse.tcf.te.ui.views.menu.categories.add"
+               label="%menu.categories.addto.label"
+               mnemonic="%menu.categories.addto.mnemonic">
+               
+               <dynamic
+                     id="org.eclipse.tcf.te.ui.views.dynamic.categories.add.multi"
+                     class="org.eclipse.tcf.te.ui.views.handler.CategoryAddToContributionItem">
+               </dynamic>
+               <visibleWhen checkEnabled="false">
+                  <with variable="selection">
+                     <test property="org.eclipse.tcf.te.ui.views.validAddToCategoriesCount" value="(1-"/>
+                     <iterate operator="and" ifEmpty="false">
+                         <adapt type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
+                     </iterate>
+                  </with>
+               </visibleWhen>
+         </menu>
+
+         <dynamic
+               id="org.eclipse.tcf.te.ui.views.dynamic.categories.add.single"
+               class="org.eclipse.tcf.te.ui.views.handler.CategoryAddToContributionItem">
+               <visibleWhen checkEnabled="false">
+                  <with variable="selection">
+                     <test property="org.eclipse.tcf.te.ui.views.validAddToCategoriesCount" value="1"/>
+                     <iterate operator="and" ifEmpty="false">
+                        <adapt type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable"/>
+                     </iterate>
+                  </with>
+               </visibleWhen>
+         </dynamic>
+      </menuContribution>
+      
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.filter">
+         <command
+               commandId="org.eclipse.tcf.te.ui.views.command.quickfilter"
+               label="%menu.filter.label"
+               mnemonic="%menu.filter.mnemonic"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <iterate>
+                     <adapt type="org.eclipse.tcf.te.core.interfaces.IFilterable">
+                        <instanceof value="org.eclipse.tcf.te.core.interfaces.IFilterable"/>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.tcf.te.ui.views.command.resetfilter"
+               label="%menu.reset.label"
+               mnemonic="%menu.reset.mnemonic"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <iterate>
+                     <adapt type="org.eclipse.tcf.te.core.interfaces.IFilterable">
+                        <instanceof value="org.eclipse.tcf.te.core.interfaces.IFilterable"/>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.search">
+         <command
+               commandId="org.eclipse.tcf.te.ui.views.command.find"
+               label="%menu.find.label"
+               mnemonic="%menu.find.mnemonic"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <with variable="selection">
+                  <iterate>
+                     <adapt type="org.eclipse.tcf.te.ui.interfaces.ISearchable">
+                        <instanceof value="org.eclipse.tcf.te.ui.interfaces.ISearchable"/>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+   </extension>
+
+<!-- Command contributions -->
+   <extension point="org.eclipse.ui.commands">
+      <!-- Definition of the Common Navigator global retargetable open
+           action id as command.
+      --> 
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.ui.navigator.Open"
+            id="org.eclipse.ui.navigator.Open"
+            name="%command.open.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.views.command_ShowInGroup"
+            id="org.eclipse.tcf.te.ui.views.command.ShowInGroup"
+            name="%command.showin.name">
+      </command>
+      
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.views.command_ShowInProperties"
+            id="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
+            name="%command.showInProperties.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.views.command_Filters"
+            id="org.eclipse.tcf.te.ui.views.command.filters"
+            name="%command.filters.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.views.command_Content"
+            id="org.eclipse.tcf.te.ui.views.command.content"
+            name="%command.content.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.find.description"
+            id="org.eclipse.tcf.te.ui.views.command.find"
+            name="%command.find.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.filter.description"
+            id="org.eclipse.tcf.te.ui.views.command.quickfilter"
+            name="%command.filter.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.reset.description"
+            id="org.eclipse.tcf.te.ui.views.command.resetfilter"
+            name="%command.reset.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.showInSM.description"
+            id="org.eclipse.tcf.te.ui.command.showIn.systemManagement"
+            name="%command.showInSM.name">
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.apply.description"
+            id="org.eclipse.tcf.te.ui.views.command.apply"
+            name="%command.apply.name">
+      </command>
+   </extension>
+
+   <extension point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties"
+            icon="icons/eview16/prop_ps.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.ui.command.showIn.systemManagement"
+            icon="icons/eview16/targets_view.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.ui.views.command.find"
+            icon="icons/obj16/search.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.ui.views.command.quickfilter"
+            icon="icons/elcl16/filter_ps.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.ui.views.command.apply"
+            disabledIcon="icons/dtool16/save_edit.png"
+            icon="icons/etool16/save_edit.png">
+      </image>
+   </extension>
+
+   <extension point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.eclipse.tcf.te.ui.views.command.find"
+            contextId="org.eclipse.tcf.te.ui.views.View"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+F">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.views.command.find"
+            contextId="org.eclipse.tcf.te.ui.views.Editor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+F">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.views.command.quickfilter"
+            contextId="org.eclipse.tcf.te.ui.views.View"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+Q">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.views.command.quickfilter"
+            contextId="org.eclipse.tcf.te.ui.views.Editor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+Q">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.views.command.resetfilter"
+            contextId="org.eclipse.tcf.te.ui.views.View"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ESC">
+      </key>
+      <key
+            commandId="org.eclipse.tcf.te.ui.views.command.resetfilter"
+            contextId="org.eclipse.tcf.te.ui.views.Editor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ESC">
+      </key>
+   </extension>
+
+<!-- Handler contributions -->
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            commandId="org.eclipse.ui.file.properties"
+            class="org.eclipse.tcf.te.ui.views.handler.OpenEditorHandler">
+         <activeWhen>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.View"/>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <iterate operator="and" ifEmpty="false">
+                  <test property="org.eclipse.tcf.te.ui.views.hasApplicableEditorBindings" value="true"/>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      
+      <handler
+            commandId="org.eclipse.ui.navigator.Open"
+            class="org.eclipse.tcf.te.ui.views.handler.NewWizardNodeHandler">
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <equals value="org.eclipse.tcf.te.ui.views.View"/>
+               </with>
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate operator="and" ifEmpty="false">
+                     <instanceof value="org.eclipse.tcf.te.ui.views.navigator.nodes.NewWizardNode"/>
+                  </iterate>
+               </with>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <count value="1"/>
+               <iterate operator="and" ifEmpty="false">
+                  <instanceof value="org.eclipse.tcf.te.ui.views.navigator.nodes.NewWizardNode"/>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+ 
+      <handler
+            commandId="org.eclipse.ui.navigator.Open"
+            class="org.eclipse.tcf.te.ui.views.handler.OpenEditorHandler">
+         <activeWhen>
+            <and>
+               <with variable="activePartId">
+                  <equals value="org.eclipse.tcf.te.ui.views.View"/>
+               </with>
+               <with variable="selection">
+                  <iterate operator="and" ifEmpty="false">
+                     <test property="org.eclipse.tcf.te.ui.views.hasApplicableEditorBindings" value="true"/>
+                  </iterate>
+               </with>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <iterate operator="and" ifEmpty="false">
+                  <test property="org.eclipse.tcf.te.ui.views.hasApplicableEditorBindings" value="true"/>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ShowInPropertiesHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.ShowInProperties">
+         <activeWhen>
+            <with variable="activePartId">
+               <or>
+                  <equals value="org.eclipse.tcf.te.ui.views.View"/>
+                  <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+               </or>
+            </with>
+         </activeWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ShowInSystemManagementHandler"
+            commandId="org.eclipse.tcf.te.ui.command.showIn.systemManagement">
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ConfigFiltersHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.filters">
+         <activeWhen>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.View"/>
+            </with>
+         </activeWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ConfigContentHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.content">
+         <activeWhen>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.View"/>
+            </with>
+         </activeWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ViewQuickFilterHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.quickfilter">
+         <activeWhen>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.View"/>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="activePart">
+               <adapt type="org.eclipse.ui.navigator.CommonViewer">
+                  <test property="org.eclipse.tcf.te.ui.views.isFilterable"/>
+               </adapt>
+            </with>
+         </enabledWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ViewQuickFilterResetHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.resetfilter">
+         <activeWhen>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.View"/>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="activePart">
+               <adapt type="org.eclipse.ui.navigator.CommonViewer">
+                  <test property="org.eclipse.tcf.te.ui.views.isFiltering"/>
+               </adapt>
+            </with>
+         </enabledWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.EditorQuickFilterHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.quickfilter">
+         <activeWhen>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="activeEditor">
+               <adapt type="org.eclipse.tcf.te.ui.views.Editor">
+                  <test property="org.eclipse.tcf.te.ui.views.isEditorFilterable"/>
+               </adapt>
+            </with>
+         </enabledWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.EditorQuickFilterResetHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.resetfilter">
+         <activeWhen>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="activeEditor">
+               <adapt type="org.eclipse.jface.viewers.TreeViewer">
+                  <test property="org.eclipse.tcf.te.ui.views.isFiltering"/>
+               </adapt>
+            </with>
+         </enabledWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.ViewSearchHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.find">
+         <activeWhen>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.View"/>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <count value="1"/>
+               <iterate>
+                  <adapt type="org.eclipse.tcf.te.ui.interfaces.ISearchable">
+                  </adapt>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.EditorSearchHandler"
+            commandId="org.eclipse.tcf.te.ui.views.command.find">
+         <activeWhen>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="selection">
+               <count value="1"/>
+               <iterate>
+                  <adapt type="org.eclipse.tcf.te.ui.interfaces.ISearchable">
+                  </adapt>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      
+      <handler
+            class="org.eclipse.tcf.te.ui.views.handler.EditorRevertHandler"
+            commandId="org.eclipse.ui.file.revert">
+         <activeWhen>
+            <with variable="activePartId">
+               <equals value="org.eclipse.tcf.te.ui.views.Editor"/>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="activeEditor">
+               <test property="org.eclipse.tcf.te.ui.views.isDirty" value="true"/>
+            </with>
+         </enabledWhen>
+      </handler>
+      
+    </extension>
+
+<!-- Eclipse core expressions property tester -->
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.ui.views.expressions.PropertyTester"
+            id="org.eclipse.tcf.te.ui.views.PropertyTester"
+            namespace="org.eclipse.tcf.te.ui.views"
+            properties="isDirty,hasApplicableEditorBindings"
+            type="java.lang.Object">
+      </propertyTester>
+
+      <propertyTester
+            class="org.eclipse.tcf.te.ui.views.internal.categories.CategoryPropertyTester"
+            id="org.eclipse.tcf.te.ui.views.categories.CategoryPropertyTester"
+            namespace="org.eclipse.tcf.te.ui.views"
+            properties="isCategoryEnabled"
+            type="java.lang.Object">
+      </propertyTester>
+
+      <propertyTester
+            class="org.eclipse.tcf.te.ui.views.internal.categories.CategoryPropertyTester"
+            id="org.eclipse.tcf.te.ui.views.categories.CategoryPropertyTester"
+            namespace="org.eclipse.tcf.te.ui.views"
+            properties="isCategoryID,belongsTo,isHiddenByPreferences,isVisibleNavigatorContent"
+            type="org.eclipse.tcf.te.ui.views.interfaces.ICategory">
+      </propertyTester>
+
+      <propertyTester
+            class="org.eclipse.tcf.te.ui.views.internal.categories.CategoryPropertyTester"
+            id="org.eclipse.tcf.te.ui.views.categories.CategoryPropertyTester"
+            namespace="org.eclipse.tcf.te.ui.views"
+            properties="belongsTo"
+            type="org.eclipse.tcf.te.ui.views.interfaces.categories.ICategorizable">
+      </propertyTester>
+
+      <propertyTester
+            class="org.eclipse.tcf.te.ui.views.internal.categories.CategoryPropertyTester"
+            id="org.eclipse.tcf.te.ui.views.categories.CategoryPropertyTester"
+            namespace="org.eclipse.tcf.te.ui.views"
+            properties="parentCategoryId,validAddToCategoriesCount"
+            type="org.eclipse.jface.viewers.ISelection">
+      </propertyTester>
+
+      <propertyTester
+            class="org.eclipse.tcf.te.ui.views.internal.quickfilter.QuickFilterTester"
+            id="org.eclipse.tcf.te.ui.views.quickfilter.QuickFilterTester"
+            namespace="org.eclipse.tcf.te.ui.views"
+            properties="isFilterable,isFiltering"
+            type="org.eclipse.jface.viewers.TreeViewer">
+      </propertyTester>
+      
+      <propertyTester
+            class="org.eclipse.tcf.te.ui.views.internal.quickfilter.EditorQuickFilterTester"
+            id="org.eclipse.tcf.te.ui.views.quickfilter.EditorQuickFilterTester"
+            namespace="org.eclipse.tcf.te.ui.views"
+            properties="isEditorFilterable"
+            type="org.eclipse.tcf.te.ui.views.editor.Editor">
+      </propertyTester>
+      
+   </extension>
+   
+<!-- Preference contributions -->
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.tcf.te.ui.views.internal.preferences.PreferencesInitializer"/>
+   </extension>
+   
+<!-- Element factory contributions -->   
+   <extension point="org.eclipse.ui.elementFactories">
+      <factory
+            class="org.eclipse.tcf.te.ui.views.internal.categories.CategoryFactory"
+            id="org.eclipse.tcf.te.ui.views.categoryFactory">
+      </factory>
+   </extension>
+
+<!-- Adapter factory contributions -->   
+   <extension point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.tcf.te.ui.views.internal.View"
+            class="org.eclipse.tcf.te.ui.views.internal.adapters.ViewAdapterFactory">
+         <adapter type="org.eclipse.ui.navigator.CommonViewer"/>
+      </factory>
+      <factory
+            adaptableType="org.eclipse.tcf.te.ui.views.editor.Editor"
+            class="org.eclipse.tcf.te.ui.views.internal.adapters.EditorAdapterFactory">
+         <adapter type="org.eclipse.jface.viewers.TreeViewer"/>
+      </factory>
+      <factory
+            adaptableType="org.eclipse.tcf.te.ui.views.editor.EditorInput"
+            class="org.eclipse.tcf.te.ui.views.internal.adapters.EditorAdapterFactory">
+         <adapter type="org.eclipse.tcf.te.runtime.model.interfaces.IModelNode"/>
+         <adapter type="org.eclipse.tcf.te.core.interfaces.IConnectable"/>
+      </factory>
+   </extension>
+
+<!-- Source provider contributions -->
+   <extension point="org.eclipse.ui.services">
+      <sourceProvider
+            provider="org.eclipse.tcf.te.ui.views.expressions.SelectionSourceProvider">
+         <variable
+               name="systemManagerViewSelection"
+               priorityLevel="workbench">
+         </variable>
+         <variable
+               name="debugViewSelection"
+               priorityLevel="workbench">
+         </variable>
+      </sourceProvider>
+   </extension>
+
+<!-- Activity contributions -->
+   <extension point="org.eclipse.ui.activities">
+      <category
+            description="%activities.category.systemmanagement.description"
+            id="org.eclipse.tcf.te.ui.views.category.systemmanagement"
+            name="%activities.category.systemmanagement.name">
+      </category>
+      
+      <activity
+            description="%activities.activity.systemmanagement.perspective.description"
+            id="org.eclipse.tcf.te.ui.views.activity.systemmanagement.perspective"
+            name="%activities.activity.systemmanagement.perspective.name">
+      </activity>
+      <activity
+            description="%activities.activity.systemmanagement.views.description"
+            id="org.eclipse.tcf.te.ui.views.activity.systemmanagement.views"
+            name="%activities.activity.systemmanagement.views.name">
+      </activity>
+
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.te.ui.views.activity.systemmanagement.perspective"
+            pattern="org\.eclipse\.tcf\.te\.ui\.views/.*\.perspective">
+      </activityPatternBinding>
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.te.ui.views.activity.systemmanagement.views"
+            pattern="org\.eclipse\.tcf\.te\.ui\.views/org\.eclipse\.tcf\.te\.ui\.views\.View">
+      </activityPatternBinding>
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.te.ui.views.activity.systemmanagement.views"
+            pattern="org\.eclipse\.tcf\.te\.ui\.views/org\.eclipse\.tcf\.te\.ui\.views\.Editor">
+      </activityPatternBinding>
+      
+      <categoryActivityBinding
+            activityId="org.eclipse.tcf.te.ui.views.activity.systemmanagement.perspective"
+            categoryId="org.eclipse.tcf.te.ui.views.category.systemmanagement">
+      </categoryActivityBinding>
+      <categoryActivityBinding
+            activityId="org.eclipse.tcf.te.ui.views.activity.systemmanagement.views"
+            categoryId="org.eclipse.tcf.te.ui.views.category.systemmanagement">
+      </categoryActivityBinding>
+      
+      <defaultEnablement
+            id="org.eclipse.tcf.te.ui.views.activity.systemmanagement.perspective">
+      </defaultEnablement>
+      <defaultEnablement
+            id="org.eclipse.tcf.te.ui.views.activity.systemmanagement.views">
+      </defaultEnablement>
+   </extension>
+   
+</plugin>

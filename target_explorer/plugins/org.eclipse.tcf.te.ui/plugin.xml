@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="newWizards" name="%extension-point.newWizards.name" schema="schema/newWizards.exsd"/>
+   <extension-point id="wizardProviders" name="%extension-point.wizardProviders.name" schema="schema/wizardProviders.exsd"/>
+   <extension-point id="viewers" name="%extension-point.viewers.name" schema="schema/viewers.exsd"/>
+   <extension-point id="cellEditors" name="%extension-point.cellEditors.name" schema="schema/cellEditors.exsd"/>
+
+<!-- View contributions -->
+   <extension point="org.eclipse.ui.views">
+      <category
+            id="org.eclipse.tcf.te.ui.views.category"
+            name="%ViewCategory.name">
+      </category>
+   </extension>
+
+<!-- New target wizard contributions -->
+   <extension point="org.eclipse.tcf.te.ui.newWizards">
+      <category
+            id="org.eclipse.tcf.te.ui.newWizards.category.general"
+            name="%NewWizards.category.name">
+      </category>
+   </extension>
+   
+<!-- Command contributions -->
+   <extension point="org.eclipse.ui.commands">
+      <category
+            id="org.eclipse.tcf.te.ui.commands.category"
+            name="%command.category.name">
+      </category>
+
+      <command
+            id="org.eclipse.tcf.te.ui.command.newWizards"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            defaultHandler="org.eclipse.tcf.te.ui.wizards.newWizard.NewWizardCommandHandler"
+            description="%command.newWizards.description"
+            helpContextId="org.eclipse.tcf.te.ui.command_NewWizards"
+            name="%command.newWizards.name">
+      </command>
+
+      <command
+            id="org.eclipse.tcf.te.ui.command.refresh"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.refresh.description"
+            helpContextId="org.eclipse.tcf.te.ui.command_Refresh"
+            name="%command.refresh.name">
+      </command>
+      
+      <command
+            id="org.eclipse.tcf.te.ui.command.showConsoleView"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            description="%command.showConsoleView.description"
+            helpContextId="org.eclipse.tcf.te.ui.command_ShowConsoleView"
+            name="%command.showConsoleView.name">
+      </command>
+
+      <command
+            id="org.eclipse.tcf.te.ui.command.connect"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.command_Connect"
+            description="%command.connect.description"
+            name="%command.connect.name">
+      </command>
+
+      <command
+            id="org.eclipse.tcf.te.ui.editor.command.connect"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.command_Connect"
+            description="%command.connect.description"
+            name="%command.connect.name">
+      </command>
+
+      <command
+            id="org.eclipse.tcf.te.ui.toolbar.command.connect"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.command_Connect"
+            description="%command.connect.toolbar.description"
+            name="%command.connect.name">
+      </command>
+
+      <command
+            id="org.eclipse.tcf.te.ui.command.disconnect"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.command_Disconnect"
+            description="%command.disconnect.description"
+            name="%command.disconnect.name">
+      </command>
+
+      <command 
+            id="org.eclipse.tcf.te.ui.editor.command.disconnect"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.command_Disconnect"
+            description="%command.disconnect.description"
+            name="%command.disconnect.name">
+      </command>
+
+      <command 
+            id="org.eclipse.tcf.te.ui.toolbar.command.disconnect"
+            categoryId="org.eclipse.tcf.te.ui.commands.category"
+            helpContextId="org.eclipse.tcf.te.ui.command_Disconnect"
+            description="%command.disconnect.toolbar.description"
+            name="%command.disconnect.name">
+      </command>
+   </extension>
+   
+<!-- Command image contributions -->   
+   <extension point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.eclipse.tcf.te.ui.command.connect"
+            disabledIcon="icons/dlcl16/connect.gif"
+            icon="icons/elcl16/connect.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.ui.editor.command.connect"
+            disabledIcon="icons/dlcl16/connect.gif"
+            icon="icons/elcl16/connect.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.ui.toolbar.command.connect"
+            disabledIcon="icons/dlcl16/connect.gif"
+            icon="icons/elcl16/connect.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.ui.command.disconnect"
+            disabledIcon="icons/dlcl16/disconnect.gif"
+            icon="icons/elcl16/disconnect.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.ui.editor.command.disconnect"
+            disabledIcon="icons/dlcl16/disconnect.gif"
+            icon="icons/elcl16/disconnect.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.ui.toolbar.command.disconnect"
+            disabledIcon="icons/dlcl16/disconnect.gif"
+            icon="icons/elcl16/disconnect.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.ui.command.newWizards"
+            disabledIcon="icons/dlcl16/newtarget_wiz.gif"
+            icon="icons/elcl16/newtarget_wiz.gif">
+      </image>
+      <image
+            commandId="org.eclipse.tcf.te.ui.command.refresh"
+            disabledIcon="icons/dlcl16/refresh_nav.png"
+            icon="icons/elcl16/refresh_nav.png">
+      </image>
+   </extension>
+
+<!-- Command handler contributions -->
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.tcf.te.ui.handler.ShowConsoleViewCommandHandler"
+            commandId="org.eclipse.tcf.te.ui.command.showConsoleView">
+      </handler>
+      
+      <handler commandId="org.eclipse.tcf.te.ui.command.connect">
+         <class class="org.eclipse.tcf.te.ui.handler.ConnectableCommandHandler">
+            <parameter name="action" value="connect"/>
+            <parameter name="handleDirty" value="true"/>
+         </class>
+         <activeWhen>
+            <with variable="systemManagerViewSelection">
+               <iterate operator="and" ifEmpty="false">
+                  <adapt type="org.eclipse.tcf.te.core.interfaces.IConnectable"/>
+               </iterate>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="systemManagerViewSelection">
+               <iterate operator="and" ifEmpty="false">
+                  <adapt type="org.eclipse.tcf.te.core.interfaces.IConnectable">
+                     <test forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.core.isConnectStateChangeActionAllowed"
+                           value="connect"/>
+                  </adapt>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler commandId="org.eclipse.tcf.te.ui.editor.command.connect">
+         <class class="org.eclipse.tcf.te.ui.handler.ConnectableCommandHandler">
+            <parameter name="action" value="connect"/>
+            <parameter name="handleDirty" value="true"/>
+         </class>
+         <activeWhen>
+            <reference definitionId="te.expressions.editor.IConnectable"/>
+         </activeWhen>
+         <enabledWhen>
+            <and>
+               <with variable="activeEditorInput">
+                  <adapt type="org.eclipse.tcf.te.core.interfaces.IConnectable">
+                     <test forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.core.isConnectStateChangeActionAllowed"
+                           value="connect"/>
+                  </adapt>
+               </with>
+            </and>
+         </enabledWhen>
+      </handler>
+
+      <handler commandId="org.eclipse.tcf.te.ui.command.disconnect">
+         <class class="org.eclipse.tcf.te.ui.handler.ConnectableCommandHandler">
+            <parameter name="action" value="disconnect"/>
+         </class>
+         <activeWhen>
+            <with variable="systemManagerViewSelection">
+               <iterate operator="and" ifEmpty="false">
+                  <adapt type="org.eclipse.tcf.te.core.interfaces.IConnectable"/>
+               </iterate>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="systemManagerViewSelection">
+               <iterate operator="and" ifEmpty="false">
+                  <adapt type="org.eclipse.tcf.te.core.interfaces.IConnectable">
+                     <test forcePluginActivation="true"
+                           property="org.eclipse.tcf.te.core.isConnectStateChangeActionAllowed"
+                           value="disconnect"/>
+                  </adapt>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler commandId="org.eclipse.tcf.te.ui.editor.command.disconnect">
+         <class class="org.eclipse.tcf.te.ui.handler.ConnectableCommandHandler">
+            <parameter name="action" value="disconnect"/>
+         </class>
+         <activeWhen>
+            <reference definitionId="te.expressions.editor.IConnectable"/>
+         </activeWhen> 
+         <enabledWhen>
+            <with variable="activeEditorInput">
+               <adapt type="org.eclipse.tcf.te.core.interfaces.IConnectable">
+                  <test forcePluginActivation="true"
+                        property="org.eclipse.tcf.te.core.isConnectStateChangeActionAllowed"
+                        value="disconnect"/>
+               </adapt>
+            </with>
+         </enabledWhen>
+      </handler>
+   </extension>
+   
+<!-- Menu contributions -->
+   <extension point="org.eclipse.ui.menus">
+
+      <menuContribution locationURI="popup:org.eclipse.tcf.te.ui.views.View#Popup?after=group.connect">
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.connect"
+               mnemonic="%command.connect.mnemonic">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="te.expressions.selection.IConnectable"/>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.disconnect"
+               mnemonic="%command.disconnect.mnemonic">
+            <visibleWhen checkEnabled="false">
+               <reference definitionId="te.expressions.selection.IConnectable"/>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+
+      <menuContribution locationURI="toolbar:org.eclipse.tcf.te.ui.views.View?after=group.connect">
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.connect"/>
+         <command
+               commandId="org.eclipse.tcf.te.ui.command.disconnect"/>
+      </menuContribution>
+   </extension>
+
+<!-- Context and binding contributions -->
+   <extension point="org.eclipse.ui.contexts">
+      <context
+            description="%context.view.description"
+            id="org.eclipse.tcf.te.ui.views.View"
+            name="%context.view.name"
+            parentId="org.eclipse.ui.contexts.window">
+      </context>
+      <context
+            description="%context.editor.description"
+            id="org.eclipse.tcf.te.ui.views.Editor"
+            name="%context.editor.name"
+            parentId="org.eclipse.ui.contexts.window">
+      </context>
+   </extension>
+
+   <extension point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.eclipse.tcf.te.ui.command.newWizards"
+            contextId="org.eclipse.tcf.te.ui.views.View"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+N">
+      </key>
+
+      <key
+            commandId="org.eclipse.tcf.te.ui.command.refresh"
+            contextId="org.eclipse.tcf.te.ui.views.View"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="F5">
+      </key>
+
+      <key
+            commandId="org.eclipse.tcf.te.ui.command.refresh"
+            contextId="org.eclipse.tcf.te.ui.views.Editor"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="F5">
+      </key>
+   </extension>
+
+<!-- Status handler contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.statushandler.handlers">
+      <handler
+            class="org.eclipse.tcf.te.ui.statushandler.DefaultStatusHandler"
+            id="org.eclipse.tcf.te.statushandler.default"
+            label="%DefaultStatusHandler.label">
+      </handler>
+   </extension>
+
+<!-- Executor service contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.concurrent.executorServices">
+      <executorService
+            id="org.eclipse.tcf.te.ui.executors.SWTDisplay"
+            label="Eclipse Platform Display Executor"
+            class="org.eclipse.tcf.te.ui.internal.executors.SWTDisplayExecutor">
+      </executorService>
+   </extension>
+   
+<!-- Executor utility delegate contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.concurrent.executorUtilDelegates">
+      <executorUtilDelegate
+      		class="org.eclipse.tcf.te.ui.internal.executors.SWTDisplayExecutorUtilDelegate"
+            id="org.eclipse.tcf.te.ui.executors.delegate.SWTDisplay"
+            label="%SWTDisplayExecutorUtilDelegate.label">
+      </executorUtilDelegate>
+   </extension>
+
+<!-- Event listener contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.eventListeners">
+      <eventListener class="org.eclipse.tcf.te.ui.events.TriggerCommandEventListener">
+         <eventType
+               bundleId="org.eclipse.tcf.te.runtime"
+               class="org.eclipse.tcf.te.runtime.events.TriggerCommandEvent"/>
+      </eventListener>
+   </extension>
+   
+<!-- Preference page contributions -->
+   <extension point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.tcf.te.ui.preferences.PreferencePage"
+            id="org.eclipse.tcf.te.ui.preferences.general"
+            name="%preference.page.name">
+      </page>
+   </extension>
+
+<!-- Preference contributions -->
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.tcf.te.ui.preferences.PreferencesInitializer"/>
+   </extension>
+
+</plugin>

@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.tcf.te.ui.views" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.tcf.te.ui.views" id="editorPageBindings" name="Editor Page Bindings Extension Point"/>
+      </appinfo>
+      <documentation>
+         This extension point is used to declare the editor page bindings and editor page removals (unbinding).
+&lt;p&gt;
+&lt;b&gt;Note:&lt;/b&gt; For the enablement expression evaluation, note that the default variable and the &quot;activeEditorInput&quot; variable are the same and non-iterable.
+      </documentation>
+   </annotation>
+
+   <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="editorPageBinding" minOccurs="1" maxOccurs="unbounded"/>
+            <element ref="editorPageUnBinding" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="editorPageUnBinding">
+      <annotation>
+         <documentation>
+            Declares a editor page removal (unbinding).
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="enablement" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique id of the editor page unbinding contribution.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="pageId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique id of the referenced editor page.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.ui.views.editorPages/editorPage/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="editorPageBinding">
+      <annotation>
+         <documentation>
+            Declares a editor page binding.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="enablement" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique id of the editor page binding contribution.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="pageId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique id of the referenced editor page.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.tcf.te.ui.views.editorPages/editorPage/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="insertBefore" type="string">
+            <annotation>
+               <documentation>
+                  The comma separated list of page id&apos;s this page shall be inserted before, or &quot;first&quot; to insert it at the beginning of the stack. If more than one page id is specified, the page is inserted before the first page found from that list. If &quot;insertBefore&quot; is specified non-empty, it will be processed before the &quot;insertAfter&quot; attribute. If neither &quot;insertBefore&quot; or &quot;insertAfter&quot; is specified, the page will be inserted at the end of the stack.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="insertAfter" type="string">
+            <annotation>
+               <documentation>
+                  The comma separated list of page id&apos;s this page shall be inserted after, or &quot;last&quot; to insert it at the end of the stack. If more than one page id is specified, the page is inserted after the first page found from that list. If &quot;insertBefore&quot; is specified non-empty, it will be processed before the &quot;insertAfter&quot; attribute. If neither &quot;insertBefore&quot; or &quot;insertAfter&quot; is specified, the page will be inserted at the end of the stack.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         Target Explorer 1.0.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;pre&gt;
+   &lt;extension point=&quot;org.eclipse.tcf.te.ui.views.editorPageBindings&quot;&gt;
+      &lt;editorPageBinding
+            id=&quot;org.eclipse.tcf.te.tcf.binding.TcfPeerPropertiesPage&quot;
+            pageId=&quot;org.eclipse.tcf.te.tcf.ui.TcfPeerPropertiesPage&quot;&gt;
+         &lt;enablement&gt;
+            &lt;with variable=&quot;activeEditorInput&quot;&gt;
+               ...
+            &lt;/with&gt;
+         &lt;/enablement&gt;
+      &lt;/editorPageBinding&gt;
+
+      &lt;editorPageUnBinding
+            id=&quot;org.eclipse.tcf.te.tcf.unbinding.TcfPeerTestPage&quot;
+            pageId=&quot;org.eclipse.tcf.te.tcf.ui.TcfPeerTestPage&quot;&gt;
+         &lt;enablement&gt;
+            &lt;with variable=&quot;activeEditorInput&quot;&gt;
+               ...
+            &lt;/with&gt;
+         &lt;/enablement&gt;
+      &lt;/editorPageUnBinding&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;
+      </documentation>
+   </annotation>
+
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2011,2013 Wind River Systems, Inc. and others.
+
+All rights reserved.
+
+This program and the accompanying materials are made available under the terms
+of the Eclipse Public License 2.0 which accompanies this distribution, and is
+available at https://www.eclipse.org/legal/epl-2.0/.
+      </documentation>
+   </annotation>
+
+</schema>

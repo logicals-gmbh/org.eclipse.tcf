@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Extension points -->
+   <extension-point id="delegates" name="%ExtensionPoint.delegates.name" schema="schema/delegates.exsd"/>
+   <extension-point id="bindings" name="%ExtensionPoint.bindings.name" schema="schema/bindings.exsd"/>
+   <extension-point id="variableDelegates" name="%ExtensionPoint.variableDelegates.name" schema="schema/variableDelegates.exsd"/> 
+   <extension-point id="variableProviders" name="%ExtensionPoint.variableProviders.name" schema="schema/variableProviders.exsd"/> 
+   
+<!-- Service contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.services.services">
+      <service
+            class="org.eclipse.tcf.te.runtime.persistence.services.URIPersistenceService"
+            id="org.eclipse.tcf.te.runtime.services.persistence">
+         <serviceType class="org.eclipse.tcf.te.runtime.persistence.interfaces.IURIPersistenceService"/>
+      </service>
+   </extension>
+
+<!-- Persistence delegate contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.persistence.delegates">
+      <delegate 
+            id="org.eclipse.tcf.te.runtime.persistence.gson.map"
+            class="org.eclipse.tcf.te.runtime.persistence.delegates.GsonMapPersistenceDelegate">
+      </delegate>
+   </extension>
+
+<!-- Persistence delegate bindings contributions -->
+   <extension
+         point="org.eclipse.tcf.te.runtime.persistence.bindings">
+      <binding
+            delegateId="org.eclipse.tcf.te.runtime.persistence.gson.map"
+            id="org.eclipse.tcf.te.runtime.persistence.binding.gson.map">
+         <enablement>
+            <with variable="container">
+               <or>
+                  <instanceof value="java.net.URI"/>
+                  <instanceof value="java.lang.String"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="containerClass">
+                        <equals value="java.lang.String"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+            <with variable="context">
+               <or>
+                  <instanceof value="java.util.Map"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="contextClass">
+                        <equals value="java.util.Map"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+         </enablement>
+      </binding>
+   </extension>
+   
+<!-- Variable Provider Contribution -->
+   <extension point="org.eclipse.tcf.te.runtime.persistence.variableProviders">
+      <provider
+            id="org.eclipse.tcf.te.runtime.persistence.variableProvider"
+            class="org.eclipse.tcf.te.runtime.persistence.internal.VariableProvider">
+      </provider>
+   </extension>
+
+</plugin>

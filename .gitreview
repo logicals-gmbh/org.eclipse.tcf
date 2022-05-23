@@ -1,0 +1,5 @@
+[gerrit]
+host=gerrit.ow.ks
+port=29418
+project=org.eclipse.tcf.git
+defaultbranch=master

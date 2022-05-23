@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?><!--
+    Copyright (c) 2010, 2016 Wind River Systems, Inc. and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License 2.0
+    which accompanies this distribution, and is available at
+    https://www.eclipse.org/legal/epl-2.0/
+
+    Contributors:
+        Wind River Systems - initial API and implementation
+ -->
+
+<plugin>
+
+   <extension-point id="launch_project_builder" name="TCF Launch Project Builder" schema="schema/launch_project_builder.exsd"/>
+
+   <extension
+         point="org.eclipse.debug.core.breakpoints">
+      <breakpoint
+            markerType="org.eclipse.tcf.debug.breakpoint.marker"
+            class="org.eclipse.tcf.internal.debug.model.TCFBreakpoint"
+            id="org.eclipse.tcf.debug.breakpoint"
+            name="TCF Breakpoint">
+      </breakpoint>
+   </extension>
+
+   <extension
+         id="org.eclipse.tcf.debug.breakpoint.marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.debug.core.breakpointMarker"/>
+      <persistent value="true"/>
+   </extension>
+
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            sourceLocatorId="org.eclipse.tcf.debug.SourceLocator"
+            name="Target Communication Framework"
+            sourcePathComputerId="org.eclipse.tcf.debug.SourcePathComputer"
+            delegate="org.eclipse.tcf.internal.debug.launch.TCFLaunchDelegate"
+            modes="run, debug"
+            id="org.eclipse.tcf.debug.LaunchConfigurationType">
+      </launchConfigurationType>
+   </extension>
+
+   <extension
+         point="org.eclipse.debug.core.sourceLocators">
+      <sourceLocator
+            name="TCF Source Lookup Director"
+            class="org.eclipse.tcf.internal.debug.launch.TCFSourceLookupDirector"
+            id="org.eclipse.tcf.debug.SourceLocator">
+      </sourceLocator>
+   </extension>
+
+   <extension
+         point="org.eclipse.debug.core.sourcePathComputers">
+      <sourcePathComputer
+            class="org.eclipse.tcf.internal.debug.launch.TCFSourcePathComputerDelegate"
+            id="org.eclipse.tcf.debug.SourcePathComputer">
+      </sourcePathComputer>
+   </extension>
+</plugin>

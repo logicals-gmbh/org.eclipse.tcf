@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!-- Extension points -->
+   <extension-point id="launchConfigTypeBindings" name="%Extension.LaunchConfigTypeBindings.name" schema="schema/launchConfigTypeBindings.exsd"/>
+   <extension-point id="launchManagerDelegates" name="%Extension.LaunchManagerDelegates.name" schema="schema/launchManagerDelegates.exsd"/>
+
+<!-- Adapter factory contributions -->
+   <extension point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.tcf.te.launch.core.selection.interfaces.ISelectionContext"
+            class="org.eclipse.tcf.te.launch.core.adapters.internal.AdapterFactory">
+         <adapter type="org.eclipse.core.expressions.IIterable"/>
+         <adapter type="org.eclipse.core.expressions.ICountable"/>
+      </factory>
+   </extension>
+
+<!-- Preference contributions -->
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.tcf.te.launch.core.preferences.PreferencesInitializer">
+      </initializer>
+   </extension>
+
+<!-- Property tester contributions -->
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.tcf.te.launch.core.bindings.internal.PropertyTester"
+            id="org.eclipse.tcf.te.launch.core.PropertyTester"
+            namespace="org.eclipse.tcf.te.launch.core"
+            properties="launchMode"
+            type="org.eclipse.debug.core.ILaunch">
+      </propertyTester>
+      <propertyTester
+            class="org.eclipse.tcf.te.launch.core.bindings.internal.PropertyTester"
+            id="org.eclipse.tcf.te.launch.core.PropertyTester"
+            namespace="org.eclipse.tcf.te.launch.core"
+            properties="isValidLaunchConfigType"
+            type="java.lang.Object">
+      </propertyTester>
+      <propertyTester
+            class="org.eclipse.tcf.te.launch.core.properties.PropertyTester"
+            id="org.eclipse.tcf.te.launch.core.properties.PropertyTester"
+            namespace="org.eclipse.tcf.te.launch.core"
+            properties="isLaunched"
+            type="java.lang.Object">
+      </propertyTester>
+   </extension>
+
+<!-- Source path computers contibutions -->
+   <extension point="org.eclipse.debug.core.sourcePathComputers">
+      <sourcePathComputer
+            class="org.eclipse.tcf.te.launch.core.computers.SourcePathComputerDelegate"
+            id="org.eclipse.tcf.te.launch.core.sourcePathComputer">
+      </sourcePathComputer>
+   </extension>
+
+<!-- Launch Step contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.stepper.steps">
+      <step
+            class="org.eclipse.tcf.te.launch.core.steps.RemoveLaunchStep"
+            id="org.eclipse.tcf.te.launch.core.removeLaunchStep"
+            label="%LaunchStep.RemoveLaunch.name">
+      </step>
+   </extension>
+
+<!-- Persistence delegate contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.persistence.delegates">
+      <delegate 
+            id="org.eclipse.tcf.te.launch.core.persistence.gson.referencedProjectItem"
+            class="org.eclipse.tcf.te.launch.core.internal.GsonReferencedProjectItemPersistenceDelegate">
+      </delegate>
+      <delegate 
+            id="org.eclipse.tcf.te.launch.core.persistence.gson.fileTransferItem"
+            class="org.eclipse.tcf.te.launch.core.internal.GsonFileTransferItemPersistenceDelegate">
+      </delegate>
+      <delegate 
+            id="org.eclipse.tcf.te.launch.core.persistence.gson.launchConfigAttributes"
+            class="org.eclipse.tcf.te.launch.core.internal.GsonLaunchConfigAttributesPersistenceDelegate">
+      </delegate>
+   </extension>
+
+<!-- Persistence delegate bindings contributions -->
+   <extension point="org.eclipse.tcf.te.runtime.persistence.bindings">
+       <binding
+            delegateId="org.eclipse.tcf.te.launch.core.persistence.gson.fileTransferItem"
+            id="org.eclipse.tcf.te.launch.core.binding.gson.fileTransferItem">
+         <enablement>
+            <with variable="container">
+               <or>
+                  <instanceof value="java.lang.String"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="containerClass">
+                        <equals value="java.lang.String"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+            <with variable="context">
+               <or>
+                  <instanceof value="org.eclipse.tcf.te.runtime.services.interfaces.filetransfer.IFileTransferItem"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="contextClass">
+                        <equals value="org.eclipse.tcf.te.runtime.services.interfaces.filetransfer.IFileTransferItem"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+         </enablement>
+      </binding>
+      <binding
+            delegateId="org.eclipse.tcf.te.launch.core.persistence.gson.referencedProjectItem"
+            id="org.eclipse.tcf.te.launch.core.binding.gson.referencedProjectItem">
+         <enablement>
+            <with variable="container">
+               <or>
+                  <instanceof value="java.lang.String"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="containerClass">
+                        <equals value="java.lang.String"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+            <with variable="context">
+               <or>
+                  <instanceof value="org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem"/>
+                  <and>
+                     <instanceof value="java.lang.Class"/>
+                     <with variable="contextClass">
+                        <equals value="org.eclipse.tcf.te.launch.core.interfaces.IReferencedProjectItem"/>
+                     </with>
+                  </and>
+               </or>
+            </with>
+         </enablement>
+      </binding>
+      <binding
+            delegateId="org.eclipse.tcf.te.launch.core.persistence.gson.launchConfigAttributes"
+            id="org.eclipse.tcf.te.launch.core.binding.gson.launchConfigAttributes">
+         <enablement>
+            <and>
+               <with variable="containerClass">
+                 <equals value="java.lang.String"/>
+               </with>
+               <or>
+                  <with variable="context">
+                     <instanceof value="org.eclipse.debug.core.ILaunchConfiguration"/>
+                  </with>
+                  <with variable="contextClass">
+                     <equals value="org.eclipse.debug.core.ILaunchConfigurationWorkingCopy"/>
+                  </with>
+               </or>
+            </and>
+         </enablement>
+      </binding>
+   </extension>
+
+<!-- Variable delegate contributions --> 
+   <extension point="org.eclipse.tcf.te.runtime.persistence.variableDelegates">
+      <delegate 
+            id="org.eclipse.tcf.te.launch.core.persistence.variableDelegate" 
+            delegateId="org.eclipse.tcf.te.launch.core.persistence.gson.fileTransferItem">
+         <class class="org.eclipse.tcf.te.runtime.persistence.delegates.PathVariableDelegate">
+            <parameter name="keysToHandle" value="host"/>
+         </class>
+      </delegate>
+   </extension>
+
+
+
+</plugin>

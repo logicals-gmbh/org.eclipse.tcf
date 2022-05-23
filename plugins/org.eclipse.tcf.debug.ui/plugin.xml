@@ -1,0 +1,996 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<!--
+    Copyright (c) 2010-2019 Wind River Systems, Inc. and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License 2.0
+    which accompanies this distribution, and is available at
+    https://www.eclipse.org/legal/epl-2.0/
+
+    Contributors:
+        Wind River Systems - initial API and implementation
+ -->
+
+<plugin>
+
+   <extension-point id="launch_context" name="TCF Launch Context" schema="schema/launch_context.exsd"/>
+   <extension-point id="annotation_provider" name="TCF Annotation Provider" schema="schema/annotation_provider.exsd"/>
+   <extension-point id="presentation_provider" name="TCF Presentation Provider" schema="schema/presentation_provider.exsd"/>
+   <extension-point id="pretty_expression_provider" name="TCF Pretty Expression Provider" schema="schema/pretty_expression_provider.exsd"/>
+
+   <extension
+        id="org.eclipse.tcf.debug.ui.adapters"
+        point="org.eclipse.core.runtime.adapters">
+      <factory
+         class="org.eclipse.tcf.internal.debug.ui.adapters.TCFLaunchAdapterFactory"
+         adaptableType="org.eclipse.tcf.internal.debug.model.TCFLaunch">
+         <adapter type="org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider"/>
+         <adapter type="org.eclipse.debug.internal.ui.viewers.model.provisional.IElementLabelProvider"/>
+         <adapter type="org.eclipse.debug.internal.ui.viewers.model.provisional.IModelProxyFactory"/>
+         <adapter type="org.eclipse.debug.internal.ui.viewers.model.provisional.IModelSelectionPolicyFactory"/>
+         <adapter type="org.eclipse.ui.views.properties.IPropertySource"/>
+         <adapter type="org.eclipse.debug.ui.contexts.ISuspendTrigger"/>
+         <adapter type="org.eclipse.debug.core.model.IDebugModelProvider"/>
+      </factory>
+      <factory
+         class="org.eclipse.tcf.internal.debug.ui.adapters.TCFNodeAdapterFactory"
+         adaptableType="org.eclipse.tcf.internal.debug.ui.model.TCFNode">
+         <adapter type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget"/>
+         <adapter type="org.eclipse.debug.ui.actions.IToggleBreakpointsTargetExtension"/>
+         <adapter type="org.eclipse.ui.views.properties.IPropertySource"/>
+      </factory>
+<!--
+      <factory
+         class="org.eclipse.tcf.internal.debug.ui.adapters.TCFBreakpointAdapterFactory"
+         adaptableType="org.eclipse.debug.core.model.IBreakpoint">
+         <adapter type="org.eclipse.jface.viewers.ILabelProvider"/>
+      </factory>
+-->
+   </extension>
+
+   <extension point="org.eclipse.debug.ui.debugModelPresentations">
+      <debugModelPresentation
+         class = "org.eclipse.tcf.internal.debug.ui.model.TCFModelPresentation"
+         id = "org.eclipse.tcf.debug">
+      </debugModelPresentation>
+   </extension>
+
+   <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            icon="icons/tcf.gif"
+            configTypeID="org.eclipse.tcf.debug.LaunchConfigurationType"
+            id="org.eclipse.tcf.debug.LaunchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+   </extension>
+
+   <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            type="org.eclipse.tcf.debug.LaunchConfigurationType"
+            description="Run or debug a program using Target Communication Framework"
+            class="org.eclipse.tcf.internal.debug.ui.launch.TCFTabGroup"
+            id="org.eclipse.tcf.debug.LaunchConfigurationTabGroup">
+      </launchConfigurationTabGroup>
+   </extension>
+
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+      		namespace="org.eclipse.tcf.launch"
+            properties="isExecutable,areUpdatePoliciesSupported,canReset"
+            type="org.eclipse.core.runtime.IAdaptable"
+            class="org.eclipse.tcf.internal.debug.ui.launch.TCFPropertyTester"
+            id="org.eclipse.tcf.launch.PropertyTester">
+      </propertyTester>
+   </extension>
+
+   <extension point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+         label="TCF Application"
+         icon="icons/tcf.gif"
+         helpContextId="org.eclipse.tcf.debug.ui.shortcut_tcf_application"
+         modes="run, debug"
+         class="org.eclipse.tcf.internal.debug.ui.launch.TCFLaunchShortcut"
+         description="Launch an application using Target Communication Framework (TCF)"
+         id="org.eclipse.tcf.debug.ui.TCFShortcut">
+         <description
+            description="Runs an application using Target Communication Framework (TCF)"
+            mode="run">
+         </description>
+         <description
+            description="Debugs an application using Target Communication Framework (TCF)"
+            mode="debug">
+         </description>
+         <contextualLaunch>
+            <enablement>
+               <with variable="selection">
+                  <count value="1"/>
+                  <iterate>
+                     <instanceof value="org.eclipse.core.runtime.IAdaptable"/>
+                     <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.tcf.launch.isExecutable"/>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+         <configurationType
+            id="org.eclipse.tcf.debug.LaunchConfigurationType">
+         </configurationType>
+      </shortcut>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            name="Debugging using Target Communication Framework"
+            description="Debugging using Target Communication Framework"
+            id="org.eclipse.tcf.debug.ui.debugging"
+            parentId="org.eclipse.debug.ui.debugging">
+      </context>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            name="TCF Trace"
+            icon="icons/tcf.gif"
+            category="org.eclipse.debug.ui"
+            class="org.eclipse.tcf.internal.debug.ui.trace.TraceView"
+            id="org.eclipse.tcf.TraceView">
+      </view>
+      <view
+            name="TCF Profiler"
+            icon="icons/profiler.png"
+            category="org.eclipse.debug.ui"
+            class="org.eclipse.tcf.internal.debug.ui.profiler.ProfilerView"
+            id="org.eclipse.tcf.ProfilerView">
+      </view>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.debug.ui.DebugPerspective">
+         <view
+               relative="org.eclipse.ui.console.ConsoleView"
+               relationship="stack"
+               visible="false"
+               id="org.eclipse.tcf.TraceView">
+         </view>
+         <view
+               relative="org.eclipse.ui.views.ContentOutline"
+               relationship="stack"
+               visible="false"
+               id="org.eclipse.tcf.ProfilerView">
+         </view>
+      </perspectiveExtension>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors.annotationTypes">
+      <type
+         name="org.eclipse.tcf.debug.top_frame">
+      </type>
+      <type
+         name="org.eclipse.tcf.debug.stack_frame">
+      </type>
+      <type
+         name="org.eclipse.tcf.debug.breakpoint_instance">
+      </type>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+         annotationImageProvider="org.eclipse.tcf.internal.debug.ui.model.TCFAnnotationImageProvider"
+         annotationType="org.eclipse.tcf.debug.top_frame"
+         colorPreferenceKey="currentIPColor"
+         colorPreferenceValue="198,219,174"
+         highlightPreferenceKey="currentIPHighlight"
+         highlightPreferenceValue="true"
+         label="%debugCurrentInstructionPointer"
+         overviewRulerPreferenceKey="currentIPOverviewRuler"
+         overviewRulerPreferenceValue="true"
+         presentationLayer="6"
+         textPreferenceKey="currentIPIndication"
+         textPreferenceValue="false"
+         verticalRulerPreferenceKey="currentIPVerticalRuler"
+         verticalRulerPreferenceValue="true">
+      </specification>
+      <specification
+         annotationImageProvider="org.eclipse.tcf.internal.debug.ui.model.TCFAnnotationImageProvider"
+         annotationType="org.eclipse.tcf.debug.stack_frame"
+         colorPreferenceKey="secondaryIPColor"
+         colorPreferenceValue="219,235,204"
+         highlightPreferenceKey="secondaryIPHighlight"
+         highlightPreferenceValue="true"
+         label="%debugCallStack"
+         overviewRulerPreferenceKey="secondaryIPOverviewRuler"
+         overviewRulerPreferenceValue="true"
+         presentationLayer="6"
+         textPreferenceKey="secondaryIPIndication"
+         textPreferenceValue="false"
+         verticalRulerPreferenceKey="secondaryIPVerticalRuler"
+         verticalRulerPreferenceValue="true">
+      </specification>
+      <specification
+         annotationImageProvider="org.eclipse.tcf.internal.debug.ui.model.TCFAnnotationImageProvider"
+         annotationType="org.eclipse.tcf.debug.breakpoint_instance"
+         colorPreferenceKey="breakpointInstanceColor"
+         colorPreferenceValue="100,200,204"
+         highlightPreferenceKey="breakpointInstanceHighlight"
+         highlightPreferenceValue="false"
+         label="%debugBreakpointInstance"
+         overviewRulerPreferenceKey="breakpointInstanceRuler"
+         overviewRulerPreferenceValue="true"
+         presentationLayer="5"
+         textPreferenceKey="breakpointInstanceIndication"
+         textPreferenceValue="false"
+         verticalRulerPreferenceKey="breakpointInstanceVerticalRuler"
+         verticalRulerPreferenceValue="true">
+      </specification>
+   </extension>
+
+   <extension point="org.eclipse.debug.ui.detailPaneFactories">
+      <detailFactories
+             class="org.eclipse.tcf.internal.debug.ui.model.TCFDetailPaneFactory"
+             id="org.eclipse.tcf.debug.DetailPaneFactory">
+         <enablement>
+            <with variable="selection">
+               <iterate>
+                  <or>
+                     <instanceof value="org.eclipse.tcf.internal.debug.ui.model.TCFNode"/>
+                  </or>
+               </iterate>
+            </with>
+         </enablement>
+      </detailFactories>
+   </extension>
+
+   <extension point="org.eclipse.ui.popupMenus">
+      <!-- TCFLaunch popup menu contributions -->
+      <objectContribution
+            id="org.eclipse.tcf.debug.ui.TCFLaunch"
+            objectClass="org.eclipse.tcf.internal.debug.model.TCFLaunch">
+         <action
+            id="org.eclipse.tcf.debug.ui.actions.Signals"
+            class="org.eclipse.tcf.internal.debug.ui.commands.SignalsCommand"
+            icon="icons/signals.gif"
+            label="%Signals.label"
+            menubarPath="additions">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.tcf.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
+      </objectContribution>
+
+      <!-- TCFNode popup menu contributions -->
+      <objectContribution
+            id="org.eclipse.tcf.debug.ui.TCFNode"
+            objectClass="org.eclipse.tcf.internal.debug.ui.model.TCFNode">
+         <action
+            id="org.eclipse.tcf.debug.ui.actions.Signals"
+            class="org.eclipse.tcf.internal.debug.ui.commands.SignalsCommand"
+            icon="icons/signals.gif"
+            label="%Signals.label"
+            menubarPath="additions">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.tcf.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
+         <action
+            id="org.eclipse.tcf.debug.ui.actions.MemoryMap"
+            class="org.eclipse.tcf.internal.debug.ui.commands.MemoryMapCommand"
+            icon="icons/memory-map.gif"
+            label="%MemoryMap.label"
+            menubarPath="additions">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.tcf.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
+         <action
+            id="org.eclipse.tcf.debug.ui.actions.Refresh"
+            class="org.eclipse.tcf.internal.debug.ui.commands.RefreshCommand"
+            icon="icons/refresh.gif"
+            label="%Refresh.label"
+            menubarPath="additions">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.tcf.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
+         <!--
+         <action
+            id="org.eclipse.tcf.debug.ui.actions.Console"
+            class="org.eclipse.tcf.internal.debug.ui.commands.ConsoleCommand"
+            icon="icons/console.gif"
+            label="%Console.label"
+            menubarPath="additions">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.tcf.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
+         -->
+         <action
+            id="org.eclipse.tcf.debug.ui.actions.Detach"
+            class="org.eclipse.tcf.internal.debug.ui.commands.DetachCommand"
+            icon="icons/detach.gif"
+            label="%Detach.label"
+            menubarPath="additions">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.tcf.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
+      </objectContribution>
+
+      <!-- IWatchInExpressions -->
+      <objectContribution
+            id="org.eclipse.tcf.debug.ui.WatchInExpressions"
+            objectClass="org.eclipse.tcf.internal.debug.ui.model.IWatchInExpressions">
+         <action
+            id="org.eclipse.tcf.debug.ui.actions.WatchInExpressions"
+            class="org.eclipse.tcf.internal.debug.ui.commands.WatchInExpressionsCommand"
+            label="%WatchInExpressions.label"
+            menubarPath="additions">
+            <enablement>
+               <pluginState
+                     value="activated"
+                     id="org.eclipse.tcf.debug.ui">
+               </pluginState>
+            </enablement>
+         </action>
+      </objectContribution>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="%commands.category.name"
+            description="%commands.category.desc"
+            id="org.eclipse.tcf.debug.ui.commands">
+      </category>
+      <command
+           categoryId="org.eclipse.tcf.debug.ui.commands"
+           defaultHandler="org.eclipse.tcf.internal.debug.ui.commands.RefreshHandler"
+           id="org.eclipse.tcf.debug.ui.commands.refresh"
+           name="%Refresh.label"/>
+      <command
+            categoryId="org.eclipse.tcf.debug.ui.commands"
+            defaultHandler="org.eclipse.tcf.internal.debug.ui.commands.ToggleQualifiedTypeNamesHandler"
+            id="org.eclipse.tcf.debug.ui.commands.toggleQualifiedTypeNames"
+            name="%showQualifiedNames.command.name">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.debug.ui.commands"
+            defaultHandler="org.eclipse.tcf.internal.debug.ui.commands.ToggleFilterVariantsHandler"
+            id="org.eclipse.tcf.debug.ui.commands.toggleFilterVariants"
+            name="%filterVariants.command.name">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.debug.ui.commands"
+            id="org.eclipse.tcf.debug.ui.commands.reset"
+            name="%Reset.label">
+         <commandParameter
+               id="org.eclipse.tcf.debug.ui.commands.reset.param.type"
+               name="type"
+               optional="true">
+         </commandParameter>
+      </command>
+      <command
+            categoryId="org.eclipse.tcf.debug.ui.commands"
+            defaultHandler="org.eclipse.tcf.internal.debug.ui.commands.ToggleSuspendAfterResetHandler"
+            id="org.eclipse.tcf.debug.ui.commands.toggleSuspendAfterReset"
+            name="Suspend after reset">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+   </extension>
+
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.tcf.internal.debug.ui.commands.RefreshHandler"
+            commandId="org.eclipse.ui.file.refresh">
+         <activeWhen>
+            <and>
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+               <with variable="activePart">
+                  <test property="org.eclipse.tcf.launch.areUpdatePoliciesSupported"/>
+               </with>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+      		class="org.eclipse.tcf.internal.debug.ui.commands.ViewMemoryCommand"
+      		commandId="org.eclipse.cdt.debug.ui.commands.viewMemory">
+         <activeWhen>
+		    <with variable="selection">
+		        <iterate operator="and">
+		            <instanceof value="org.eclipse.tcf.debug.ui.ITCFObject">
+		            </instanceof>
+		        </iterate>
+		        <count value="+">
+		        </count>
+		    </with>
+         </activeWhen>
+      </handler>
+      <handler
+      		class="org.eclipse.tcf.internal.debug.ui.commands.RestoreDefaultTypeCommand"
+      		commandId="org.eclipse.cdt.debug.ui.command.restoreDefaultType">
+         <activeWhen>
+		    <with variable="selection">
+		        <iterate operator="and">
+		            <instanceof value="org.eclipse.tcf.internal.debug.ui.model.ICastToType">
+		            </instanceof>
+		        </iterate>
+		        <count value="+">
+		        </count>
+		    </with>
+         </activeWhen>
+      </handler>
+      <handler
+      		class="org.eclipse.tcf.internal.debug.ui.commands.CastToTypeCommand"
+      		commandId="org.eclipse.cdt.debug.ui.command.castToType">
+         <activeWhen>
+		    <with variable="selection">
+		        <iterate operator="and">
+		            <instanceof value="org.eclipse.tcf.internal.debug.ui.model.ICastToType">
+		            </instanceof>
+		        </iterate>
+		        <count value="+">
+		        </count>
+		    </with>
+         </activeWhen>
+      </handler>
+      <handler
+      		class="org.eclipse.tcf.internal.debug.ui.commands.CastToArrayCommand"
+      		commandId="org.eclipse.cdt.debug.ui.command.castToArray">
+         <activeWhen>
+		    <with variable="selection">
+		        <iterate operator="and">
+		            <instanceof value="org.eclipse.tcf.internal.debug.ui.model.ICastToType">
+		            </instanceof>
+		        </iterate>
+		        <count value="+">
+		        </count>
+		    </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.eclipse.tcf.internal.debug.ui.commands.ResetHandler"
+            commandId="org.eclipse.tcf.debug.ui.commands.reset">
+         <activeWhen>
+            <with variable="debugContext">
+               <iterate ifEmpty="false" operator="or">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.tcf.launch.canReset"/>
+               </iterate>
+               <count value="1"/>
+            </with>
+         </activeWhen>
+      </handler>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.menus">
+      <!-- Registers View -->
+      <menuContribution
+            locationURI="toolbar:org.eclipse.debug.ui.RegisterView?after=additions">
+         <command
+               commandId="org.eclipse.tcf.debug.ui.commands.refresh"
+               icon="icons/refresh.gif"
+               id="org.eclipse.tcf.debug.ui.commands.refresh.registers"
+               label="%Refresh.label"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:org.eclipse.debug.ui.RegisterView?after=additions">
+         <menu
+               label="%UpdatePolicy.label"
+               id="org.eclipse.tcf.debug.ui.commands.update.policy.registers">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+            <dynamic
+                  id="org.eclipse.tcf.debug.ui.commands.update.policy.registers.menu"
+                  class="org.eclipse.tcf.internal.debug.ui.commands.UpdatePolicyMenu"/>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.debug.ui.RegisterView?after=additions">
+         <command
+          	   commandId="org.eclipse.cdt.debug.ui.commands.viewMemory"
+           	   label="%ViewMemory.label">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <!-- Variables View -->
+      <menuContribution
+            locationURI="toolbar:org.eclipse.debug.ui.VariableView?after=additions">
+         <command
+               commandId="org.eclipse.tcf.debug.ui.commands.refresh"
+               icon="icons/refresh.gif"
+               id="org.eclipse.tcf.debug.ui.commands.refresh.variables"
+               label="%Refresh.label"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:org.eclipse.debug.ui.VariableView?after=additions">
+         <menu
+               label="%UpdatePolicy.label"
+               id="org.eclipse.tcf.debug.ui.commands.update.policy.variables">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+            <dynamic
+                  id="org.eclipse.tcf.debug.ui.commands.update.policy.variables.menu"
+                  class="org.eclipse.tcf.internal.debug.ui.commands.UpdatePolicyMenu"/>
+         </menu>
+         <menu
+               label="%cpp.menu.label"
+               id="org.eclipse.tcf.debug.ui.commands.show.qualified.types.variables">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+            <command
+                  commandId="org.eclipse.tcf.debug.ui.commands.toggleQualifiedTypeNames"
+                  style="toggle">
+            </command>
+         </menu>
+         <menu
+               label="%ada.menu.label"
+               id="org.eclipse.tcf.debug.ui.commands.filter.variants.variables">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+            <command
+                  commandId="org.eclipse.tcf.debug.ui.commands.toggleFilterVariants"
+                  style="toggle">
+            </command>
+         </menu>
+      </menuContribution>
+      <!-- Expressions View -->
+      <menuContribution
+            locationURI="toolbar:org.eclipse.debug.ui.ExpressionView?after=additions">
+         <command
+               commandId="org.eclipse.tcf.debug.ui.commands.refresh"
+               icon="icons/refresh.gif"
+               id="org.eclipse.tcf.debug.ui.commands.refresh.expressions"
+               label="%Refresh.label"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:org.eclipse.debug.ui.ExpressionView?after=additions">
+         <menu
+               label="%UpdatePolicy.label"
+               id="org.eclipse.tcf.debug.ui.commands.update.policy.expressions">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+            <dynamic
+                  id="org.eclipse.tcf.debug.ui.commands.update.policy.expressions.menu"
+                  class="org.eclipse.tcf.internal.debug.ui.commands.UpdatePolicyMenu"/>
+         </menu>
+         <menu
+               label="%cpp.menu.label"
+               id="org.eclipse.tcf.debug.ui.commands.show.qualified.types.expressions">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+            <command
+                  commandId="org.eclipse.tcf.debug.ui.commands.toggleQualifiedTypeNames"
+                  style="toggle">
+            </command>
+         </menu>
+         <menu
+               label="%ada.menu.label"
+               id="org.eclipse.tcf.debug.ui.commands.filter.variants.expressions">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+            <command
+                  commandId="org.eclipse.tcf.debug.ui.commands.toggleFilterVariants"
+                  style="toggle">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.debug.ui.ExpressionView?after=additions">
+         <command
+          	   commandId="org.eclipse.cdt.debug.ui.commands.viewMemory"
+           	   label="%ViewMemory.label">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <!-- Modules View -->
+      <menuContribution
+            locationURI="toolbar:org.eclipse.debug.ui.ModuleView?after=additions">
+         <command
+               commandId="org.eclipse.tcf.debug.ui.commands.refresh"
+               icon="icons/refresh.gif"
+               id="org.eclipse.tcf.debug.ui.commands.refresh.modules"
+               label="%Refresh.label"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:org.eclipse.debug.ui.ModuleView?after=additions">
+         <menu
+               label="%UpdatePolicy.label"
+               id="org.eclipse.tcf.debug.ui.commands.update.policy.modules">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+            <dynamic
+                  id="org.eclipse.tcf.debug.ui.commands.update.policy.modules.menu"
+                  class="org.eclipse.tcf.internal.debug.ui.commands.UpdatePolicyMenu"/>
+         </menu>
+      </menuContribution>
+      <!-- Memory View -->
+      <menuContribution
+            locationURI="toolbar:org.eclipse.debug.ui.MemoryView?after=additions">
+         <command
+               commandId="org.eclipse.tcf.debug.ui.commands.refresh"
+               icon="icons/refresh.gif"
+               id="org.eclipse.tcf.debug.ui.commands.refresh.memory"
+               label="%Refresh.label"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:org.eclipse.debug.ui.MemoryView?after=additions">
+         <menu
+               label="%UpdatePolicy.label"
+               id="org.eclipse.tcf.debug.ui.commands.update.policy.memory">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+            <dynamic
+                  id="org.eclipse.tcf.debug.ui.commands.update.policy.memory.menu"
+                  class="org.eclipse.tcf.internal.debug.ui.commands.UpdatePolicyMenu"/>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.debug.ui.RegisterView?after=additions">
+         <menu
+               label="%RegisterVectorDisplay.label">
+            <dynamic
+                  class="org.eclipse.tcf.internal.debug.ui.commands.RegisterVectorDisplayMenu"
+                  id="org.eclipse.tcf.debug.ui.RegisterVectorDisplayMenu">
+            </dynamic>
+            <visibleWhen
+                  checkEnabled="true">
+            </visibleWhen>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.debug.ui.main.toolbar?after=stepGroup">
+         <command
+               commandId="org.eclipse.tcf.debug.ui.commands.reset"
+               icon="icons/reset.gif"
+               label="%Reset.label"
+               style="pulldown"
+               tooltip="%Reset.tooltip">
+            <visibleWhen checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:org.eclipse.tcf.debug.ui.commands.reset">
+         <dynamic
+               class="org.eclipse.tcf.internal.debug.ui.commands.ResetMenu"
+               id="org.eclipse.tcf.debug.ui.menu.dynamic">
+         </dynamic>
+         <separator
+               name="group.reset"
+               visible="true">
+         </separator>
+         <command
+               commandId="org.eclipse.tcf.debug.ui.commands.toggleSuspendAfterReset"
+               label="Suspend after reset"
+               style="toggle">
+         </command>
+      </menuContribution>
+   </extension>
+
+   <extension
+         point="org.eclipse.debug.ui.memoryRenderings">
+      <renderingBindings
+            defaultIds="org.eclipse.debug.ui.rendering.hexint"
+            primaryId="org.eclipse.debug.ui.rendering.hexint"
+            renderingIds="org.eclipse.debug.ui.rendering.hexint,org.eclipse.debug.ui.rendering.signedint,org.eclipse.debug.ui.rendering.unsignedint,org.eclipse.debug.ui.rendering.ascii,org.eclipse.debug.ui.rendering.raw_memory">
+         <enablement>
+            <instanceof value="org.eclipse.tcf.internal.debug.ui.model.TCFMemoryBlock"/>
+         </enablement>
+      </renderingBindings>
+   </extension>
+
+   <extension point="org.eclipse.debug.ui.debugModelContextBindings">
+      <modelContextBinding
+            contextId="org.eclipse.tcf.debug.ui.debugging"
+            debugModelId="org.eclipse.tcf.debug"/>
+   </extension>
+
+   <extension point="org.eclipse.ui.propertyPages">
+      <page class="org.eclipse.tcf.internal.debug.ui.properties.TCFPropertyPage"
+            id="org.eclipse.tcf.debug.node.propertyPage"
+            name="%propertyPage.name">
+         <filter name="debugModelId" value="org.eclipse.tcf.debug"/>
+         <enabledWhen>
+            <instanceof value="org.eclipse.tcf.internal.debug.ui.model.TCFNode"/>
+         </enabledWhen>
+      </page>
+      <page class="org.eclipse.tcf.internal.debug.ui.properties.TCFBreakpointStatusPage"
+            id="org.eclipse.tcf.breakpoint.status"
+            name="%breakpoints.statusPage.name">
+         <filter name="debugModelId" value="org.eclipse.tcf.debug"/>
+         <enabledWhen>
+            <adapt type="org.eclipse.debug.core.model.IBreakpoint"/>
+         </enabledWhen>
+      </page>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.debug.ui.DebugPreferencePage"
+            class="org.eclipse.tcf.internal.debug.ui.preferences.TCFDebugPreferencePage"
+            id="org.eclipse.tcf.internal.debug.ui.preferences"
+            name="%preferencePage.name">
+         <keywordReference
+               id="org.eclipse.tcf.debug.ui.preference.keywords">
+         </keywordReference>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.keywords">
+      <keyword
+            id="org.eclipse.tcf.debug.ui.preference.keywords"
+            label="tcf debug stack performance">
+      </keyword>
+   </extension>
+
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.tcf.internal.debug.ui.preferences.TCFPreferencesInitializer"/>
+   </extension>
+
+   <extension point="org.eclipse.ui.menus">
+      <!-- Root nodes for the debug view view menu to provide common contribution anchors for
+           debug view context tree filters and sorters -->
+      <menuContribution locationURI="menu:org.eclipse.debug.ui.DebugView?after=additions">
+         <separator name="group.filter" visible="true"/>
+         <menu
+               id="org.eclipse.tcf.debug.ui.DebugView.menu.filters"
+               label="%debugview.menu.filters">
+         </menu>
+         <separator name="group.sort" visible="false"/>
+         <menu
+               id="org.eclipse.tcf.debug.ui.DebugView.menu.sorters"
+               label="%debugview.menu.sorters">
+         </menu>
+         <!-- Menu item to open TCF preferences -->
+         <separator name="group.prefs" visible="false"/>
+         <command
+               commandId="org.eclipse.ui.window.preferences"
+               label="%command.preferences.label"
+               style="push">
+            <parameter
+                  name="preferencePageId"
+                  value="org.eclipse.tcf.internal.debug.ui.preferences">
+            </parameter>
+            <visibleWhen
+                  checkEnabled="false">
+               <with variable="activeContexts">
+                  <iterate ifEmpty="false" operator="or">
+                     <equals value="org.eclipse.tcf.debug.ui.debugging"/>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+
+<!-- Activity contributions -->
+   <extension point="org.eclipse.ui.activities">
+      <category
+            description="%activities.category.debugger.description"
+            id="org.eclipse.tcf.debug.ui.category.debugger"
+            name="%activities.category.debugger.name">
+      </category>
+      <category
+            description="%activities.category.profiler.description"
+            id="org.eclipse.tcf.debug.ui.category.profiler"
+            name="%activities.category.profiler.name">
+      </category>
+
+      <activity
+            description="%activities.activity.debugger.launch.description"
+            id="org.eclipse.tcf.debug.ui.activity.debugger.launch"
+            name="%activities.activity.debugger.launch.name">
+      </activity>
+      <activity
+            description="%activities.activity.debugger.views.description"
+            id="org.eclipse.tcf.debug.ui.activity.debugger.views"
+            name="%activities.activity.debugger.views.name">
+      </activity>
+      <activity
+            description="%activities.activity.profiler.views.description"
+            id="org.eclipse.tcf.debug.ui.activity.profiler.views"
+            name="%activities.activity.profiler.views.name">
+      </activity>
+
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.debug.ui.activity.debugger.views"
+            pattern="org\.eclipse\.tcf\.debug\.ui/.*\.TraceView">
+      </activityPatternBinding>
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.debug.ui.activity.debugger.launch"
+            pattern="org\.eclipse\.tcf\.debug/.*\.LaunchConfigurationType">
+      </activityPatternBinding>
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.debug.ui.activity.debugger.launch"
+            pattern="org\.eclipse\.tcf\.debug\.ui/.*\.TCFShortCut">
+      </activityPatternBinding>
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.debug.ui.activity.debugger.launch"
+            pattern="org\.eclipse\.tcf\.debug\.ui/.*\.LaunchConfiguration.+">
+      </activityPatternBinding>
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.debug.ui.activity.debugger.launch"
+            pattern="org\.eclipse\.tcf\.debug\.ui/.*\.TCFShortCut">
+      </activityPatternBinding>
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.debug.ui.activity.debugger.views"
+            pattern="org\.eclipse\.tcf\.debug\.ui/.*\.TraceView">
+      </activityPatternBinding>
+      <activityPatternBinding
+            activityId="org.eclipse.tcf.debug.ui.activity.profiler.views"
+            pattern="org\.eclipse\.tcf\.debug\.ui/.*\.ProfilerView">
+      </activityPatternBinding>
+
+      <categoryActivityBinding
+            activityId="org.eclipse.tcf.debug.ui.activity.debugger.launch"
+            categoryId="org.eclipse.tcf.debug.ui.category.debugger">
+      </categoryActivityBinding>
+      <categoryActivityBinding
+            activityId="org.eclipse.tcf.debug.ui.activity.debugger.views"
+            categoryId="org.eclipse.tcf.debug.ui.category.debugger">
+      </categoryActivityBinding>
+      <categoryActivityBinding
+            activityId="org.eclipse.tcf.debug.ui.activity.profiler.views"
+            categoryId="org.eclipse.tcf.debug.ui.category.profiler">
+      </categoryActivityBinding>
+
+      <defaultEnablement
+            id="org.eclipse.tcf.debug.ui.activity.debugger.launch">
+      </defaultEnablement>
+      <defaultEnablement
+            id="org.eclipse.tcf.debug.ui.activity.debugger.views">
+      </defaultEnablement>
+      <defaultEnablement
+            id="org.eclipse.tcf.debug.ui.activity.profiler.views">
+      </defaultEnablement>
+   </extension>
+
+</plugin>

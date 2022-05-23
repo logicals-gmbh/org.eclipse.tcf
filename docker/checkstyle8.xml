@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Checkstyle//DTD Check Configuration 1.3//EN" "https://lcmdm.blob.core.windows.net/lc-ci/configuration_1_3.dtd">
+<?xml-stylesheet type="text/xsl" href="checkstyle-stylesheet.xsl"?>
+
+<!--
+    This configuration file was written by the eclipse-cs plugin configuration editor
+-->
+<!--
+    Checkstyle-Configuration: logi.cals
+    Description: none
+-->
+<module name="Checker">
+  <property name="severity" value="warning"/>
+  <property name="fileExtensions" value="java"/>
+  <module name="TreeWalker">
+    <property name="tabWidth" value="2"/>
+    <module name="SuppressWarningsHolder"/>
+    <module name="CyclomaticComplexity">
+      <property name="max" value="7"/>
+    </module>
+    <module name="HiddenField">
+      <property name="tokens" value="VARIABLE_DEF"/>
+    </module>
+    <module name="StringLiteralEquality"/>
+    <module name="UnusedImports"/>
+    <module name="LocalVariableName"/>
+    <module name="RedundantModifier"/>
+    <module name="IllegalThrows"/>
+    <module name="TrailingComment">
+      <property name="legalComment" value="\$NON-NLS-"/>
+    </module>
+    <module name="AnonInnerLength"/>
+    <module name="StaticVariableName"/>
+    <module name="ParameterName"/>
+    <module name="MethodName"/>
+    <module name="FinalClass">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="DefaultComesLast"/>
+    <module name="LocalFinalVariableName"/>
+    <module name="MemberName"/>
+    <module name="EqualsHashCode"/>
+    <module name="VisibilityModifier">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="EmptyStatement"/>
+    <module name="PackageName"/>
+    <module name="ConstantName"/>
+    <module name="ParameterAssignment"/>
+    <module name="HideUtilityClassConstructor">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="SimplifyBooleanExpression"/>
+    <module name="SimplifyBooleanReturn"/>
+    <module name="ModifierOrder"/>
+    <module name="BooleanExpressionComplexity"/>
+    <module name="InnerAssignment"/>
+    <module name="MissingDeprecated"/>
+    <module name="MissingOverride"/>
+    <module name="JavadocMethod">
+      <property name="allowMissingParamTags" value="true"/>
+      <property name="allowMissingReturnTag" value="true"/>
+      <property name="allowMissingJavadoc" value="true"/>
+      <property name="allowMissingPropertyJavadoc" value="true"/>
+      <property name="suppressLoadErrors" value="true"/>
+      <property name="tokens" value="METHOD_DEF"/>
+    </module>
+    <module name="JavadocStyle"/>
+    <module name="AbstractClassName">
+      <property name="format" value="^Abstract.*$"/>
+      <property name="ignoreName" value="true"/>
+    </module>
+    <module name="TypeName"/>
+    <module name="RedundantImport"/>
+    <module name="LineLength">
+      <property name="max" value="150"/>
+    </module>
+    <module name="MethodLength">
+      <property name="max" value="60"/>
+    </module>
+    <module name="ParameterNumber">
+      <property name="max" value="3"/>
+      <property name="tokens" value="METHOD_DEF"/>
+    </module>
+    <module name="ParameterNumber">
+      <property name="max" value="10"/>
+      <property name="tokens" value="CTOR_DEF"/>
+    </module>
+    <module name="OuterTypeNumber"/>
+    <module name="GenericWhitespace"/>
+    <module name="EmptyForInitializerPad"/>
+    <module name="EmptyForIteratorPad"/>
+    <module name="NoWhitespaceAfter">
+      <property name="tokens" value="BNOT,DEC,DOT,INC,LNOT,UNARY_MINUS,UNARY_PLUS,TYPECAST"/>
+    </module>
+    <module name="NoWhitespaceBefore"/>
+    <module name="OperatorWrap"/>
+    <module name="MethodParamPad">
+      <property name="allowLineBreaks" value="true"/>
+    </module>
+    <module name="ParenPad"/>
+    <module name="TypecastParenPad"/>
+    <module name="WhitespaceAfter">
+      <property name="tokens" value="COMMA,SEMI"/>
+    </module>
+    <module name="WhitespaceAround">
+      <property name="allowEmptyConstructors" value="true"/>
+      <property name="allowEmptyMethods" value="true"/>
+    </module>
+    <module name="AvoidNestedBlocks"/>
+    <module name="EmptyBlock"/>
+    <module name="LeftCurly">
+      <property name="option" value="nl"/>
+    </module>
+    <module name="NeedBraces"/>
+    <module name="RightCurly">
+      <property name="option" value="alone"/>
+    </module>
+    <module name="CovariantEquals"/>
+    <module name="DeclarationOrder"/>
+    <module name="EqualsAvoidNull"/>
+    <module name="ExplicitInitialization"/>
+    <module name="FallThrough">
+      <property name="reliefPattern" value="falls? ?through"/>
+    </module>
+    <module name="IllegalCatch"/>
+    <module name="IllegalType">
+      <property name="tokens" value="METHOD_DEF,PARAMETER_DEF,VARIABLE_DEF"/>
+    </module>
+    <module name="ModifiedControlVariable"/>
+    <module name="MultipleVariableDeclarations"/>
+    <module name="NestedForDepth"/>
+    <module name="NestedIfDepth"/>
+    <module name="NestedTryDepth"/>
+    <module name="NoClone"/>
+    <module name="PackageDeclaration"/>
+    <module name="SuperClone"/>
+    <module name="SuperFinalize"/>
+    <module name="UnnecessaryParentheses"/>
+    <module name="OneStatementPerLine"/>
+    <module name="InnerTypeLast"/>
+    <module name="InterfaceIsType">
+      <property name="allowMarkerInterfaces" value="false"/>
+    </module>
+    <module name="MutableException"/>
+    <module name="ClassDataAbstractionCoupling"/>
+    <module name="ClassFanOutComplexity"/>
+    <module name="JavaNCSS"/>
+    <module name="NPathComplexity"/>
+    <module name="ArrayTypeStyle"/>
+    <module name="Indentation">
+      <property name="arrayInitIndent" value="2"/>
+      <property name="basicOffset" value="2"/>
+      <property name="caseIndent" value="2"/>
+      <property name="lineWrappingIndentation" value="2"/>
+      <property name="throwsIndent" value="2"/>
+    </module>
+    <module name="OuterTypeFilename"/>
+    <module name="PackageAnnotation"/>
+    <module name="UpperEll"/>
+    <module name="IllegalImport"/>
+    <module name="MissingSwitchDefault"/>
+    <module name="TodoComment"/>
+    <module name="MagicNumber">
+      <property name="tokens" value="NUM_INT,NUM_LONG"/>
+      <property name="ignoreNumbers" value="-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9"/>
+    </module>
+    <module name="MagicNumber">
+      <property name="tokens" value="NUM_DOUBLE,NUM_FLOAT"/>
+      <property name="ignoreNumbers" value="0.0, 1.0"/>
+    </module>
+    <module name="SuppressWarnings"/>
+    <module name="AnnotationLocation"/>
+    <module name="AnnotationUseStyle"/>
+
+    <module name="OneTopLevelClass"/>
+    <module name="NoFinalizer"/>
+    <module name="AtclauseOrder"/>
+
+    <module name="JavadocTagContinuationIndentation"/>
+    <module name="NonEmptyAtclauseDescription"/>
+    <module name="SingleLineJavadoc"/>
+
+    <module name="CommentsIndentation"/>
+    <module name="LambdaParameterName"/>
+    <module name ="SingleSpaceSeparator"/>
+    <module name="SuppressionCommentFilter"/>
+  </module>
+  <module name="SuppressWarningsFilter"/>
+  <module name="FileTabCharacter">
+    <property name="eachLine" value="true"/>
+  </module>
+  <module name="Translation"/>
+  <module name="RegexpHeader">
+    <property name="header" value="^#!\n^&lt;\?xml.*&gt;$\n^\W*Copyright \(C\) logi.cals GmbH. All rights reserved\.\W*$"/>
+    <property name="multiLines" value="1,2"/>
+  </module>
+  <module name="SuppressWithPlainTextCommentFilter" />
+  <module name="UniqueProperties"/>
+
+
+    <!-- These lines contain the rules that are not checked and the corresponding reasons for deactivation -->
+  <metadata name="com.logicals.annotations.deactivated.AnnotationUseStyle" value="no special preference for the style of annotations"/>
+  <metadata name="com.logicals.annotations.deactivated.AnnotationOnSameLine" value="Contradicts the formatting rules."/>
+  <metadata name="com.logicals.blocksChecks.adapted.LeftCurly" value="according to formatting rules"/>
+  <metadata name="com.logicals.blocksChecks.adapted.RightCurly" value="according to formatting rules"/>
+  <metadata name="com.logicals.blocksChecks.deactivated.EmptyCatchBlock" value="is checked by PMD"/>
+  <metadata name="com.logicals.codingProblems.deactivated.AvoidInlineConditionals" value="Inline conditionals can improve the readability of the code."/>
+  <metadata name="com.logicals.codingProblems.deactivated.FinalLocalVariable" value="Clean code is more important than performance optimizatione"/>
+  <metadata name="com.logicals.codingProblems.deactivated.IllegalInstantiation" value="Substantial effort for configuration"/>
+  <metadata name="com.logicals.codingProblems.deactivated.IllegalToken" value="Substantial effort for configuration"/>
+  <metadata name="com.logicals.codingProblems.deactivated.IllegalTokenText" value="Substantial effort for configuration"/>
+  <metadata name="com.logicals.codingProblems.deactivated.JunitTestCase" value="No longer relevant after JUnit 4."/>
+  <metadata name="com.logicals.codingProblems.deactivated.MissingCtor" value="Default Constructor may be used."/>
+  <metadata name="com.logicals.codingProblems.deactivated.MultipleStringLiterals" value="is checked by PMD"/>
+  <metadata name="com.logicals.codingProblems.deactivated.RequireThis" value="If all members are always prefixed with 'this.', it makes the code less readable. There is also the rule 'Hidden Field', which prevents a field from being overwritten by a local variable."/>
+  <metadata name="com.logicals.codingProblems.deactivated.ReturnCount" value="Usage of this rule leads to unnecessary variables and unreadable code."/>
+  <metadata name="com.logicals.codingProblems.deactivated.ArrayTrailingComma" value="The last element of an array initialization should NOT end with a comma. Otherwise it looks like incomplete code."/>
+  <metadata name="com.logicals.codingProblems.deactivated.VariableDeclarationUsageDistance" value="Sometimes it makes sense to define variables e.g. at the beginning of a method or in a common block."/>
+  <metadata name="com.logicals.codingProblems.deactivated.OverloadMethodsDeclarationOrder" value="The grouping of overloaded methods is not always beneficial. Example: Private methods that are used within only one public method should be placed immediately after this method."/>
+  <metadata name="com.logicals.codingProblems.adapted.HiddenField" value="It is allowed that parameters are hiding fields. This is not allowed for local variables."/>
+  <metadata name="com.logicals.codingProblems.adapted.RedundantThrows" value="internal errors of checkstyle should not abort the compile"/>
+  <metadata name="com.logicals.codingProblems.adapted.FallThrough" value="Fallthrough is allowed when the comment 'falls? ?through' is used in the case statement."/>
+  <metadata name="com.logicals.codingProblems.adapted.IllegalType" value="used for methods, parameters and variables"/>
+  <metadata name="com.logicals.codingProblems.adapted.InterfaceIsType" value="Interfaces must contain methods"/>
+  <metadata name="com.logicals.codingProblems.adapted.MagicNumber.1" value="used for INT and LONG; allowed numbers: -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9"/>
+  <metadata name="com.logicals.codingProblems.adapted.MagicNumber.2" value="for DOUBLE and FLOAT; allowed numbers: 0.0, 1.0"/>
+  <metadata name="com.logicals.codingProblems.adapted.ReturnCount" value="A maximum of 5 returns is allowed"/>
+  <metadata name="com.logicals.classDesign.deactivated.DesignForExtension" value="'final' modifier should not be used at each method, where it is possible. This is 'clutter'."/>
+  <metadata name="com.logicals.classDesign.deactivated.ThrowsCount" value="Some Eclipse Interfaces declare several exceptions."/>
+  <metadata name="com.logicals.miscellaneous.deactivated.DescendantToken" value="Not needed, because most of the checks which can be realized with this rule are already performed by other rules. Example: No default in a switch statement."/>
+  <metadata name="com.logicals.miscellaneous.deactivated.NewlineAtEndOfFile" value="It is not necessary, that files end with a newline"/>
+  <metadata name="com.logicals.miscellaneous.deactivated.FinalParameters" value="Because of other rules, this would mean that ALL parameters ALWAYS must have the 'final' modifier. This is 'clutter. Clean code is more important than performance optimization"/>
+  <metadata name="com.logicals.miscellaneous.deactivated.UncommentedMain" value="does not makes sense, because we have an application structure where a package can have more entry points."/>
+  <metadata name="com.logicals.miscellaneous.deactivated.AvoidEscapedUnicodeCharacters" value="There may be code locations where it is necessary to escape the characters."/>
+  <metadata name="com.logicals.miscellaneous.adapted.Indentation" value="according to formatting rules"/>
+  <metadata name="com.logicals.miscellaneous.adapted.TrailingComment" value="NON-NLS (Eclipse Marker for strings that will not be localized) are allowed."/>
+  <metadata name="com.logicals.modifiers.deactivated.InterfaceMemberImpliedModifier" value="Using modifiers that are implied in interfaces is clutter. The rule 'RedundantModifier' is used instead."/>
+  <metadata name="com.logicals.namingConventions.deactivated.ClassTypeParameterName" value="This rule hinders restricted generics."/>
+  <metadata name="com.logicals.namingConventions.adapted.AbstractClassName" value="Only classes whose names begin with 'Abstract' must be abstract."/>
+  <metadata name="com.logicals.namingConventions.deactivated.MethodTypeParameterName" value="Parameter names do not have special naming convention."/>
+  <metadata name="com.logicals.namingConventions.deactivated.InterfaceTypeParameterName" value="Parameter names do not have special naming convention."/>
+  <metadata name="com.logicals.namingConventions.deactivated.AbbreviationAsWordInName" value="Rule would check too restrictive naming conventions"/>
+  <metadata name="com.logicals.namingConventions.deactivated.CatchParameterName" value="Rule checks naming conventions that are not meaningful."/>
+  <metadata name="com.logicals.headers.adapted.RegexpHeader" value="There may be a Bash- or XML-header before the copyright. The first or second line must contain 'Copyright (C) logi.cals automation solutions and services GmbH. All rights reserved.'."/>
+  <metadata name="com.logicals.headers.deactivated.Header" value="The rule 'Regexp Header' is used instead."/>
+  <metadata name="com.logicals.imports.deactivated.AvoidStarImport" value="Imports of whole packages are allowed"/>
+  <metadata name="com.logicals.imports.deactivated.AvoidStaticImport" value="Static imports may be used"/>
+  <metadata name="com.logicals.imports.deactivated.ImportOrder" value="Contradicts the Eclipse formatter."/>
+  <metadata name="com.logicals.imports.deactivated.ImportControl" value="Substantial effort for configuration, control is done by review."/>
+  <metadata name="com.logicals.imports.deactivated.CustomImportOrder" value="Imports do not need to be sorted"/>
+  <metadata name="com.logicals.javadocComments.deactivated.PackageJavadoc" value="Javadoc is not necessary for all packages (e.g. unit tests)."/>
+  <metadata name="com.logicals.javadocComments.deactivated.TypeJavadoc" value="not all types need Javadoc"/>
+  <metadata name="com.logicals.javadocComments.deactivated.VariableJavadoc" value="Variables should not have a Javadoc."/>
+  <metadata name="com.logicals.javadocComments.deactivated.WriteTag" value="Write Tag is not used"/>
+  <metadata name="com.logicals.javadocComments.adapted.MethodJavadoc" value="Exceptions must be documented, everything else can be omitted in appropriate situations (e.g. unit tests or when the documentation is unnecessary)."/>
+  <metadata name="com.logicals.javadocComments.deactivated.JavadocTagContinuationIndentation" value="Not relevant, is formatted by the formatter."/>
+  <metadata name="com.logicals.javadocComments.deactivated.SummaryJavadoc" value="Too restrictive"/>
+  <metadata name="com.logicals.javadocComments.deactivated.SingeLineJavadoc" value="Writing single-line Javadocs can also be useful."/>
+  <metadata name="com.logicals.javadocComments.deactivated.JavadocVariable" value="No need for Javadoc for each variable"/>
+  <metadata name="com.logicals.javadocComments.deactivated.JavadocType" value="No need for Javadoc for each class."/>
+  <metadata name="com.logicals.javadocComments.deactivated.JavadocPackage" value="No need for Javadoc for each package."/>
+  <metadata name="com.logicals.javadocComments.deactivated.JavadocParagraph" value="Contradicts the Eclipse formatter."/>
+  <metadata name="com.logicals.metrics.adapted.CyclomaticComplexity" value="maximum: 7"/>
+  <metadata name="com.logicals.regexp.deactivated.RegexpSingleline" value="No custom rules are used."/>
+  <metadata name="com.logicals.regexp.deactivated.RegexpMultiline" value="No custom rules are used."/>
+  <metadata name="com.logicals.regexp.deactivated.RegexpSingleLineJava" value="No custom rules are used."/>
+  <metadata name="com.logicals.regexp.deactivated.Regexp" value="No custom rules are used."/>
+  <metadata name="com.logicals.regexp.deactivated.RegexpOnFilename" value="No custom rules are used."/>
+  <metadata name="com.logicals.sizeViolations.deactivated.ExecutableStatementCount" value="Not necessary. Code size is already validated by other rules."/>
+  <metadata name="com.logicals.sizeViolations.deactivated.MethodCount" value="Is indirectly checked by other rules for file length and method length."/>
+  <metadata name="com.logicals.sizeViolations.adapted.LineLength" value="Maximum of 150 characters"/>
+  <metadata name="com.logicals.sizeViolations.adapted.MethodLength" value="Maximum of 60 lines"/>
+  <metadata name="com.logicals.sizeViolations.adapted.ParameterNumber.1" value="Maximum of 3 parameters per method"/>
+  <metadata name="com.logicals.sizeViolations.adapted.ParameterNumber.2" value="Maximum of 10 parameters in constructors"/>
+  <metadata name="com.logicals.sizeViolations.adapted.FileLength" value="Maximum of 400 lines"/>
+  <metadata name="com.logicals.whitespace.adapted.NoWhitespaceAfter" value="according to formatting rules"/>
+  <metadata name="com.logicals.whitespace.adapted.MethodParamPad" value="according to formatting rules"/>
+  <metadata name="com.logicals.whitespace.adapted.TypecastParenPad" value="according to formatting rules"/>
+  <metadata name="com.logicals.whitespace.adapted.WhitespaceAfter" value="according to formatting rules"/>
+  <metadata name="com.logicals.whitespace.adapted.WhitespaceAround" value="according to formatting rules"/>
+  <metadata name="com.logicals.whitespace.adapted.FileTabCharacter" value="according to formatting rules"/>
+  <metadata name="com.logicals.whitespace.deactivated.EmptyLineSeparator" value="Not relevant, is formatted by the formatter."/>
+  <metadata name="com.logicals.whitespace.deactivated.SeparatorWrap" value="Not relevant, is formatted by the formatter."/>
+  <metadata name="com.logicals.whitespace.deactivated.SingleSpaceSeparator" value="Not relevant, is formatted by the formatter."/>
+  <metadata name="com.logicals.filters.deactivated.SeverityMatchFilter" value="Severity level is not used"/>
+  <metadata name="com.logicals.filters.deactivated.SuppressionFilter" value="Suppressions are directly done in the source code"/>
+  <metadata name="com.logicals.filters.deactivated.BeforeExecutionExclusionFileFilter" value="Exclusions are not configured via this filter."/>
+  <metadata name="com.logicals.filters.additional.SuppressWithPlainTextCommentFilter" value="offCommentFormat: CHECKSTYLE IGNORE (\w+) FOR NEXT (\d+) LINES; checkFormat: $1;"/>
+</module>
