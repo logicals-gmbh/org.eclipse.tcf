@@ -79,7 +79,9 @@ pipeline {
       logParser parsingRulesPath: 'jenkins/jenkins.logparserplugin.rules',
                 projectRulePath: 'jenkins/jenkins.logparserplugin.rules',
                 showGraphs: true,
-                useProjectRule: true
+                useProjectRule: true,
+                failBuildOnError: true,
+                unstableOnWarning: true
       junit allowEmptyResults: true, testResults: 'test-results/**/*.xml'
     }
   }

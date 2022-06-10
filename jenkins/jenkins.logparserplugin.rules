@@ -26,6 +26,12 @@ info /^.*\[WARNING\] Bundle-ClassPath entry.*/
 info /^.*\[WARNING\] /src/plugins/org.eclipse.tcf.debug/build.properties:.*/
 info /^.*\[WARNING\] No system packages found in profile nor toolchain for JavaSE-18.*/
 
+# Fail job when there are build errors
+error /^.*FAILURE.*$/
+error /(?i)^\[error\].*$/
+error /^.*Failed to execute goal.*$/
+error /^Caused by: .*$/
+
 #
 # Generic Rules for errors and warnings
 #

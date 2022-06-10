@@ -8,13 +8,17 @@ import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.eclipse.paho.mqttv5.client.IMqttToken;
+import org.eclipse.paho.mqttv5.client.MqttCallback;
+import org.eclipse.paho.mqttv5.client.MqttClient;
+import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
+import org.eclipse.paho.mqttv5.client.MqttDisconnectResponse;
+import org.eclipse.paho.mqttv5.client.persist.MemoryPersistence;
+import org.eclipse.paho.mqttv5.common.MqttException;
+import org.eclipse.paho.mqttv5.common.MqttMessage;
+import org.eclipse.paho.mqttv5.common.MqttSubscription;
+import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
+
 import org.eclipse.tcf.internal.core.Token;
 import org.eclipse.tcf.protocol.IPeer;
 import org.eclipse.tcf.protocol.Protocol;
@@ -23,7 +27,7 @@ import org.eclipse.tcf.services.ILocator;
 /**
  * ChannelMQTT implements TCF channel over MQTT protocol.
  *
- * @since 1.7
+ * @since 1.7.2
  */
 public class ChannelMQTT extends AbstractChannel implements MqttCallback {
 
@@ -31,8 +35,7 @@ public class ChannelMQTT extends AbstractChannel implements MqttCallback {
     public static final int ESC = 3;
     private static int id_cnt = 0;
     private final String id = UUID.randomUUID().toString() + "-" + Integer.toHexString(id_cnt++);
-    private String inboundTopic;
-    private String outboundTopic;
+    private String tcfTopic;
     private AtomicBoolean stoppedLock = new AtomicBoolean(false);
     private boolean stopped;
     private byte[] wr_buf = new byte[0x1000];
@@ -51,24 +54,27 @@ public class ChannelMQTT extends AbstractChannel implements MqttCallback {
         callback = this;
         final MemoryPersistence persistence = new MemoryPersistence();
         final String broker = remote_peer.getAttributes().get(MqttPeer.ATTR_BROKER_ID);
-        inboundTopic = remote_peer.getAttributes().get(MqttPeer.ATTR_INBOUND_TOPIC);
-        outboundTopic = remote_peer.getAttributes().get(MqttPeer.ATTR_OUTBOUND_TOPIC);
+        tcfTopic = remote_peer.getAttributes().get(MqttPeer.ATTR_TCF_TOPIC);
         try {
+            tcfTopic = remote_peer.getAttributes().get(MqttPeer.ATTR_TCF_TOPIC);
             mqttClient = new MqttClient(broker, id, persistence);
             mqttClient.setCallback(callback);
-            final MqttConnectOptions connOpts = new MqttConnectOptions();
+            final MqttConnectionOptions connOpts = new MqttConnectionOptions();
             connOpts.setUserName(getUsername(remote_peer));
             connOpts.setPassword(getPassword(remote_peer));
-            connOpts.setCleanSession(true);
+            connOpts.setCleanStart(true);
             mqttClient.connect(connOpts);
-            mqttClient.subscribe(getInboundTopic());
+
+            MqttSubscription opts = new MqttSubscription(getTcfTopic(), 1);
+            opts.setNoLocal(true);
+            mqttClient.subscribe(new MqttSubscription[] { opts });
         }
         catch (MqttException exception) {
             // TODO Auto-generated catch block
             exception.printStackTrace();
         }
     }
-    
+
     public void init()
     {
         Protocol.invokeLater(new Runnable() {
@@ -80,14 +86,14 @@ public class ChannelMQTT extends AbstractChannel implements MqttCallback {
         });
     }
 
-    private char[] getPassword(final IPeer remote_peer) {
+    private byte[] getPassword(final IPeer remote_peer) {
         String password = remote_peer.getAttributes().get(MqttPeer.ATTR_PASSWORD);
-        return password.isEmpty() ? null : password.toCharArray(); 
+        return password.isEmpty() ? null : password.getBytes();
     }
 
     private String getUsername(final IPeer remote_peer) {
         String userName = remote_peer.getUserName();
-        return userName.isEmpty() ? null : userName; 
+        return userName.isEmpty() ? null : userName;
     }
 
     @Override
@@ -161,7 +167,7 @@ public class ChannelMQTT extends AbstractChannel implements MqttCallback {
         }
 
         try {
-            mqttClient.unsubscribe(getOutboundTopic());
+            mqttClient.unsubscribe(getTcfTopic());
             mqttClient.disconnect();
             mqttClient.close();
         }
@@ -170,12 +176,8 @@ public class ChannelMQTT extends AbstractChannel implements MqttCallback {
         }
     }
 
-    private String getOutboundTopic() {
-        return outboundTopic;
-    }
-
-    private String getInboundTopic() {
-        return inboundTopic;
+    private String getTcfTopic() {
+        return tcfTopic;
     }
 
     private void checkEndOfString(final int i) throws Exception {
@@ -261,7 +263,7 @@ public class ChannelMQTT extends AbstractChannel implements MqttCallback {
 
         final MqttMessage message = new MqttMessage(content.getBytes());
         message.setQos(1);
-        mqttClient.publish(getOutboundTopic(), message);
+        mqttClient.publish(getTcfTopic(), message);
     }
 
     @Override
@@ -314,7 +316,7 @@ public class ChannelMQTT extends AbstractChannel implements MqttCallback {
 
             /**
              * Reads bytes from a channel
-             * 
+             *
              * @param end
              *            the first byte character
              * @return a byte array containing all the bytes read
@@ -346,7 +348,7 @@ public class ChannelMQTT extends AbstractChannel implements MqttCallback {
             /**
              * Reads complete strings made of bytes and return the Java string
              * that it forms
-             * 
+             *
              * @return string containing all the bytes read
              * @throws IOException
              *             if it finds EOM or EOS reading from input stream
@@ -538,16 +540,6 @@ public class ChannelMQTT extends AbstractChannel implements MqttCallback {
     }
 
     @Override
-    public void connectionLost(final Throwable arg0) {
-        Protocol.log("MQTT connection lost", arg0);
-    }
-
-    @Override
-    public void deliveryComplete(final IMqttDeliveryToken arg0) {
-        // no implementation needed
-    }
-
-    @Override
     protected int read() throws IOException {
 
         while (!isStopped());
@@ -569,5 +561,35 @@ public class ChannelMQTT extends AbstractChannel implements MqttCallback {
 
     public AtomicBoolean getIsInitialized() {
         return initialized;
+    }
+
+    @Override
+    public void authPacketArrived(int arg0, MqttProperties arg1)
+    {
+    }
+
+    @Override
+    public void connectComplete(boolean arg0, String arg1)
+    {
+    }
+
+    @Override
+    public void deliveryComplete(IMqttToken arg0)
+    {
+    }
+
+    @Override
+    public void disconnected(MqttDisconnectResponse e)
+    {
+        Protocol.log("Disconnected from MQTT broker: " + e.getReasonString(), e.getException());
+        synchronized (stoppedLock) {
+            this.stopped = true;
+        }
+    }
+
+    @Override
+    public void mqttErrorOccurred(MqttException e)
+    {
+        Protocol.log("MQTT error occurred: " + e.getLocalizedMessage(), e);
     }
 }

@@ -11,9 +11,7 @@ Eclipse-LazyStart: true
 Bundle-Activator: org.eclipse.tcf.internal.Activator
 Import-Package: org.osgi.framework,
  org.osgi.service.packageadmin,
- org.osgi.util.tracker,
- org.eclipse.paho.client.mqttv3,
- org.eclipse.paho.client.mqttv3.persist
+ org.osgi.util.tracker
 Export-Package: org.eclipse.tcf.core;version="1.7.2",
  org.eclipse.tcf.internal;x-internal:=true,
  org.eclipse.tcf.internal.core;x-internal:=true,
@@ -23,3 +21,4 @@ Export-Package: org.eclipse.tcf.core;version="1.7.2",
  org.eclipse.tcf.services;version="1.7.2",
  org.eclipse.tcf.util;version="1.7.2"
 Automatic-Module-Name: org.eclipse.tcf.core
+Bundle-ClassPath: lib/org.eclipse.paho.mqttv5.client-1.2.5.jar
