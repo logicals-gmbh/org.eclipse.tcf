@@ -823,7 +823,7 @@ public class LocatorService implements ILocator {
                         if (buf[0] == 127) network_prefix_len = 8;
                     }
                     if (broadcast == null) {
-                        // Java 1.7.0 on Linux returns broadcast == null for loop-back interface
+                        // Java 1.7.2 on Linux returns broadcast == null for loop-back interface
                         broadcast = address;
                     }
                 }

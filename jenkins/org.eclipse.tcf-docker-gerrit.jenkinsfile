@@ -74,4 +74,13 @@ pipeline {
             }
         }
     }
+    post {
+    always {
+      logParser parsingRulesPath: 'jenkins/jenkins.logparserplugin.rules',
+                projectRulePath: 'jenkins/jenkins.logparserplugin.rules',
+                showGraphs: true,
+                useProjectRule: true
+      junit allowEmptyResults: true, testResults: 'test-results/**/*.xml'
+    }
+  }
 }

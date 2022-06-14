@@ -1,0 +1,43 @@
+###########################################################################################################################################
+#
+# Parsing rules for warnings and errors related to the CI (Jenkins, Docker)
+#
+# NOTICE:
+# This file is parsed from top to bottom and the first matching rule is applied.
+# We use the section 'info' for our rules to keep the quick access links in the CI but still allow the build to pass.
+# If you add a rule ensure that you also add a comment that specifies why it is okay for the specific line to pass.
+#
+###########################################################################################################################################
+
+# Test results
+info /Tests run:.*Errors: 0/
+
+# Fakeroot causes warnings when updating packages, e.g., update-alternatives: warning: skip creation of /usr/share/man/man1/fakeroot.1.gz because associated file /usr/share/man/man1/fakeroot-sysv.1.gz (of link group fakeroot) doesn't exist
+info /update-alternatives: warning: skip creation of .* because associated file .* doesn't exist.*/
+
+# Ignore unmatched cancel notification from MonacoEditor
+info /WARNING: Unmatched cancel notification for request id/
+
+# Ignore weird errors for visualstudio application insights
+info /root ERROR TypeError: Failed to fetch/
+info /root ERROR .*hosted-plugin:.* ApplicationInsights:CorrelationIdManager.*/
+info /.*Error: getaddrinfo EAI_AGAIN dc.services.visualstudio.com/
+info /^.*\[WARNING\] Bundle-ClassPath entry.*/
+info /^.*\[WARNING\] /src/plugins/org.eclipse.tcf.debug/build.properties:.*/
+info /^.*\[WARNING\] No system packages found in profile nor toolchain for JavaSE-18.*/
+
+#
+# Generic Rules for errors and warnings
+#
+
+# error level
+error /ERROR/
+error /Error/
+error /] error/
+error /SEVERE/
+
+# warning level
+warning /WARNING/
+warning /Warning/
+warning /warning/
+warning /WARN/
