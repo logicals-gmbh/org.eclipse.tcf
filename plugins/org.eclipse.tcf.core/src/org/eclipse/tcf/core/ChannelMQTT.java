@@ -46,21 +46,27 @@ public class ChannelMQTT extends AbstractChannel implements MqttCallback {
     byte[] read_payload = new byte[0];
     private AtomicBoolean initialized = new AtomicBoolean();
 
-    public ChannelMQTT(final IPeer remote_peer) throws MqttException {
+    public ChannelMQTT(final IPeer remote_peer) {
         super(remote_peer);
         callback = this;
         final MemoryPersistence persistence = new MemoryPersistence();
         final String broker = remote_peer.getAttributes().get(MqttPeer.ATTR_BROKER_ID);
         inboundTopic = remote_peer.getAttributes().get(MqttPeer.ATTR_INBOUND_TOPIC);
         outboundTopic = remote_peer.getAttributes().get(MqttPeer.ATTR_OUTBOUND_TOPIC);
-        mqttClient = new MqttClient(broker, id, persistence);
-        mqttClient.setCallback(callback);
-        final MqttConnectOptions connOpts = new MqttConnectOptions();
-        connOpts.setUserName(getUsername(remote_peer));
-        connOpts.setPassword(getPassword(remote_peer));
-        connOpts.setCleanSession(true);
-        mqttClient.connect(connOpts);
-        mqttClient.subscribe(getInboundTopic());
+        try {
+            mqttClient = new MqttClient(broker, id, persistence);
+            mqttClient.setCallback(callback);
+            final MqttConnectOptions connOpts = new MqttConnectOptions();
+            connOpts.setUserName(getUsername(remote_peer));
+            connOpts.setPassword(getPassword(remote_peer));
+            connOpts.setCleanSession(true);
+            mqttClient.connect(connOpts);
+            mqttClient.subscribe(getInboundTopic());
+        }
+        catch (MqttException exception) {
+            // TODO Auto-generated catch block
+            exception.printStackTrace();
+        }
     }
     
     public void init()

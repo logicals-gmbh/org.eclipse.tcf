@@ -138,12 +138,7 @@ public class TransportManager {
 
             public IChannel openChannel(final IPeer peer) {
                 assert getName().equals(peer.getTransportName());
-                try {
-                    return new ChannelMQTT(peer);
-                }
-                catch (final MqttException exception) {
-                    return null;
-                }
+                return new ChannelMQTT(peer);
             }
 
         });
