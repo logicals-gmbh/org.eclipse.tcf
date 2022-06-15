@@ -23,3 +23,6 @@ Export-Package: org.eclipse.tcf.core;version="1.7.2",
  org.eclipse.tcf.services;version="1.7.2",
  org.eclipse.tcf.util;version="1.7.2"
 Automatic-Module-Name: org.eclipse.tcf.core
+Bundle-ClassPath: lib/org.eclipse.paho.mqttv5.client-1.2.5.jar,
+ lib/org.eclipse.paho.mqttv5.client-1.2.5-sources.jar,
+ .

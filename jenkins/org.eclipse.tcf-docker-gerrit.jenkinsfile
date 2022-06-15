@@ -1,11 +1,10 @@
 import utils.build.PipelineUtil
-import utils.build.MavenUtil
 
-PIPELINE_UTIL = new utils.build.PipelineUtil()
+PIPELINE_UTIL = new PipelineUtil()
 
 pipeline {
     agent {
-        label "LinuxDocker"
+        label 'LinuxDocker'
     }
     parameters {
         string name: 'GERRIT_REFSPEC', defaultValue: 'master'
@@ -17,20 +16,20 @@ pipeline {
         gerrit gerritProjects: [[pattern: 'org.eclipse.tcf', branches: [[compareType: 'ANT', pattern: '**']], triggerOnEvents: [draftPublished(), patchsetCreated()], compareType: 'PLAIN', disableStrictForbiddenFileVerification: false]], serverName: 'defaultServer'
     }
     stages {
-        stage("Clean ws") {
+        stage('Clean ws') {
             steps {
                 cleanWs()
             }
         }
-        stage("Checkout Repository") {
+        stage('Checkout Repository') {
             steps {
                 script {
-                    if (env.GERRIT_REFSPEC.equals("master") || env.GERRIT_REFSPEC.equals("") || env.GERRIT_REFSPEC.isEmpty()) {
+                    if (env.GERRIT_REFSPEC.equals('master') || env.GERRIT_REFSPEC.equals('') || env.GERRIT_REFSPEC.isEmpty()) {
                         checkout poll: false,
                             scm: [$class: 'GitSCM', branches: [[name: 'master']],
                                     doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
                                     userRemoteConfigs: [[url: 'http://gerrit.ow.ks:9000/org.eclipse.tcf']]]
-                        sh "git submodule update --init --recursive"
+                        sh 'git submodule update --init --recursive'
                     } else {
                         println "Checking out $GERRIT_REFSPEC"
                         checkout poll: false,
@@ -41,19 +40,18 @@ pipeline {
                                                 submoduleCfg: [],
                                                 userRemoteConfigs: [[refspec: '$GERRIT_REFSPEC',
                                                                     url: 'http://gerrit.ow.ks:9000/org.eclipse.tcf']]]
-                        sh "git submodule update --init --recursive"
+                        sh 'git submodule update --init --recursive'
                     }
                 }
             }
         }
-        stage("Build") {
+        stage('Build') {
             steps {
                 timestamps {
                     withCredentials([
                         [$class: 'UsernamePasswordMultiBinding', credentialsId: '323d7685-d554-4c46-ab0b-e69673a6c893', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME']
                     ]) {
                         script {
-
                             try {
                                 sh '''
                                 set +x
@@ -79,8 +77,10 @@ pipeline {
       logParser parsingRulesPath: 'jenkins/jenkins.logparserplugin.rules',
                 projectRulePath: 'jenkins/jenkins.logparserplugin.rules',
                 showGraphs: true,
-                useProjectRule: true
+                useProjectRule: true,
+                failBuildOnError: true,
+                unstableOnWarning: true
       junit allowEmptyResults: true, testResults: 'test-results/**/*.xml'
     }
-  }
+    }
 }

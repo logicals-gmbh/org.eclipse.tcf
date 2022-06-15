@@ -37,9 +37,5 @@
 <unit id="org.hamcrest" version="1.1.0.v20090501071000"/>
 <repository location="https://download.eclipse.org/tools/orbit/downloads/drops/R20211213173813/repository/"/>
 </location>
-<location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-	<repository location="https://download.eclipse.org/paho/releases/1.2.5/Java/"/>
-	<unit id="org.eclipse.paho.client.mqttv3" version="0.0.0"/>
-</location>
 </locations>
 </target>

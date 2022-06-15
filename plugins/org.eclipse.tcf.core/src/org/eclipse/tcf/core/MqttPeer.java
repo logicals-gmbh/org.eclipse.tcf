@@ -14,8 +14,7 @@ public class MqttPeer extends TransientPeer
   public static final String ATTR_BROKER_ID = "BrokerId";
   public static final String ATTR_PASSWORD = "Password";
   public static final String ATTR_SESSION_ID = "SessionId";
-  public static final String ATTR_INBOUND_TOPIC = "inboundTopic";
-  public static final String ATTR_OUTBOUND_TOPIC = "outboundTopic";
+  public static final String ATTR_TCF_TOPIC = "tcfTopic";
 
   public MqttPeer(final Map<String, String> attrs)
   {

@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.tcf.core.AbstractChannel;
 import org.eclipse.tcf.core.ChannelHTTP;
 import org.eclipse.tcf.core.ChannelMQTT;
