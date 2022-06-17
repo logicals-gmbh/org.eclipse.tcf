@@ -69,6 +69,19 @@
         <orbit-site>https://download.eclipse.org/tools/orbit/downloads/drops/R20150124073747/repository/</orbit-site>
     </properties>
 
+    <distributionManagement>
+        <repository>
+        <id>logicals-libs-release</id>
+        <name>logicals-libs-release</name>
+        <url>https://artifactory.logicals.com/artifactory/libs-release-local</url>
+        </repository>
+        <snapshotRepository>
+        <id>logicals-libs-snapshot-local</id>
+        <name>logicals-snapshots</name>
+        <url>https://artifactory.logicals.com/artifactory/libs-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <repositories>
         <repository>
             <id>license-feature</id>
